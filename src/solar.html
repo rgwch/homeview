@@ -1,0 +1,23 @@
+<template>
+    <div class="container"  style="border-color: blue;border-width:2px;border-style:solid">
+        <h2>Solaranlage</h2>
+        <div class="row">
+            <div class="col-sm-4">
+                <h3>Tagesenergie</h3>
+                ${day_energy} kWh
+            </div>
+            <div class="col-sm-4">
+                <h3>Jahresenergie</h3>
+                ${year_energy} kWh
+            </div>
+            <div class="col-sm-4">
+                <h3>Gesamt</h3>
+                ${total_energy} MWh
+            </div>
+        </div>
+        <div id="graph" class="area">
+            <h3>Momentane Leistung</h3>
+
+        </div>
+    </div>
+</template>
