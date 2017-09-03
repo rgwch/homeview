@@ -24,6 +24,7 @@ export class Solar {
   private x
   private width
   private resizing = false
+  private timer=null
 
   private update_dimensions() {
     if (!this.resizing) {
@@ -44,7 +45,15 @@ export class Solar {
     }
   }
 
+  detached(){
+    if(this.timer!=null){
+      clearTimeout(this.timer)
+    }
+    this.timer=null
+  }
+
   attached() {
+    console.log("attached")
     this.svg = d3.select("#graph").append("svg")
       .attr("width", "90%")
       .attr("height", height)
@@ -70,7 +79,7 @@ export class Solar {
       .attr("x", padding + 5)
       .attr("y", 25)
 
-    setInterval(() => {
+    this.timer=setInterval(() => {
       this.update()
     }, 10000)
 

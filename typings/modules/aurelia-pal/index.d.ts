@@ -207,6 +207,13 @@ export interface Dom {
   createElement(tagName: string): Element;
   
   /**
+    * Creates the specified HTML attribute
+    * @param name A string that specifies the name of attribute to be created.
+    * @return The created attribute.
+    */
+  createAttribute(name: string): Attr;
+  
+  /**
     * Creates a new Text node.
     * @param text A string to populate the new Text node.
     * @return A Text node.
@@ -225,6 +232,12 @@ export interface Dom {
     * @return A DocumentFragment.
     */
   createDocumentFragment(): DocumentFragment;
+  
+  /**
+    * Creates a new HTMLTemplateElement.
+    * @return An HTMLTemplateElement.
+    */
+  createTemplateElement(): HTMLTemplateElement;
   
   /**
     * Creates a new MutationObserver.
