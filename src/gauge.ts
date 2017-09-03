@@ -9,6 +9,7 @@ export class Gauge {
 
   constructor(private placeholderName, configuration) {
     this.configure(configuration)
+    //this.render()
   }
 
 
@@ -17,35 +18,48 @@ export class Gauge {
 
     this.config.size = this.config.size * 0.9;
 
-    this.config.raduis = this.config.size * 0.97 / 2;
+    this.config.radius = this.config.size * 0.97 / 2;
     this.config.cx = this.config.size / 2;
     this.config.cy = this.config.size / 2;
 
     this.config.min = undefined != configuration.min ? configuration.min : 0;
     this.config.max = undefined != configuration.max ? configuration.max : 100;
+    this.config.suffix = undefined != configuration.suffix ? configuration.suffix : "";
     this.config.range = this.config.max - this.config.min;
 
     this.config.majorTicks = configuration.majorTicks || 5;
     this.config.minorTicks = configuration.minorTicks || 2;
 
     this.config.greenColor = configuration.greenColor || "#109618";
-    this.config.yellowColor = configuration.yellowColor || "#FF9900";
+    this.config.yellowColor = configuration.yellowColor || "#ffd74c";
     this.config.redColor = configuration.redColor || "#DC3912";
 
     this.config.transitionDuration = configuration.transitionDuration || 500;
+
+    this.config.captHeight= undefined != configuration.captHeight ? configuration.captHeight : 20
   }
 
   render() {
-    this.body = d3.select("#" + this.placeholderName)
-      .append("svg:svg")
+    this.body = d3.select("#" + this.placeholderName).append("svg:svg")
       .attr("class", "gauge")
       .attr("width", this.config.size)
-      .attr("height", this.config.size);
+      .attr("height", this.config.size+this.config.captHeight);
+
+    if(this.config.captHeight>0) {
+      this.body.append("svg:text")
+        .classed("captionText", true)
+        .attr("x", this.config.cx)
+        .attr("y", this.config.size + this.config.captHeight)
+        .attr("dy", -2)
+        .attr("dx",-5)
+        .text("test")
+    }
+
 
     this.body.append("svg:circle")
       .attr("cx", this.config.cx)
       .attr("cy", this.config.cy)
-      .attr("r", this.config.raduis)
+      .attr("r", this.config.radius)
       .style("fill", "#ccc")
       .style("stroke", "#000")
       .style("stroke-width", "0.5px");
@@ -53,7 +67,7 @@ export class Gauge {
     this.body.append("svg:circle")
       .attr("cx", this.config.cx)
       .attr("cy", this.config.cy)
-      .attr("r", 0.9 * this.config.raduis)
+      .attr("r", 0.9 * this.config.radius)
       .style("fill", "#fff")
       .style("stroke", "#e0e0e0")
       .style("stroke-width", "2px");
@@ -139,7 +153,7 @@ export class Gauge {
       .y(function (d) {
         return d.y
       })
-      //.interpolate("basis");
+    //.interpolate("basis");
 
     pointerContainer.selectAll("path")
       .data([pointerPath])
@@ -153,7 +167,7 @@ export class Gauge {
     pointerContainer.append("svg:circle")
       .attr("cx", this.config.cx)
       .attr("cy", this.config.cy)
-      .attr("r", 0.12 * this.config.raduis)
+      .attr("r", 0.12 * this.config.radius)
       .style("fill", "#4684EE")
       .style("stroke", "#666")
       .style("opacity", 1);
@@ -171,7 +185,7 @@ export class Gauge {
       .style("fill", "#000")
       .style("stroke-width", "0px");
 
-    this.redraw(this.config.min, 0);
+    this.redraw(this.config.min, "-", 0);
   }
 
   buildPointerPath(value) {
@@ -200,8 +214,8 @@ export class Gauge {
 
   valueToPoint(value, factor) {
     return {
-      x: this.config.cx - this.config.raduis * factor * Math.cos(this.valueToRadians(value)),
-      y: this.config.cy - this.config.raduis * factor * Math.sin(this.valueToRadians(value))
+      x: this.config.cx - this.config.radius * factor * Math.cos(this.valueToRadians(value)),
+      y: this.config.cy - this.config.radius * factor * Math.sin(this.valueToRadians(value))
     };
   }
 
@@ -213,17 +227,20 @@ export class Gauge {
       .attr("d", d3.arc()
         .startAngle(this.valueToRadians(start))
         .endAngle(this.valueToRadians(end))
-        .innerRadius(0.65 * this.config.raduis)
-        .outerRadius(0.85 * this.config.raduis))
+        .innerRadius(0.65 * this.config.radius)
+        .outerRadius(0.85 * this.config.radius))
       .attr("transform", () => {
         return "translate(" + this.config.cx + ", " + this.config.cy + ") rotate(270)"
       });
   }
 
-  redraw(value, transitionDuration) {
+  redraw(value, caption, transitionDuration) {
     var pointerContainer = this.body.select(".pointerContainer");
+    pointerContainer.selectAll("text").text(Math.round(value)+this.config.suffix);
 
-    pointerContainer.selectAll("text").text(Math.round(value));
+    if(undefined != caption) {
+      this.body.selectAll(".captionText").text(caption)
+    }
 
     var pointer = pointerContainer.selectAll("path");
     pointer.transition()
@@ -231,7 +248,7 @@ export class Gauge {
       //.delay(0)
       //.ease("linear")
       //.attr("transform", function(d)
-      .attrTween("transform",  ()=> {
+      .attrTween("transform", () => {
         var pointerValue = value;
         if (value > this.config.max) pointerValue = this.config.max + 0.02 * this.config.range;
         else if (value < this.config.min) pointerValue = this.config.min - 0.02 * this.config.range;
@@ -239,11 +256,12 @@ export class Gauge {
         var currentRotation = this._currentRotation || targetRotation;
         this._currentRotation = targetRotation;
 
-        return (step)=> {
+        return (step) => {
           var rotation = currentRotation + (targetRotation - currentRotation) * step;
           return "translate(" + this.config.cx + ", " + this.config.cy + ") rotate(" + rotation + ")";
         }
       });
+
   }
 
   valueToDegrees(value) {

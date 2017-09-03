@@ -1,9 +1,13 @@
 <template>
   <div class="container">
-    <p>Innentemperatur: ${inside_temp} - Luftfeuchte: ${inside_humid}%</p>
-    <p>Aussentemperatur: ${outside_temp} - Luftfeuchte: ${outside_humid}%</p>
-  </div>
-  <div id="temp_gauge">
-    test
+    <div class="row">
+
+      <div class="col-sm-5 col-md-3 col-lg-2">
+        <div id="humid_gauge_inside"></div>
+      </div>
+      <div class="col-sm-5 col-md-3 col-lg-2">
+        <div id="humid_gauge_outside"></div>
+      </div>
+    </div>
   </div>
 </template>
