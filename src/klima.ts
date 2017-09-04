@@ -1,4 +1,3 @@
-import {Gauge} from './components/gauge'
 import {autoinject} from 'aurelia-framework'
 import {FetchClient} from './services/fetchclient'
 
@@ -18,15 +17,7 @@ export class Klima{
   private inside_humid_gauge;
   private outside_humid_gauge;
 
-  constructor(private fetcher:FetchClient){}
-
-  detached(){
-    if(this.timer!=null){
-      clearTimeout(this.timer)
-    }
-    this.timer=null
-  }
-  attached(){
+  constructor(private fetcher:FetchClient){
     let config={
       size:180,
       label: "innen",
@@ -41,14 +32,22 @@ export class Klima{
     }
     let config2= Object.assign({},config)
     config2.label="aussen"
-    this.inside_humid_gauge=new Gauge('humid_gauge_inside',config)
-    this.outside_humid_gauge=new Gauge('humid_gauge_outside',config2)
+    this.inside_humid_gauge=config
+    this.outside_humid_gauge=config2
+
+  }
+
+  detached(){
+    if(this.timer!=null){
+      clearTimeout(this.timer)
+    }
+    this.timer=null
+  }
+  attached(){
     this.update()
     this.timer=setInterval(()=>{
       this.update()
     },10000)
-    this.inside_humid_gauge.render()
-    this.outside_humid_gauge.render()
   }
 
   async update(){
@@ -56,7 +55,7 @@ export class Klima{
     this.inside_humid=await this.fetcher.fetchJson(`http://${server}/get/${_inside_humid}`)
     this.outside_humid=await this.fetcher.fetchJson(`http://${server}/get/${_outside_humid}`)
     this.outside_temp=await this.fetcher.fetchJson(`http://${server}/get/${_outside_temp}`)
-    this.inside_humid_gauge.redraw(this.inside_humid, this.inside_temp)
-    this.outside_humid_gauge.redraw(this.outside_humid, this.outside_temp)
+    //this.inside_humid_gauge.redraw(this.inside_humid, this.inside_temp)
+    //this.outside_humid_gauge.redraw(this.outside_humid, this.outside_temp)
   }
 }

@@ -8,11 +8,11 @@ export class Gauge {
   private body
   private _currentRotation
 
-  constructor() {
-    this.configure()
-    //this.render()
-  }
 
+  attached(){
+    this.configure()
+    this.render()
+  }
 
   configure() {
   
