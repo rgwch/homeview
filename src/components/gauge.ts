@@ -1,17 +1,26 @@
 /*
  http://bl.ocks.org/tomerd/1499279
  */
-import {bindable} from 'aurelia-framework';
+import {bindable, autoinject} from 'aurelia-framework';
+import {EventAggregator} from "aurelia-event-aggregator"
 import * as d3 from "d3";
+
+@autoinject
 export class Gauge {
   @bindable config
   private body
   private _currentRotation
 
+  constructor(private ea:EventAggregator){
+
+  }
 
   attached(){
     this.configure()
     this.render()
+    this.ea.subscribe(this.config.event, data =>{
+      this.redraw(data.humidity,data.temp,500)
+    })
   }
 
   configure() {

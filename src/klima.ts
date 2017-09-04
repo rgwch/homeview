@@ -1,5 +1,6 @@
 import {autoinject} from 'aurelia-framework'
 import {FetchClient} from './services/fetchclient'
+import {EventAggregator} from "aurelia-event-aggregator"
 
 const server="192.168.16.140:8087"
 const _inside_temp='hm-rpc.1.000E5569A24A0E.1.ACTUAL_TEMPERATURE'
@@ -17,8 +18,9 @@ export class Klima{
   private inside_humid_gauge;
   private outside_humid_gauge;
 
-  constructor(private fetcher:FetchClient){
+  constructor(private fetcher:FetchClient, private ea:EventAggregator){
     let config={
+      event: "inside_change",
       size:180,
       label: "innen",
       min: 20,
@@ -32,6 +34,7 @@ export class Klima{
     }
     let config2= Object.assign({},config)
     config2.label="aussen"
+    config2.event="outside_change"
     this.inside_humid_gauge=config
     this.outside_humid_gauge=config2
 
@@ -55,6 +58,9 @@ export class Klima{
     this.inside_humid=await this.fetcher.fetchJson(`http://${server}/get/${_inside_humid}`)
     this.outside_humid=await this.fetcher.fetchJson(`http://${server}/get/${_outside_humid}`)
     this.outside_temp=await this.fetcher.fetchJson(`http://${server}/get/${_outside_temp}`)
+    this.ea.publish(this.inside_humid_gauge.event,{temp:this.inside_temp, humidity: this.inside_humid})
+    this.ea.publish(this.outside_humid_gauge.event,{temp:this.outside_temp, humidity: this.outside_humid})
+
     //this.inside_humid_gauge.redraw(this.inside_humid, this.inside_temp)
     //this.outside_humid_gauge.redraw(this.outside_humid, this.outside_temp)
   }
