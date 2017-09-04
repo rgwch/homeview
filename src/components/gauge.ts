@@ -1,5 +1,5 @@
 /*
- http://bl.ocks.org/tomerd/1499279
+ derived from: http://bl.ocks.org/tomerd/1499279
  */
 import {bindable, autoinject} from 'aurelia-framework';
 import {EventAggregator} from "aurelia-event-aggregator"
@@ -23,7 +23,7 @@ export class Gauge {
     this.configure()
     this.render()
     this.ea.subscribe(this.config.event, data =>{
-      this.redraw(data.humidity,data.temp,500)
+      this.redraw(data.humidity,data.temp,this.config.transitionDuration)
     })
   }
 
@@ -33,8 +33,8 @@ export class Gauge {
     this.config.cx = this.config.size / 2;
     this.config.cy = this.config.size / 2;
 
-    this.config.min = undefined != this.config.min ? this.config.min : 0;
-    this.config.max = undefined != this.config.max ? this.config.max : 100;
+    this.config.min = this.config.min || 0;
+    this.config.max = this.config.max || 100;
     this.config.suffix = undefined != this.config.suffix ? this.config.suffix : "";
     this.config.range = this.config.max - this.config.min;
 
@@ -47,8 +47,8 @@ export class Gauge {
 
     this.config.transitionDuration = this.config.transitionDuration || 500;
 
-    this.config.captHeight= undefined != this.config.captHeight ? this.config.captHeight : 0
-    this.config.captSuffix= undefined != this.config.captSuffix ? this.config.captSuffix : ""
+    this.config.captHeight= this.config.captHeight || 0
+    this.config.captSuffix= this.config.captSuffix || ""
   }
 
   render() {
@@ -58,7 +58,7 @@ export class Gauge {
       .attr("height", this.config.size+this.config.captHeight);
 
     if(this.config.captHeight>0) {
-      let fontSize=this.config.captHeight-2
+      const captFontSize=this.config.captHeight-2
       this.body.append("svg:rect")
         .classed("captionRect",true)
         .attr("x", "4")
@@ -72,7 +72,7 @@ export class Gauge {
         .classed("captionText", true)
         .attr("x", this.config.cx)
         .attr("y", this.config.size + this.config.captHeight-4)
-        .style("font-size",fontSize+"px")
+        .style("font-size",captFontSize+"px")
         .text("test")
         .attr("text-anchor","middle")
     }
@@ -107,25 +107,25 @@ export class Gauge {
     }
 
     if (undefined != this.config.label) {
-      var fontSize = Math.round(this.config.size / 9);
+      const configFontSize = Math.round(this.config.size / 9);
       this.body.append("svg:text")
         .attr("x", this.config.cx)
-        .attr("y", this.config.cy / 2 + fontSize / 2)
-        .attr("dy", fontSize / 2)
+        .attr("y", this.config.cy / 2 + configFontSize / 2)
+        .attr("dy", configFontSize / 2)
         .attr("text-anchor", "middle")
         .text(this.config.label)
-        .style("font-size", fontSize + "px")
+        .style("font-size", configFontSize + "px")
         .style("fill", "#333")
         .style("stroke-width", "0px");
     }
 
-    var fontSize = Math.round(this.config.size / 16);
-    var majorDelta = this.config.range / (this.config.majorTicks - 1);
-    for (var major = this.config.min; major <= this.config.max; major += majorDelta) {
-      var minorDelta = majorDelta / this.config.minorTicks;
-      for (var minor = major + minorDelta; minor < Math.min(major + majorDelta, this.config.max); minor += minorDelta) {
-        var point1 = this.valueToPoint(minor, 0.75);
-        var point2 = this.valueToPoint(minor, 0.85);
+    let fontSiz = Math.round(this.config.size / 16);
+    let majorDelta = this.config.range / (this.config.majorTicks - 1);
+    for (let major = this.config.min; major <= this.config.max; major += majorDelta) {
+      let minorDelta = majorDelta / this.config.minorTicks;
+      for (let minor = major + minorDelta; minor < Math.min(major + majorDelta, this.config.max); minor += minorDelta) {
+        let point1 = this.valueToPoint(minor, 0.75);
+        let point2 = this.valueToPoint(minor, 0.85);
 
         this.body.append("svg:line")
           .attr("x1", point1.x)
@@ -136,8 +136,8 @@ export class Gauge {
           .style("stroke-width", "1px");
       }
 
-      var point1 = this.valueToPoint(major, 0.7);
-      var point2 = this.valueToPoint(major, 0.85);
+      let point1 = this.valueToPoint(major, 0.7);
+      let point2 = this.valueToPoint(major, 0.85);
 
       this.body.append("svg:line")
         .attr("x1", point1.x)
@@ -148,27 +148,27 @@ export class Gauge {
         .style("stroke-width", "2px");
 
       if (major == this.config.min || major == this.config.max) {
-        var point = this.valueToPoint(major, 0.63);
+        let point = this.valueToPoint(major, 0.63);
 
         this.body.append("svg:text")
           .attr("x", point.x)
           .attr("y", point.y)
-          .attr("dy", fontSize / 3)
+          .attr("dy", fontSiz / 3)
           .attr("text-anchor", major == this.config.min ? "start" : "end")
           .text(major)
-          .style("font-size", fontSize + "px")
+          .style("font-size", fontSiz + "px")
           .style("fill", "#333")
           .style("stroke-width", "0px");
       }
     }
 
-    var pointerContainer = this.body.append("svg:g").attr("class", "pointerContainer");
+    const pointerContainer = this.body.append("svg:g").attr("class", "pointerContainer");
 
-    var midValue = (this.config.min + this.config.max) / 2;
+    const midValue = (this.config.min + this.config.max) / 2;
 
-    var pointerPath = this.buildPointerPath(midValue);
+    const pointerPath = this.buildPointerPath(midValue);
 
-    var pointerLine = d3.line()
+    const pointerLine = d3.line()
       .x(function (d) {
         return d.x
       })
@@ -194,7 +194,7 @@ export class Gauge {
       .style("stroke", "#666")
       .style("opacity", 1);
 
-    var fontSize = Math.round(this.config.size / 10);
+    let fontSize = Math.round(this.config.size / 10);
     pointerContainer.selectAll("text")
       .data([midValue])
       .enter()
@@ -211,16 +211,16 @@ export class Gauge {
   }
 
   buildPointerPath(value) {
-    var delta = this.config.range / 13;
+    const delta = this.config.range / 13;
 
-    var head = this.valueToPointX(value, 0.85);
-    var head1 = this.valueToPointX(value - delta, 0.12);
-    var head2 = this.valueToPointX(value + delta, 0.12);
+    const head = this.valueToPointX(value, 0.85);
+    const head1 = this.valueToPointX(value - delta, 0.12);
+    const head2 = this.valueToPointX(value + delta, 0.12);
 
-    var tailValue = value - (this.config.range * (1 / (270 / 360)) / 2);
-    var tail = this.valueToPointX(tailValue, 0.28);
-    var tail1 = this.valueToPointX(tailValue - delta, 0.12);
-    var tail2 = this.valueToPointX(tailValue + delta, 0.12);
+    const tailValue = value - (this.config.range * (1 / (270 / 360)) / 2);
+    const tail = this.valueToPointX(tailValue, 0.28);
+    const tail1 = this.valueToPointX(tailValue - delta, 0.12);
+    const tail2 = this.valueToPointX(tailValue + delta, 0.12);
 
     return [head, head1, tail2, tail, tail1, head2, head];
 
@@ -228,7 +228,7 @@ export class Gauge {
   }
 
   valueToPointX(value, factor) {
-    var point = this.valueToPoint(value, factor);
+    const point = this.valueToPoint(value, factor);
     point.x -= this.config.cx;
     point.y -= this.config.cy;
     return point;
@@ -257,7 +257,7 @@ export class Gauge {
   }
 
   redraw(value, caption, transitionDuration) {
-    var pointerContainer = this.body.select(".pointerContainer");
+    const pointerContainer = this.body.select(".pointerContainer");
     pointerContainer.selectAll("text").text(Math.round(value)+this.config.suffix);
 
     if(undefined != caption) {
@@ -265,22 +265,22 @@ export class Gauge {
       this.body.selectAll(".captionText").text(caption+this.config.captSuffix)
     }
 
-    var pointer = pointerContainer.selectAll("path");
+    const pointer = pointerContainer.selectAll("path");
     pointer.transition()
       .duration(undefined != transitionDuration ? transitionDuration : this.config.transitionDuration)
       //.delay(0)
       //.ease("linear")
       //.attr("transform", function(d)
       .attrTween("transform", () => {
-        var pointerValue = value;
+        let pointerValue = value;
         if (value > this.config.max) pointerValue = this.config.max + 0.02 * this.config.range;
         else if (value < this.config.min) pointerValue = this.config.min - 0.02 * this.config.range;
-        var targetRotation = (this.valueToDegrees(pointerValue) - 90);
-        var currentRotation = this._currentRotation || targetRotation;
+        const targetRotation = (this.valueToDegrees(pointerValue) - 90);
+        const currentRotation = this._currentRotation || targetRotation;
         this._currentRotation = targetRotation;
 
         return (step) => {
-          var rotation = currentRotation + (targetRotation - currentRotation) * step;
+          const rotation = currentRotation + (targetRotation - currentRotation) * step;
           return "translate(" + this.config.cx + ", " + this.config.cy + ") rotate(" + rotation + ")";
         }
       });
