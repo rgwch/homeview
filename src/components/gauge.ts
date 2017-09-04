@@ -1,46 +1,45 @@
 /*
  http://bl.ocks.org/tomerd/1499279
  */
+import {bindable} from 'aurelia-framework';
 import * as d3 from "d3";
 export class Gauge {
-  private config
+  @bindable config
   private body
   private _currentRotation
 
-  constructor(private placeholderName, configuration) {
-    this.configure(configuration)
+  constructor() {
+    this.configure()
     //this.render()
   }
 
 
-  configure(configuration) {
-    this.config = configuration;
-
+  configure() {
+  
     this.config.size = this.config.size * 0.9;
-
     this.config.radius = this.config.size * 0.97 / 2;
     this.config.cx = this.config.size / 2;
     this.config.cy = this.config.size / 2;
 
-    this.config.min = undefined != configuration.min ? configuration.min : 0;
-    this.config.max = undefined != configuration.max ? configuration.max : 100;
-    this.config.suffix = undefined != configuration.suffix ? configuration.suffix : "";
+    this.config.min = undefined != this.config.min ? this.config.min : 0;
+    this.config.max = undefined != this.config.max ? this.config.max : 100;
+    this.config.suffix = undefined != this.config.suffix ? this.config.suffix : "";
     this.config.range = this.config.max - this.config.min;
 
-    this.config.majorTicks = configuration.majorTicks || 5;
-    this.config.minorTicks = configuration.minorTicks || 2;
+    this.config.majorTicks = this.config.majorTicks || 5;
+    this.config.minorTicks = this.config.minorTicks || 2;
 
-    this.config.greenColor = configuration.greenColor || "#109618";
-    this.config.yellowColor = configuration.yellowColor || "#ffd74c";
-    this.config.redColor = configuration.redColor || "#DC3912";
+    this.config.greenColor = this.config.greenColor || "#109618";
+    this.config.yellowColor = this.config.yellowColor || "#ffd74c";
+    this.config.redColor = this.config.redColor || "#DC3912";
 
-    this.config.transitionDuration = configuration.transitionDuration || 500;
+    this.config.transitionDuration = this.config.transitionDuration || 500;
 
-    this.config.captHeight= undefined != configuration.captHeight ? configuration.captHeight : 20
+    this.config.captHeight= undefined != this.config.captHeight ? this.config.captHeight : 20
   }
 
   render() {
-    this.body = d3.select("#" + this.placeholderName).append("svg:svg")
+    this.body = d3.select(".gaugehost").append("svg:svg")
       .attr("class", "gauge")
       .attr("width", this.config.size)
       .attr("height", this.config.size+this.config.captHeight);

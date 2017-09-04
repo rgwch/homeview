@@ -1,13 +1,8 @@
 <template>
+  <require from="components/gauge"></require>
   <div class="container">
     <div class="row">
-
-      <div class="col-sm-5 col-md-3 col-lg-2">
-        <div id="humid_gauge_inside"></div>
-      </div>
-      <div class="col-sm-5 col-md-3 col-lg-2">
-        <div id="humid_gauge_outside"></div>
-      </div>
+      <gauge config.bind="humid_gauge_inside"></gauge>
     </div>
   </div>
 </template>
