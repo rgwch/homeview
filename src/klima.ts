@@ -22,7 +22,7 @@ export class Klima{
     let config={
       event: "inside_change",
       size:150,
-      label: "innen",
+      label: "Wohnen",
       min: 20,
       max: 80,
       suffix: "%",
@@ -31,7 +31,7 @@ export class Klima{
       greenZones:[{from: 40, to: 60 }],
       redZones: [{from: 20, to:30},{from: 70, to: 80}],
       yellowZones: [{from: 30, to: 40},{from: 60, to:70}],
-      captHeight:20,
+      captHeight:22,
       captSuffix: " °C"
     }
     let config2= Object.assign({},config)
