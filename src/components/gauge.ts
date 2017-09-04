@@ -11,9 +11,7 @@ export class Gauge {
   private body
   private _currentRotation
 
-  constructor(private ea:EventAggregator){
-
-  }
+  constructor(private ea:EventAggregator){}
 
   attached(){
     this.configure()
@@ -24,7 +22,6 @@ export class Gauge {
   }
 
   configure() {
-  
     this.config.size = this.config.size * 0.9;
     this.config.radius = this.config.size * 0.97 / 2;
     this.config.cx = this.config.size / 2;
@@ -45,6 +42,7 @@ export class Gauge {
     this.config.transitionDuration = this.config.transitionDuration || 500;
 
     this.config.captHeight= undefined != this.config.captHeight ? this.config.captHeight : 20
+    this.config.captSuffix= undefined != this.config.captSuffix ? this.config.captSuffix : ""
   }
 
   render() {
@@ -54,13 +52,22 @@ export class Gauge {
       .attr("height", this.config.size+this.config.captHeight);
 
     if(this.config.captHeight>0) {
+      let fontSize=this.config.captHeight
+      this.body.append("svg:rect")
+        .attr("x", "2")
+        .attr("y",this.config.size)
+        .attr("width",this.config.size-2)
+        .attr("height",this.config.captHeight)
+        .attr("stroke","green")
+        .attr("stroke-width",1)
+        .attr("fill","#ccc")
       this.body.append("svg:text")
         .classed("captionText", true)
         .attr("x", this.config.cx)
-        .attr("y", this.config.size + this.config.captHeight)
-        .attr("dy", -2)
-        .attr("dx",-5)
+        .attr("y", this.config.size + this.config.captHeight-2)
+        .style("font-size",fontSize+"px")
         .text("test")
+        .attr("text-anchor","middle")
     }
 
 
@@ -247,7 +254,7 @@ export class Gauge {
     pointerContainer.selectAll("text").text(Math.round(value)+this.config.suffix);
 
     if(undefined != caption) {
-      this.body.selectAll(".captionText").text(caption)
+      this.body.selectAll(".captionText").text(caption+this.config.captSuffix)
     }
 
     var pointer = pointerContainer.selectAll("path");
