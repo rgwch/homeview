@@ -1,6 +1,10 @@
-import {bindable, autoinject} from 'aurelia-framework';
+import {autoinject, bindable} from 'aurelia-framework';
 import {EventAggregator} from "aurelia-event-aggregator"
 import * as d3 from "d3";
+
+const arcsize = 15
+const lower = 15
+const upper = 165
 
 @autoinject
 export class Doublegauge {
@@ -13,7 +17,9 @@ export class Doublegauge {
   private upperValue
   private lowerValue
 
-  constructor(private ea: EventAggregator) {}
+
+  constructor(private ea: EventAggregator) {
+  }
 
   attached() {
     this.configure()
@@ -35,10 +41,10 @@ export class Doublegauge {
 
     this.upperScale = d3.scaleLinear()
       .domain([this.config.topMin, this.config.topMax])
-      .range([15, 165])
+      .range([lower, upper])
     this.lowerScale = d3.scaleLinear()
       .domain([this.config.bottomMin, this.config.bottomMax])
-      .range([165, 15])
+      .range([upper, lower])
   }
 
   render() {
@@ -51,8 +57,8 @@ export class Doublegauge {
     this.rectangle(this.body, 5, 5, this.config.size - 10, this.config.size - 10, "blue", "white")
     let center = this.config.size / 2
     let size = (this.config.size / 2) * 0.9
-    this.arch(this.body, center, center, size - 15, size, this.deg2rad(this.upperScale(this.config.topMin)), this.deg2rad(this.upperScale(this.config.topMax)), "blue", 270)
-    this.arch(this.body, center, center, size - 15, size, this.deg2rad(this.lowerScale(this.config.bottomMin)), this.deg2rad(this.lowerScale(this.config.bottomMax)), "green", 90)
+    this.arch(this.body, center, center, size - arcsize, size, this.deg2rad(this.upperScale(this.config.topMin)), this.deg2rad(this.upperScale(this.config.topMax)), "blue", 270)
+    this.arch(this.body, center, center, size - arcsize, size, this.deg2rad(this.lowerScale(this.config.bottomMin)), this.deg2rad(this.lowerScale(this.config.bottomMax)), "green", 90)
     this.upperArrow = this.arrow(this.body, center, center, center, 10, "red")
     this.lowerArrow = this.arrow(this.body, center, center, center, center + size, "green")
 
@@ -64,17 +70,23 @@ export class Doublegauge {
       .attr("stroke", "steelblue")
 
     let valuesFontSize = Math.round(size / 5)
-    this.upperValue = this.stringElem(this.body, center, center - size / 2, valuesFontSize)
-    this.lowerValue = this.stringElem(this.body, center, center + size / 2, valuesFontSize)
-    this.body.append("svg:text")
-      .attr("x",)
+    this.upperValue = this.stringElem(this.body, center, center - size / 2, valuesFontSize,"middle")
+    this.lowerValue = this.stringElem(this.body, center, center + size / 2, valuesFontSize,"middle")
+    let lp=this.valueToPointTop(this.config.topMin,1)
+    let markersFontSize=Math.round(size/6)
+    this.stringElem(this.body,center-lp.x,center-lp.y,markersFontSize,"start")
+      .text(this.config.topMin)
+    lp=this.valueToPointTop(this.config.topMax,1)
+    this.stringElem(this.body,center-lp.x,center-lp.y,markersFontSize, "end")
+      .text(this.config.topMax)
+
   }
 
-  stringElem(parent, x, y, size) {
+  stringElem(parent, x, y, size, align) {
     return parent.append("svg:text")
       .attr("x", x)
       .attr("y", y)
-      .attr("text-anchor", "middle")
+      .attr("text-anchor", align)
       .attr("dy", size / 2)
       .style("font-size", size + "px")
       .style("fill", "black")
@@ -92,7 +104,7 @@ export class Doublegauge {
   }
 
   arch(parent, x, y, inner, outer, start, end, color, rotation) {
-    let gen=d3.arc()
+    let gen = d3.arc()
       .startAngle(start)
       .endAngle(end)
       .innerRadius(inner)
@@ -120,12 +132,22 @@ export class Doublegauge {
     return deg * Math.PI / 180
   }
 
+
+  valueToPointTop(value, factor) {
+    let arc = this.upperScale(value)
+    let rad=this.deg2rad(arc)
+    let r = (this.config.size / 2) * 0.9 -arcsize
+    let x = r * Math.cos(rad)
+    let y = r * Math.sin(rad)
+    return {"x":x,"y":y}
+  }
+
   redraw(top, bottom) {
     let center = this.config.size / 2
     let valTop = this.upperScale(top)
     let valBottom = this.lowerScale(bottom)
-    this.upperArrow.attr("transform", `rotate(${valTop},${center},${center})`)
-    this.lowerArrow.attr("transform", `rotate(${valBottom},${center},${center})`)
+    this.upperArrow.attr("transform", `rotate(${valTop-90},${center},${center})`)
+    this.lowerArrow.attr("transform", `rotate(${valBottom-90},${center},${center})`)
     this.upperValue.text(top + this.config.topSuffix)
     this.lowerValue.text(bottom + this.config.bottomSuffix)
   }
