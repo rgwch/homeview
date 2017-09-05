@@ -94,17 +94,20 @@ export class Gauge {
       .style("stroke", "#e0e0e0")
       .style("stroke-width", "2px");
 
-    for (let index in this.config.greenZones) {
-      this.drawBand(this.config.greenZones[index].from, this.config.greenZones[index].to, this.config.greenColor);
-    }
+    /**
+     * Draw zones of different colors
+     */
+    this.config.greenZones.forEach(zone=>{
+      this.drawBand(zone.from, zone.to, this.config.greenColor);
+    })
 
-    for (let index in this.config.yellowZones) {
-      this.drawBand(this.config.yellowZones[index].from, this.config.yellowZones[index].to, this.config.yellowColor);
-    }
+    this.config.yellowZones.forEach(zone=>{
+      this.drawBand(zone.from,zone.to,this.config.yellowColor)
+    })
 
-    for (let index in this.config.redZones) {
-      this.drawBand(this.config.redZones[index].from, this.config.redZones[index].to, this.config.redColor);
-    }
+    this.config.redZones.forEach(zone=>{
+      this.drawBand(zone.from,zone.to,this.config.redColor)
+    })
 
     if (undefined != this.config.label) {
       const configFontSize = Math.round(this.config.size / 9);
