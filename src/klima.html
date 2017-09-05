@@ -1,9 +1,12 @@
 <template>
   <require from="components/gauge"></require>
+  <require from="components/doublegauge"></require>
   <div class="container">
     <div class="row">
       <gauge config.bind="inside_humid_gauge"></gauge>
       <gauge config.bind="outside_humid_gauge"></gauge>
+      <doublegauge config.bind="empty"></doublegauge>
     </div>
+
   </div>
 </template>

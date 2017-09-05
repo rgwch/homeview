@@ -26,6 +26,7 @@
     "e2e": "gulp serve e2e"
   },
   "devDependencies": {
+    "@types/node": "^8.0.26",
     "aurelia-bundler": "^0.4.0",
     "aurelia-protractor-plugin": "^1.0.0",
     "aurelia-tools": "^1.0.0",
@@ -88,6 +89,7 @@
     "devDependencies": {}
   },
   "dependencies": {
+    "@types/d3": "^4.10.0",
     "@types/d3-selection": "^1.1.0",
     "aurelia-event-aggregator": "^1.0.1",
     "d3": "^4.10.0"

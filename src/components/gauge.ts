@@ -12,18 +12,18 @@ export class Gauge {
   private _currentRotation
   private color
 
-  constructor(private ea:EventAggregator){
-    this.color=d3.scaleLinear()
-      .domain([-10,40])
+  constructor(private ea: EventAggregator) {
+    this.color = d3.scaleLinear()
+      .domain([-10, 40])
       .range(["#a6e0ff", "#ffaca9"])
 
   }
 
-  attached(){
+  attached() {
     this.configure()
     this.render()
-    this.ea.subscribe(this.config.event, data =>{
-      this.redraw(data.humidity,data.temp,this.config.transitionDuration)
+    this.ea.subscribe(this.config.event, data => {
+      this.redraw(data.humidity, data.temp, this.config.transitionDuration)
     })
   }
 
@@ -47,34 +47,34 @@ export class Gauge {
 
     this.config.transitionDuration = this.config.transitionDuration || 500;
 
-    this.config.captHeight= this.config.captHeight || 0
-    this.config.captSuffix= this.config.captSuffix || ""
+    this.config.captHeight = this.config.captHeight || 0
+    this.config.captSuffix = this.config.captSuffix || ""
   }
 
   render() {
     this.body = d3.select(".gaugehost").append("svg:svg")
       .attr("class", "gauge")
       .attr("width", this.config.size)
-      .attr("height", this.config.size+this.config.captHeight);
+      .attr("height", this.config.size + this.config.captHeight);
 
-    if(this.config.captHeight>0) {
-      const captFontSize=this.config.captHeight-2
+    if (this.config.captHeight > 0) {
+      const captFontSize = this.config.captHeight - 2
       this.body.append("svg:rect")
-        .classed("captionRect",true)
+        .classed("captionRect", true)
         .attr("x", "4")
-        .attr("y",this.config.size)
-        .attr("width",this.config.size-8)
-        .attr("height",this.config.captHeight-2)
-        .attr("stroke","green")
-        .attr("stroke-width",2)
-        .attr("fill","#ccc")
+        .attr("y", this.config.size)
+        .attr("width", this.config.size - 8)
+        .attr("height", this.config.captHeight - 2)
+        .attr("stroke", "green")
+        .attr("stroke-width", 2)
+        .attr("fill", "#ccc")
       this.body.append("svg:text")
         .classed("captionText", true)
         .attr("x", this.config.cx)
-        .attr("y", this.config.size + this.config.captHeight-4)
-        .style("font-size",captFontSize+"px")
+        .attr("y", this.config.size + this.config.captHeight - 4)
+        .style("font-size", captFontSize + "px")
         .text("test")
-        .attr("text-anchor","middle")
+        .attr("text-anchor", "middle")
     }
 
 
@@ -97,16 +97,16 @@ export class Gauge {
     /**
      * Draw zones of different colors
      */
-    this.config.greenZones.forEach(zone=>{
+    this.config.greenZones.forEach(zone => {
       this.drawBand(zone.from, zone.to, this.config.greenColor);
     })
 
-    this.config.yellowZones.forEach(zone=>{
-      this.drawBand(zone.from,zone.to,this.config.yellowColor)
+    this.config.yellowZones.forEach(zone => {
+      this.drawBand(zone.from, zone.to, this.config.yellowColor)
     })
 
-    this.config.redZones.forEach(zone=>{
-      this.drawBand(zone.from,zone.to,this.config.redColor)
+    this.config.redZones.forEach(zone => {
+      this.drawBand(zone.from, zone.to, this.config.redColor)
     })
 
     if (undefined != this.config.label) {
@@ -172,10 +172,10 @@ export class Gauge {
     const pointerPath = this.buildPointerPath(midValue);
 
     const pointerLine = d3.line()
-      .x(function (d) {
+      .x(function (d:any) {
         return d.x
       })
-      .y(function (d) {
+      .y(function (d:any) {
         return d.y
       })
     //.interpolate("basis");
@@ -254,18 +254,20 @@ export class Gauge {
         .endAngle(this.valueToRadians(end))
         .innerRadius(0.65 * this.config.radius)
         .outerRadius(0.85 * this.config.radius))
+
       .attr("transform", () => {
         return "translate(" + this.config.cx + ", " + this.config.cy + ") rotate(270)"
       });
+
   }
 
   redraw(value, caption, transitionDuration) {
     const pointerContainer = this.body.select(".pointerContainer");
-    pointerContainer.selectAll("text").text(Math.round(value)+this.config.suffix);
+    pointerContainer.selectAll("text").text(Math.round(value) + this.config.suffix);
 
-    if(undefined != caption) {
-      this.body.select(".captionRect").attr("fill",this.color(caption))
-      this.body.selectAll(".captionText").text(caption+this.config.captSuffix)
+    if (undefined != caption) {
+      this.body.select(".captionRect").attr("fill", this.color(caption))
+      this.body.selectAll(".captionText").text(caption + this.config.captSuffix)
     }
 
     const pointer = pointerContainer.selectAll("path");

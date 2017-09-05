@@ -17,6 +17,7 @@ export class Klima{
   private timer=null
   private inside_humid_gauge;
   private outside_humid_gauge;
+  private empty={}
 
   constructor(private fetcher:FetchClient, private ea:EventAggregator){
     let config={
@@ -62,7 +63,7 @@ export class Klima{
     this.outside_temp=await this.fetcher.fetchJson(`http://${server}/get/${_outside_temp}`)
     this.ea.publish(this.inside_humid_gauge.event,{temp:this.inside_temp, humidity: this.inside_humid})
     this.ea.publish(this.outside_humid_gauge.event,{temp:this.outside_temp, humidity: this.outside_humid})
-
+    this.ea.publish("doublegauge_changed",{upper: this.inside_temp,lower:this.inside_humid})
     //this.inside_humid_gauge.redraw(this.inside_humid, this.inside_temp)
     //this.outside_humid_gauge.redraw(this.outside_humid, this.outside_temp)
   }

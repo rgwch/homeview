@@ -16,10 +16,10 @@ const format = d3.format(".2f")
 
 @autoinject
 export class Solar {
-  private act_power = 0
-  private day_energy = 0
-  private year_energy = 0
-  private total_energy = 0
+  private act_power = "0"
+  private day_energy = "0"
+  private year_energy = "0"
+  private total_energy = "0"
   private svg
   private svgAxis
   private xAxis
