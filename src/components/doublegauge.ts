@@ -2,9 +2,9 @@ import {autoinject, bindable} from 'aurelia-framework';
 import {EventAggregator} from "aurelia-event-aggregator"
 import * as d3 from "d3";
 
-const arcsize = 15
-const lower = 15
-const upper = 165
+const ARCSIZE = 15
+const MIN_VALUE = 15
+const MAX_VALUE = 165
 
 @autoinject
 export class Doublegauge {
@@ -32,19 +32,23 @@ export class Doublegauge {
   configure() {
     this.config.event = this.config.event || "doublegauge_changed"
     this.config.size = this.config.size || 150
-    this.config.topMin = this.config.topMin || 0
-    this.config.topMax = this.config.topMax || 100
-    this.config.bottomMin = this.config.bottomMin || 0
-    this.config.bottomMax = this.config.bottomMax || 100
-    this.config.topSuffix = this.config.topSuffix || "°C"
-    this.config.bottomSuffix = this.config.bottomSuffix || "%"
 
+    this.config.upperMin = this.config.upperMin || 0
+    this.config.upperMax = this.config.upperMax || 100
+    this.config.upperSuffix = this.config.upperSuffix || "°C"
+    this.config.upperBands=[{from: this.config.upperMin,to: this.config.upperMax, color: "blue"}]
     this.upperScale = d3.scaleLinear()
-      .domain([this.config.topMin, this.config.topMax])
-      .range([lower, upper])
+      .domain([this.config.upperMin, this.config.upperMax])
+      .range([MIN_VALUE, MAX_VALUE])
+
+    this.config.lowerMin = this.config.lowerMin || 0
+    this.config.lowerMax = this.config.lowerMax || 100
+    this.config.lowerSuffix = this.config.lowerSuffix || "%"
+    this.config.lowerBands=[{from: this.config.lowerMin,to: this.config.lowerMax, color: "green"}]
+
     this.lowerScale = d3.scaleLinear()
-      .domain([this.config.bottomMin, this.config.bottomMax])
-      .range([upper, lower])
+      .domain([this.config.lowerMin, this.config.lowerMax])
+      .range([MAX_VALUE, MIN_VALUE])
   }
 
   render() {
@@ -57,9 +61,15 @@ export class Doublegauge {
     this.rectangle(this.body, 5, 5, this.config.size - 10, this.config.size - 10, "blue", "white")
     let center = this.config.size / 2
     let size = (this.config.size / 2) * 0.9
-    this.arch(this.body, center, center, size - arcsize, size, this.deg2rad(this.upperScale(this.config.topMin)), this.deg2rad(this.upperScale(this.config.topMax)), "blue", 270)
-    this.arch(this.body, center, center, size - arcsize, size, this.deg2rad(this.lowerScale(this.config.bottomMin)), this.deg2rad(this.lowerScale(this.config.bottomMax)), "green", 90)
-    this.upperArrow = this.arrow(this.body, center, center, center, 10, "red")
+    this.config.upperBands.forEach(band=>{
+      this.arch(center,center,size-ARCSIZE,size,this.deg2rad(this.upperScale(band.from)),
+        this.deg2rad(this.upperScale(band.to)),band.color,270)
+    })
+    this.config.lowerBands.forEach(band=>{
+      this.arch(center, center, size - ARCSIZE, size, this.deg2rad(this.lowerScale(band.from)),
+        this.deg2rad(this.lowerScale(band.to)), band.color, 90)
+    })
+      this.upperArrow = this.arrow(this.body, center, center, center, 10, "red")
     this.lowerArrow = this.arrow(this.body, center, center, center, center + size, "green")
 
     this.body.append("svg:circle")
@@ -69,21 +79,33 @@ export class Doublegauge {
       .attr("fill", "steelblue")
       .attr("stroke", "steelblue")
 
+    /* fields for actual measurements in the center of the upper and loewer scale */
     let valuesFontSize = Math.round(size / 5)
-    this.upperValue = this.stringElem(this.body, center, center - size / 2, valuesFontSize,"middle")
-    this.lowerValue = this.stringElem(this.body, center, center + size / 2, valuesFontSize,"middle")
-    let lp=this.valueToPointTop(this.config.topMin,1)
+    this.upperValue = this.stringElem(center, center - size / 2, valuesFontSize,"middle")
+    this.lowerValue = this.stringElem(center, center + size / 2, valuesFontSize,"middle")
+
     let markersFontSize=Math.round(size/6)
-    this.stringElem(this.body,center-lp.x,center-lp.y,markersFontSize,"start")
-      .text(this.config.topMin)
-    lp=this.valueToPointTop(this.config.topMax,1)
-    this.stringElem(this.body,center-lp.x,center-lp.y,markersFontSize, "end")
-      .text(this.config.topMax)
+
+    /* write min and max values to the upper scale */
+    let lp=this.valueToPoint(this.config.upperMin,1, this.upperScale)
+    this.stringElem(center-lp.x,center-lp.y,markersFontSize,"start")
+      .text(this.config.upperMin)
+    lp=this.valueToPoint(this.config.upperMax,1, this.upperScale)
+    this.stringElem(center-lp.x,center-lp.y,markersFontSize, "end")
+      .text(this.config.upperMax)
+
+    /* write min and max values to the lower scale */
+    lp=this.valueToPoint(this.config.lowerMin,1,this.lowerScale)
+    this.stringElem(center+lp.x,center+lp.y,markersFontSize,"start")
+      .text(this.config.lowerMin)
+    lp=this.valueToPoint(this.config.lowerMax,1,this.lowerScale)
+    this.stringElem(center+lp.x,center+lp.y,markersFontSize,"end")
+      .text(this.config.lowerMax)
 
   }
 
-  stringElem(parent, x, y, size, align) {
-    return parent.append("svg:text")
+  stringElem(x, y, size, align) {
+    return this.body.append("svg:text")
       .attr("x", x)
       .attr("y", y)
       .attr("text-anchor", align)
@@ -103,13 +125,13 @@ export class Doublegauge {
       .attr("stroke-width", "1")
   }
 
-  arch(parent, x, y, inner, outer, start, end, color, rotation) {
+  arch(x, y, inner, outer, start, end, color, rotation) {
     let gen = d3.arc()
       .startAngle(start)
       .endAngle(end)
       .innerRadius(inner)
       .outerRadius(outer)
-    parent.append("svg:path")
+    this.body.append("svg:path")
       .style("fill", color)
       .attr("d", gen)
       .attr("transform", () => {
@@ -125,7 +147,6 @@ export class Doublegauge {
       .attr("y2", y)
       .attr("stroke", color)
       .attr("stroke.width", 2)
-    //.attr("transform",`rotate(20,${cx},${cy})`)
   }
 
   deg2rad(deg) {
@@ -133,10 +154,10 @@ export class Doublegauge {
   }
 
 
-  valueToPointTop(value, factor) {
-    let arc = this.upperScale(value)
+  valueToPoint(value, factor,scale) {
+    let arc = scale(value)
     let rad=this.deg2rad(arc)
-    let r = (this.config.size / 2) * 0.9 -arcsize
+    let r = (this.config.size / 2) * 0.9 -ARCSIZE
     let x = r * Math.cos(rad)
     let y = r * Math.sin(rad)
     return {"x":x,"y":y}
@@ -148,7 +169,7 @@ export class Doublegauge {
     let valBottom = this.lowerScale(bottom)
     this.upperArrow.attr("transform", `rotate(${valTop-90},${center},${center})`)
     this.lowerArrow.attr("transform", `rotate(${valBottom-90},${center},${center})`)
-    this.upperValue.text(top + this.config.topSuffix)
-    this.lowerValue.text(bottom + this.config.bottomSuffix)
+    this.upperValue.text(top + this.config.upperSuffix)
+    this.lowerValue.text(bottom + this.config.lowerSuffix)
   }
 }
