@@ -15,32 +15,30 @@ export class Klima{
   private outside_temp=0
   private outside_humid=0
   private timer=null
-  private inside_humid_gauge;
-  private outside_humid_gauge;
-  private empty={}
+  private outside_gauge
+  private livingroom_gauge
 
   constructor(private fetcher:FetchClient, private ea:EventAggregator){
-    let config={
-      event: "inside_change",
-      size:150,
-      label: "Wohnen",
-      min: 20,
-      max: 80,
-      suffix: "%",
-      majorTicks: 10,
-      minorTicks: 5,
-      greenZones:[{from: 40, to: 60 }],
-      redZones: [{from: 20, to:30},{from: 70, to: 80}],
-      yellowZones: [{from: 30, to: 40},{from: 60, to:70}],
-      captHeight:22,
-      captSuffix: " °C"
+    this.outside_gauge={
+      event: "outside_data_update",
+      size: 450,
+      upperMin: -20,
+      upperMax: 40,
+      upperSuffix: "°C",
+      upperBands: [{from: -20, to: 0, color: "#1393ff"},{from: 0, to: 10, color: "#bfffcc"},{from:10, to: 25, color: "#ffdea6"},
+        {from: 25, to: 40, color: "#ff5660"}],
+      lowerMin: 20,
+      lowerMax: 80,
+      lowerSuffix: "%",
+      lowerBands: [{from: 20, to: 30, color: "#f00"},{from: 30, to: 40, color: "#f8ff20"}, {from: 40, to:60, color: "#0f0"},
+        {from:60, to:70, color: "#f8ff20"}, {from: 70, to:80, color: "#f00"}]
     }
-    let config2= Object.assign({},config)
-    config2.label="aussen"
-    config2.event="outside_change"
-    this.inside_humid_gauge=config
-    this.outside_humid_gauge=config2
-
+    this.livingroom_gauge=Object.assign({},this.outside_gauge)
+    this.livingroom_gauge.event="livingroom_data_update"
+    this.livingroom_gauge.upperMin=10
+    this.livingroom_gauge.upperMax=35
+    this.livingroom_gauge.upperBands=[{from: 10, to:18, color: "#bff7ff"}, {from: 18, to: 24, color: "#6eff59"},
+      {from: 24, to:35, color: "#ff3c3a"}]
   }
 
   detached(){
@@ -61,10 +59,7 @@ export class Klima{
     this.inside_humid=await this.fetcher.fetchJson(`http://${server}/get/${_inside_humid}`)
     this.outside_humid=await this.fetcher.fetchJson(`http://${server}/get/${_outside_humid}`)
     this.outside_temp=await this.fetcher.fetchJson(`http://${server}/get/${_outside_temp}`)
-    this.ea.publish(this.inside_humid_gauge.event,{temp:this.inside_temp, humidity: this.inside_humid})
-    this.ea.publish(this.outside_humid_gauge.event,{temp:this.outside_temp, humidity: this.outside_humid})
-    this.ea.publish("doublegauge_changed",{upper: this.inside_temp,lower:this.inside_humid})
-    //this.inside_humid_gauge.redraw(this.inside_humid, this.inside_temp)
-    //this.outside_humid_gauge.redraw(this.outside_humid, this.outside_temp)
+    this.ea.publish(this.outside_gauge.event,{upper: this.outside_temp,lower:this.outside_humid})
+    this.ea.publish(this.livingroom_gauge.event,{upper:this.inside_temp, lower: this.inside_humid})
   }
 }

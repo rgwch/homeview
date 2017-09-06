@@ -11,7 +11,7 @@ export class App {
       { route: 'users',         name: 'users',        moduleId: 'users',        nav: true, title: 'Github Users' },
       { route: 'child-router',  name: 'child-router', moduleId: 'child-router', nav: true, title: 'Child Router' },
       */
-      { route: 'klima', name: 'klima', moduleId: 'klima', nav: true, title: 'Warm/Kalt'},
+      { route: 'klima', name: 'klima', moduleId: 'klima', nav: true, title: 'Klima'},
       { route: 'solar', name: 'solar', moduleId: 'solar', nav: true, title: 'Solaranlage'}
     ]);
 

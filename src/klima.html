@@ -1,12 +1,15 @@
 <template>
-  <require from="components/gauge"></require>
   <require from="components/doublegauge"></require>
   <div class="container">
     <div class="row">
-      <gauge config.bind="inside_humid_gauge"></gauge>
-      <gauge config.bind="outside_humid_gauge"></gauge>
-      <doublegauge config.bind="empty"></doublegauge>
+      <div class="col-sm-3 col-xs-12 col-md-2">
+        <h3>Draussen</h3>
+        <doublegauge config.bind="outside_gauge"></doublegauge>
+      </div>
+      <div class="col-sm-3 col-xs-12 col-md-2">
+        <h3>Wohnzimmer</h3>
+        <doublegauge config.bind="livingroom_gauge"></doublegauge>
+      </div>
     </div>
-
   </div>
 </template>
