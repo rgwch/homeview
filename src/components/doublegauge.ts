@@ -114,14 +114,14 @@ export class Doublegauge {
     this.upperArrow = this.arrow(this.body, center, center,
       center, 10, "red")
     this.lowerArrow = this.arrow(this.body, center, center,
-      center, center + size, "green")
+      center, center + size, "#0048ff")
 
     // Small disc around the axe of the pointers
     this.body.append("svg:circle")
       .attr("cx", center)
       .attr("cy", center)
       .attr("r", 8)
-      .attr("fill", "steelblue")
+      .attr("fill", "#2f1d1c")
       .attr("stroke", "steelblue")
 
     /* fields for actual measurements in the center of the upper and lower scale */
