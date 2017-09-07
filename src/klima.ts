@@ -25,20 +25,20 @@ export class Klima{
       upperMin: -20,
       upperMax: 40,
       upperSuffix: "°C",
-      upperBands: [{from: -20, to: 0, color: "#1393ff"},{from: 0, to: 10, color: "#bfffcc"},{from:10, to: 25, color: "#ffdea6"},
-        {from: 25, to: 40, color: "#ff5660"}],
+      upperBands: [{from: -20, to: 0, color: "#1393ff"},{from: 0, to: 10, color: "#bff7ff"},{from:10, to: 25, color: "#109618"},
+        {from: 25, to: 40, color: "#DC3912"}],
       lowerMin: 20,
       lowerMax: 80,
       lowerSuffix: "%",
-      lowerBands: [{from: 20, to: 30, color: "#f00"},{from: 30, to: 40, color: "#f8ff20"}, {from: 40, to:60, color: "#0f0"},
-        {from:60, to:70, color: "#f8ff20"}, {from: 70, to:80, color: "#f00"}]
+      lowerBands: [{from: 20, to: 30, color: "#DC3912"},{from: 30, to: 40, color: "#ffd74c"}, {from: 40, to:60, color: "#109618"},
+        {from:60, to:70, color: "#ffd74c"}, {from: 70, to:80, color: "#DC3912"}]
     }
     this.livingroom_gauge=Object.assign({},this.outside_gauge)
     this.livingroom_gauge.event="livingroom_data_update"
     this.livingroom_gauge.upperMin=10
-    this.livingroom_gauge.upperMax=34
-    this.livingroom_gauge.upperBands=[{from: 10, to:18, color: "#bff7ff"}, {from: 18, to: 24, color: "#6eff59"},
-      {from: 24, to:34, color: "#ff3c3a"}]
+    this.livingroom_gauge.upperMax=30
+    this.livingroom_gauge.upperBands=[{from: 10, to:18, color: "#bff7ff"}, {from: 18, to: 24, color: "#109618"},
+      {from: 24, to:30, color: "#DC3912"}]
   }
 
   detached(){
