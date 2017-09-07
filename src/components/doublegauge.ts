@@ -112,7 +112,7 @@ export class Doublegauge {
 
     // create the pointers, initial reading is 90° for both
     this.upperArrow = this.arrow(this.body, center, center,
-      center, 10, "red")
+      center, center-size, "red")
     this.lowerArrow = this.arrow(this.body, center, center,
       center, center + size, "#0048ff")
 
