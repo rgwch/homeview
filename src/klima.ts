@@ -21,7 +21,7 @@ export class Klima{
   constructor(private fetcher:FetchClient, private ea:EventAggregator){
     this.outside_gauge={
       event: "outside_data_update",
-      size: 450,
+      size: 180,
       upperMin: -20,
       upperMax: 40,
       upperSuffix: "°C",
@@ -36,9 +36,9 @@ export class Klima{
     this.livingroom_gauge=Object.assign({},this.outside_gauge)
     this.livingroom_gauge.event="livingroom_data_update"
     this.livingroom_gauge.upperMin=10
-    this.livingroom_gauge.upperMax=35
+    this.livingroom_gauge.upperMax=34
     this.livingroom_gauge.upperBands=[{from: 10, to:18, color: "#bff7ff"}, {from: 18, to: 24, color: "#6eff59"},
-      {from: 24, to:35, color: "#ff3c3a"}]
+      {from: 24, to:34, color: "#ff3c3a"}]
   }
 
   detached(){

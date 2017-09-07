@@ -1,6 +1,6 @@
 import 'fetch'
 
-const DEBUG=false
+const DEBUG=true
 export class FetchClient{
 
   public async fetchJson(url){
