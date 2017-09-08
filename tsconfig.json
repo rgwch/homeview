@@ -21,8 +21,6 @@
   "filesGlob": [
     "./src/**/*.ts",
     "./test/**/*.ts",
-    "./typings/index.d.ts",
-    "./custom_typings/**/*.d.ts",
     "./jspm_packages/**/*.d.ts"
   ],
   "exclude": [

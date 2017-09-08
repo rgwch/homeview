@@ -1,6 +1,13 @@
-# aurelia-skeleton-navigation (typescript)
+# Homeview
 
-## Running The App
+## What it is
+
+Homeview is an [Aurelia](http://aurelia.io) based Web-app to display and control
+smarthome devices attached to [ioBroker](http://iobroker.net). 
+
+
+The following informations come from the 'aurelia-skeleton-typescript', adapted 
+for Homeview:
 
 To run the app, follow these steps.
 
