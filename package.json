@@ -1,32 +1,29 @@
 {
-  "name": "aurelia-skeleton-navigation-typescript",
-  "version": "1.1.2",
-  "description": "A starter kit for building a standard navigation-style app with Aurelia and TypeScript.",
+  "name": "Homeview",
+  "version": "0.0.1",
+  "description": "A Webapp to view and control ioBroker devices",
   "keywords": [
-    "aurelia",
-    "navigation",
-    "skeleton",
-    "typescript",
-    "vscode"
+    "ioBroker",
+    "smarthome",
+    "d3",
+    "typescript"
   ],
-  "homepage": "http://aurelia.io",
+  "homepage": "",
   "bugs": {
-    "url": "https://github.com/aurelia/skeleton-navigation-typescript/issues"
+    "url": ""
   },
   "license": "CC0-1.0",
-  "author": "Mike Graham <mgraham@technicalmedia.com> (http://cmichaelgraham.io/)",
+  "author": "rgwch",
   "main": "dist/main.js",
   "repository": {
     "type": "git",
-    "url": "http://github.com/aurelia/skeleton-navigation-typescript"
+    "url": "http://github.com/rgwch/homeview"
   },
   "scripts": {
-    "prepublish": "typings install",
     "test": "gulp test",
     "e2e": "gulp serve e2e"
   },
   "devDependencies": {
-    "@types/node": "^8.0.26",
     "aurelia-bundler": "^0.4.0",
     "aurelia-protractor-plugin": "^1.0.0",
     "aurelia-tools": "^1.0.0",
@@ -58,7 +55,6 @@
     "systemjs": "0.19.40",
     "tslint": "^3.15.1",
     "typescript": "^2.0.8",
-    "typings": "^2.0.0",
     "vinyl-paths": "^2.1.0",
     "yargs": "^6.3.0"
   },
@@ -67,7 +63,6 @@
       "aurelia-animator-css": "npm:aurelia-animator-css@^1.0.0",
       "aurelia-bootstrapper": "npm:aurelia-bootstrapper@^1.0.0",
       "aurelia-event-aggregator": "npm:aurelia-event-aggregator@^1.0.1",
-      "aurelia-fetch-client": "npm:aurelia-fetch-client@^1.0.0",
       "aurelia-framework": "npm:aurelia-framework@^1.0.0",
       "aurelia-history-browser": "npm:aurelia-history-browser@^1.0.0",
       "aurelia-loader-default": "npm:aurelia-loader-default@^1.0.0",
@@ -87,11 +82,5 @@
       "text": "github:systemjs/plugin-text@^0.0.8"
     },
     "devDependencies": {}
-  },
-  "dependencies": {
-    "@types/d3": "^4.10.0",
-    "@types/d3-selection": "^1.1.0",
-    "aurelia-event-aggregator": "^1.0.1",
-    "d3": "^4.10.0"
   }
 }
