@@ -17,6 +17,7 @@ export class Klima{
   private timer=null
   private outside_gauge
   private livingroom_gauge
+  private empty={}
 
   constructor(private fetcher:FetchClient, private ea:EventAggregator){
     this.outside_gauge={
