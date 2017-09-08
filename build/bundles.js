@@ -30,7 +30,8 @@ module.exports = {
         "bootstrap",
         "bootstrap/css/bootstrap.css!text",
         "fetch",
-        "jquery"
+        "jquery",
+        "d3"
       ],
       "options": {
         "inject": true,
