@@ -3,9 +3,20 @@
 }
 
 .frame{
-  border-style: outset;
-  border-color: darkgrey;
-  border-width: 5;
-  padding: 5;
-  margin:5
+  border-style: solid;
+  border-color: #a79ea3;
+  border-width: 5px;
+  border-radius: 5px;
+}
+
+.flat_button{
+  margin: 3px !important;
+}
+
+.light_on{
+  background: yellow;
+}
+
+.light_off{
+  background: #d3d3d3;
 }

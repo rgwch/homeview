@@ -1,7 +1,7 @@
 <template>
   <div class="multiswitch">
-    <div class="btn-group frame" role="group" aria-label="Basic example" >
-      <button repeat.for="button of cfg.buttons" type="button" class="btn btn-secondary" id="button.value">${button.caption}</button>
+    <div class="btn-group frame ${light}" role="group" aria-label="Basic example" data-toogle="buttons">
+      <button repeat.for="button of cfg.buttons" type="button" class="btn btn-primary flat_button" id="button.value" click.trigger="clicked(button.value)">${button.caption}</button>
     </div>
   </div>
 </template>
