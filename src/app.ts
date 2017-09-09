@@ -6,7 +6,8 @@ export class App {
     config.title = 'Homeview';
     config.map([
       { route: ['','klima'], name: 'klima', moduleId: 'klima', nav: true, title: 'Klima'},
-      { route: 'solar', name: 'solar', moduleId: 'solar', nav: true, title: 'Solaranlage'}
+      { route: 'solar', name: 'solar', moduleId: 'solar', nav: true, title: 'Solaranlage'},
+      { route: 'showcase', name: 'Showcase', moduleId: 'showcase', nav: true, title: 'Showcase'}
     ]);
 
     this.router = router;

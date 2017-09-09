@@ -1,0 +1,11 @@
+.h2{
+  color: blue;
+}
+
+.frame{
+  border-style: outset;
+  border-color: darkgrey;
+  border-width: 5;
+  padding: 5;
+  margin:5
+}

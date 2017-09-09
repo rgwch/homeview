@@ -26,7 +26,7 @@ export class Threewayswitch {
   render() {
     this.element.id = "tws_" + this.cfg.event
     this.body = d3sel.select("#" + this.element.id).append("svg:svg")
-      .attr("class", "doublegauge")
+      .attr("class", "threewayswitch")
       .attr("width", this.cfg.width)
       .attr("height", this.cfg.height);
 

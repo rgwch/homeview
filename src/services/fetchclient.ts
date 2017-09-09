@@ -1,15 +1,46 @@
 import 'whatwg-fetch'
-import environment from '../environment'
+import globals from '../globals'
 
-export class FetchClient{
+/**
+ * In mock mode: create reasonable random values based on URL patterns
+ */
+const KNOWN_SOURCES = [
+  {s: "temperatur", l: -1, u: 36},
+  {s: "humid", l: 20, u: 80},
+  {s: "energy", l: 1000, u: 100000},
+  {s: "power", l: 0, u: 10000}
+]
 
-  public async fetchJson(url){
-      if(environment.debug) {
-        return Math.round((Math.random()*40+20)*10)/10
-      }else{
-        let result = await fetch(url)
-        return (await result.json()).val
-      }
+export class FetchClient {
+
+  public async fetchJson(url) {
+    if (globals.mock) {
+      let upper = 100
+      let lower = -10
+      KNOWN_SOURCES.find(source => {
+        if (url.toLowerCase().includes(source.s)) {
+          upper = source.u
+          lower = source.l
+          return true
+        } else {
+          return false
+        }
+      })
+      return Math.round((Math.random() * (upper - lower) + lower) * 10) / 10
+    }
+    else {
+      let
+        result = await
+
+          fetch(url)
+
+      return (await
+
+          result
+            .json()
+
+      ).val
+    }
   }
 
 }
