@@ -28,4 +28,10 @@ export class Showcase{
       }
     })
   }
+  attached(){
+    let to=setTimeout(()=>{
+      this.ea.publish(this.multi.message,{clicked:1})
+      clearTimeout(to)
+  },20)
+  }
 }
