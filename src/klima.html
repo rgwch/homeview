@@ -1,7 +1,7 @@
 <template>
   <require from="components/doublegauge"></require>
   <require from="components/threewayswitch"></require>
-  <div class="container" style="margin-top:40px">
+  <div class="container">
     <div class="row">
       <div class="col-sm-3 col-xs-12 col-md-2">
         <h3>Draussen</h3>
@@ -10,12 +10,6 @@
       <div class="col-sm-3 col-xs-12 col-md-2">
         <h3>Wohnzimmer</h3>
         <doublegauge config.bind="livingroom_gauge"></doublegauge>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-sm-3 col-xs-12 col-md-2">
-
-        <threewayswitch cfg.bind="empty"></threewayswitch>
       </div>
     </div>
   </div>

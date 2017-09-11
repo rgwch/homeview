@@ -5,6 +5,7 @@ import {EventAggregator} from "aurelia-event-aggregator"
 export class Multiswitch{
   @bindable cfg;
   private light="light_off"
+  private basic_id="B"+Math.random().toString()
 
   constructor(private ea:EventAggregator){}
   attached(){
