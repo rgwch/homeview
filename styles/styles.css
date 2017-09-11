@@ -2,14 +2,22 @@
   color: blue;
 }
 
-.skin{
 
+.inner{
+  fill: #d3d3d3;
+  stroke: "blue";
+  stroke-width: 1;
 }
+
+
 .frame{
   border-style: solid;
   border-color: #a79ea3;
   border-width: 5px;
   border-radius: 5px;
+  fill: #a79ea3;
+  stroke: black;
+  stroke-width: 1;
 }
 
 .flat_button{

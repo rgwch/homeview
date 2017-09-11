@@ -1,6 +1,7 @@
 <template>
   <require from="components/threewayswitch"></require>
   <require from="components/multiswitch"></require>
+  <require from="components/lineargauge"></require>
   <div class="container">
     <div class="row">
       <div class="col-sm-3">
@@ -10,6 +11,10 @@
       <div class="col-sm-3">
         <h2>Multiswitch</h2>
         <multiswitch cfg.bind="multi"></multiswitch>
+      </div>
+      <div class="col-sm-3">
+        <h2>Linear Gauge</h2>
+        <lineargauge cfg.bind="linear"></lineargauge>
       </div>
     </div>
   </div>
