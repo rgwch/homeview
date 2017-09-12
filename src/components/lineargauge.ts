@@ -3,8 +3,8 @@ import {EventAggregator} from "aurelia-event-aggregator"
 import {scaleLinear} from "d3-scale";
 import {select, Selection} from 'd3-selection'
 import 'd3-transition'
-//import {rect} from 'd3-shape'
 
+const FRAMEWIDTH=5
 
 @autoinject()
 export class Lineargauge{
@@ -45,14 +45,17 @@ export class Lineargauge{
       .attr("width",this.cfg.width)
       .attr("height",this.cfg.height)
 
+    // draw frame
     this.rectangle(0,0,this.cfg.width,this.cfg.height,"frame")
-    this.rectangle(5,5,this.cfg.width-10,this.cfg.height-10,"inner")
+    this.rectangle(FRAMEWIDTH,FRAMEWIDTH,this.cfg.width-2*FRAMEWIDTH,this.cfg.height-2*FRAMEWIDTH,"inner")
     this.body.append("svg:rect")
-    const baseline=this.cfg.height-12
+    const baseline=this.cfg.height-(2*FRAMEWIDTH)-2
+    // draw colored bands
     this.cfg.bands.forEach(band=>{
       this.line(this.scale(band.from), baseline, this.scale(band.to), baseline ,band.color,5).attr("opacity",0.5)
     })
 
+    // draw tick marks and text on every second tick
     const ticks=this.scale.ticks(10)
     const tickFormat=this.scale.tickFormat(10,"s")
     const fontSize=this.cfg.height/5
@@ -71,19 +74,21 @@ export class Lineargauge{
       even=!even
     })
 
-    this.indicator=this.line(this.scale(0),baseline+1,this.scale(0), 5, "red",1.2)
+    // draw indicator
+    this.indicator=this.line(this.scale(0),baseline+1,this.scale(0), FRAMEWIDTH, "red",1.2)
       .attr("id","indicator1")
+    // value text
     this.value=this.body.append("svg:text")
       .attr("x",this.scale(this.cfg.min+((this.cfg.max-this.cfg.min)/2)))
-      .attr("y",5)
+      .attr("y",FRAMEWIDTH)
       .attr("text-anchor","middle")
-      .attr("dy",5+this.cfg.height/2)
-      .attr("opacity",0.2)
-      .style("font-size",this.cfg.height-12)
+      .attr("dy",FRAMEWIDTH+this.cfg.height/2)
+      .attr("opacity",0.3)
+      .style("font-size",this.cfg.height-2*FRAMEWIDTH-2)
       .style("fill","grey")
   }
 
-  // helper to draw a rectangle
+  // helper to add a rectangle
   rectangle(x, y, w, h, clazz) {
     this.body.append("svg:rect")
       .attr("x", x)
@@ -93,6 +98,7 @@ export class Lineargauge{
       .classed(clazz,true)
   }
 
+  // helper to add a line
   line(x1,y1,x2,y2,color,width){
     return this.body.append("svg:line")
       .attr("x1",x1)
@@ -104,10 +110,10 @@ export class Lineargauge{
   }
 
   redraw(value){
-    const x=this.scale(value)-this.scale(0)
-    // this.indicator.attr("transform",`translate(${x},${0})`)
+    const x=this.scale(value)
     let sel=select("#indicator1")
     sel.transition()
+      .duration(300)
       .attr("x1",x)
       .attr("x2",x)
     this.value.text(value)
