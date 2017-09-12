@@ -1,8 +1,9 @@
 import {autoinject, bindable} from 'aurelia-framework';
 import {EventAggregator} from "aurelia-event-aggregator"
-import * as d3scale from "d3-scale";
-import * as d3sel from 'd3-selection'
-import * as d3shape from 'd3-shape'
+import {scaleLinear} from "d3-scale";
+import {select,Selection} from 'd3-selection'
+import {arc} from 'd3-shape'
+import 'd3-transition'
 
 
 const MIN_VALUE = 15
@@ -64,7 +65,7 @@ export class Doublegauge {
 
     /* create a scale to convert values (domain) into degrees (range)
      of the gauge pointer */
-    this.upperScale = d3scale.scaleLinear()
+    this.upperScale = scaleLinear()
       .domain([this.config.upperMin, this.config.upperMax])
       .range([MIN_VALUE, MAX_VALUE])
     this.upperScale.clamp(true)
@@ -75,7 +76,7 @@ export class Doublegauge {
     this.config.lowerBands = this.config.lowerBands ||
       [{from: this.config.lowerMin, to: this.config.lowerMax, color: "green"}]
 
-    this.lowerScale = d3scale.scaleLinear()
+    this.lowerScale = scaleLinear()
       .domain([this.config.lowerMin, this.config.lowerMax])
       .range([MAX_VALUE, MIN_VALUE])
     this.lowerScale.clamp(true)
@@ -87,7 +88,7 @@ export class Doublegauge {
   render() {
     // create unique id and attach SVG container
     this.element.id = "dg_" + this.config.event
-    this.body = d3sel.select("#" + this.element.id).append("svg:svg")
+    this.body = select("#" + this.element.id).append("svg:svg")
       .attr("class", "doublegauge")
       .attr("width", this.config.size)
       .attr("height", this.config.size);
@@ -204,7 +205,7 @@ export class Doublegauge {
 
   // helper to draw and position an arch
   arch(x, y, inner, outer, start, end, color, rotation) {
-    let gen = d3shape.arc()
+    let gen = arc()
       .startAngle(start)
       .endAngle(end)
       .innerRadius(inner)
@@ -252,9 +253,15 @@ export class Doublegauge {
     let center = this.config.size / 2
     let valTop = this.upperScale(top)
     let valBottom = this.lowerScale(bottom)
-    this.upperArrow.attr("transform",
+    this.upperArrow
+      .transition()
+      .duration(100)
+      .attr("transform",
       `rotate(${valTop - 90},${center},${center})`)
-    this.lowerArrow.attr("transform",
+    this.lowerArrow
+      .transition()
+      .duration(100)
+      .attr("transform",
       `rotate(${valBottom - 90},${center},${center})`)
     this.upperValue.text(top + this.config.upperSuffix)
     this.lowerValue.text(bottom + this.config.lowerSuffix)

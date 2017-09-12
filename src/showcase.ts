@@ -7,6 +7,20 @@ import {FetchClient} from './services/fetchclient'
 export class Showcase{
   private timer
   private emptyObj={}
+  doubleg={
+    event: "doublegauge_data_update",
+    size: 180,
+    upperMin: -20,
+    upperMax: 40,
+    upperSuffix: "°C",
+    upperBands: [{from: -20, to: 0, color: "#1393ff"},{from: 0, to: 10, color: "#bff7ff"},{from:10, to: 25, color: "#109618"},
+      {from: 25, to: 40, color: "#DC3912"}],
+    lowerMin: 20,
+    lowerMax: 80,
+    lowerSuffix: "%",
+    lowerBands: [{from: 20, to: 30, color: "#DC3912"},{from: 30, to: 40, color: "#ffd74c"}, {from: 40, to:60, color: "#109618"},
+      {from:60, to:70, color: "#ffd74c"}, {from: 70, to:80, color: "#DC3912"}]
+  }
   private multi={
     buttons:[
       {
@@ -57,6 +71,8 @@ export class Showcase{
     let lg=Math.round(await this.fetcher.fetchJson("fake://power")+0.5)
     this.ea.publish(this.multi.message,{clicked:mm})
     this.ea.publish(this.linear.event,lg)
-
+    let temp=await this.fetcher.fetchJson("fake://temperatur")
+    let humid = Math.round(await this.fetcher.fetchJson("fake://humid")+0.5)
+    this.ea.publish(this.doubleg.event,{upper: temp, lower:humid})
   }
 }
