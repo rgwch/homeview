@@ -5,6 +5,7 @@ import {FetchClient} from './services/fetchclient'
 
 @autoinject
 export class Showcase{
+  private timer
   private emptyObj={}
   private multi={
     buttons:[
@@ -40,9 +41,15 @@ export class Showcase{
     })
   }
   attached(){
-    let to=setInterval(()=>{
+    this.timer=setInterval(()=>{
       this.update()
   },3000)
+  }
+  detached(){
+    if(undefined != this.timer){
+      clearInterval(this.timer)
+      delete this.timer
+    }
   }
 
   async update(){

@@ -111,14 +111,11 @@
           "d3-quadtree",
           "d3-queue",
           "d3-random",
-          "d3-request",
           "d3-voronoi",
           "d3-zoom",
           "whatwg-fetch",
           "d3-transition",
-          "d3-timer",
-          "d3",
-          "xmlhttprequest"
+          "d3-timer"
         ]
       }
     ],
