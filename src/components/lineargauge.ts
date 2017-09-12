@@ -1,8 +1,6 @@
 import {autoinject, bindable} from 'aurelia-framework';
 import {EventAggregator} from "aurelia-event-aggregator"
-import * as d3scale from "d3-scale";
-import * as d3sel from 'd3-selection'
-import * as d3shape from 'd3-shape'
+import * as d3 from "d3";
 
 @autoinject()
 export class Lineargauge{
@@ -32,13 +30,13 @@ export class Lineargauge{
       padding: 0,
       bands:[{from: 0,to:100,color: "blue"}]
     }, this.cfg)
-    this.scale=d3scale.scaleLinear().domain([this.cfg.min,this.cfg.max]).range([5+this.cfg.padding,this.cfg.width-5-this.cfg.padding])
+    this.scale=d3.scaleLinear().domain([this.cfg.min,this.cfg.max]).range([5+this.cfg.padding,this.cfg.width-5-this.cfg.padding])
     this.scale.clamp(true)
   }
 
   render(){
     this.element.id="lg_"+this.cfg.event
-    this.body=d3sel.select("#"+this.element.id).append("svg:svg")
+    this.body=d3.select("#"+this.element.id).append("svg:svg")
       .attr("class","lineargauge")
       .attr("width",this.cfg.width)
       .attr("height",this.cfg.height)
@@ -70,6 +68,7 @@ export class Lineargauge{
     })
 
     this.indicator=this.line(this.scale(0),baseline+1,this.scale(0), 5, "red",1.2)
+      .attr("id","indicator1")
     this.value=this.body.append("svg:text")
       .attr("x",this.scale(this.cfg.min+((this.cfg.max-this.cfg.min)/2)))
       .attr("y",5)
@@ -102,7 +101,9 @@ export class Lineargauge{
 
   redraw(value){
     const x=this.scale(value)-this.scale(0)
-    this.indicator.attr("transform",`translate(${x},${0})`)
+    d3.selectAll("#indicator1").transition()
+      .attr("x1",x)
+    //this.indicator.attr("transform",`translate(${x},${0})`)
     this.value.text(value)
   }
 }

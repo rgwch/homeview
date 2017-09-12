@@ -8,7 +8,8 @@ const KNOWN_SOURCES = [
   {s: "temperatur", l: -1, u: 36},
   {s: "humid", l: 20, u: 80},
   {s: "energy", l: 1000, u: 100000},
-  {s: "power", l: 0, u: 10000}
+  {s: "power", l: 0, u: 10000},
+  {s: "012", l:0, u:2}
 ]
 
 export class FetchClient {

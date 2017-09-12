@@ -1,5 +1,7 @@
 import {autoinject, bindable} from 'aurelia-framework';
 import {EventAggregator} from "aurelia-event-aggregator"
+import {FetchClient} from './services/fetchclient'
+
 
 @autoinject
 export class Showcase{
@@ -21,14 +23,14 @@ export class Showcase{
   }
   private linear={
     event: "lineargauge1",
-    min:-500,
-    max: 500,
+    min:0,
+    max: 10000,
     height: 50,
     width: 200,
     padding: 10,
-    bands: [{from: 0, to: 50, color: "red"},{from: 50, to: 300, color: "blue"},{from: 300, to: 500, color: "yellow"}]
+    bands: [{from: 0, to: 500, color: "red"},{from: 500, to: 7000, color: "blue"},{from: 7000, to: 10000, color: "yellow"}]
   }
-  constructor(private ea:EventAggregator){
+  constructor(private ea:EventAggregator, private fetcher:FetchClient){
     this.ea.subscribe(this.multi.message+":click", event=>{
       if(event.value==0){
         this.ea.publish(this.multi.message,{"state":"on"})
@@ -38,10 +40,16 @@ export class Showcase{
     })
   }
   attached(){
-    let to=setTimeout(()=>{
-      this.ea.publish(this.multi.message,{clicked:1})
-      this.ea.publish(this.linear.event,280)
-      clearTimeout(to)
-  },20)
+    let to=setInterval(()=>{
+      this.update()
+  },3000)
+  }
+
+  async update(){
+    let mm=Math.round(await this.fetcher.fetchJson("fake://012")+0.5)
+    let lg=Math.round(await this.fetcher.fetchJson("fake://power")+0.5)
+    this.ea.publish(this.multi.message,{clicked:mm})
+    this.ea.publish(this.linear.event,lg)
+
   }
 }
