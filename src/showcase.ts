@@ -38,12 +38,23 @@ export class Showcase{
   }
   private linear={
     event: "lineargauge1",
+    suffix: " W",
     min:0,
     max: 10000,
     height: 50,
     width: 200,
     padding: 10,
-    bands: [{from: 0, to: 500, color: "red"},{from: 500, to: 7000, color: "blue"},{from: 7000, to: 10000, color: "yellow"}]
+    bands: [{from: 0, to: 1500, color: "red"},{from: 1500, to: 7000, color: "blue"},{from: 7000, to: 10000, color: "yellow"}]
+  }
+  private vertical={
+    event: "verticalgauge1",
+    suffix: " °C",
+    min:0,
+    max: 100,
+    height: 200,
+    width: 50,
+    padding: 10,
+    bands: [{from: 0, to: 30, color: "blue"},{from: 30, to: 70, color: "green"},{from: 70, to: 100, color: "red"}]
   }
   constructor(private ea:EventAggregator, private fetcher:FetchClient){
     this.ea.subscribe(this.multi.message+":click", event=>{
@@ -55,6 +66,7 @@ export class Showcase{
     })
   }
   attached(){
+    this.update()
     this.timer=setInterval(()=>{
       this.update()
   },3000)
@@ -67,12 +79,19 @@ export class Showcase{
   }
 
   async update(){
-    let mm=Math.round(await this.fetcher.fetchJson("fake://012")+0.5)
+    let mm=Math.round(await this.fetcher.fetchJson("fake://012"))
     let lg=Math.round(await this.fetcher.fetchJson("fake://power")+0.5)
     this.ea.publish(this.multi.message,{clicked:mm})
     this.ea.publish(this.linear.event,lg)
     let temp=await this.fetcher.fetchJson("fake://temperatur")
     let humid = Math.round(await this.fetcher.fetchJson("fake://humid")+0.5)
     this.ea.publish(this.doubleg.event,{upper: temp, lower:humid})
+    if(mm==0){
+      this.ea.publish(this.multi.message,{state:"on"})
+    }else if(mm==1){
+      this.ea.publish(this.multi.message,{state: "off"})
+    }
+    let vg=await this.fetcher.fetchJson("fake(temperature")
+    this.ea.publish(this.vertical.event,vg)
   }
 }

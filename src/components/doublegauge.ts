@@ -253,21 +253,6 @@ export class Doublegauge {
     let center = this.config.size / 2
     let size = (this.config.size / 2) * 0.9
     let factor=size/(size-this.arcsize)-0.05
-    let valTop = this.upperScale(top)
-    let valBottom = this.lowerScale(bottom)
-    /*
-    this.upperArrow
-      .transition()
-      .duration(100)
-      .attr("transform",
-      `rotate(${valTop - 90},${center},${center})`)
-    this.lowerArrow
-      .transition()
-      .duration(100)
-      .attr("transform",
-      `rotate(${valBottom - 90},${center},${center})`)
-
-      */
     let tpos=this.valueToPoint(top,factor,this.upperScale)
     let bpos=this.valueToPoint(bottom,1.2,this.lowerScale)
     this.upperArrow

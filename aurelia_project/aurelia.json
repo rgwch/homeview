@@ -1,5 +1,5 @@
 {
-  "name": "hv",
+  "name": "Homeview",
   "type": "project:application",
   "bundler": {
     "id": "cli",

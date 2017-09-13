@@ -27,7 +27,8 @@ export class FetchClient {
           return false
         }
       })
-      return Math.round((Math.random() * (upper - lower) + lower) * 10) / 10
+      let r=Math.random()
+      return Math.round((r * (upper - lower) + lower) * 10) / 10
     }
     else {
       let
