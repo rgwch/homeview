@@ -1,6 +1,6 @@
 import {autoinject,bindable} from 'aurelia-framework'
 import {EventAggregator} from "aurelia-event-aggregator"
-import * as d3sel from 'd3-selection'
+import {selectAll} from 'd3-selection'
 
 @autoinject
 export class Multiswitch{
@@ -34,11 +34,6 @@ export class Multiswitch{
       }else if("off"==event.state){
         this.light="light_off"
       }else if(undefined != event.clicked){
-        //let id=`#${this.basic_id}_${event.clicked}`
-        //$(id).button('toggle')
-        // d3sel.selectAll(id).classed("active",true)
-        // $(id).addClass("foul")
-        //$(id).click()
         this.toggle(event.clicked)
       }
     })
@@ -50,7 +45,7 @@ export class Multiswitch{
   }
 
   toggle(but){
-    d3sel.selectAll(`#${this.basic_id}>.btn`).classed("active",false)
-    d3sel.selectAll(`#${this.basic_id}_${but}`).classed("active",true)
+    selectAll(`#${this.basic_id}>.btn`).classed("active",false)
+    selectAll(`#${this.basic_id}_${but}`).classed("active",true)
   }
 }

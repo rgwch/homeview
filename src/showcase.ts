@@ -48,12 +48,12 @@ export class Showcase{
   }
   private vertical={
     event: "verticalgauge1",
-    suffix: " °C",
+    suffix: "°C",
     min:0,
     max: 100,
     height: 200,
-    width: 50,
-    padding: 10,
+    width: 60,
+    padding: 5,
     bands: [{from: 0, to: 30, color: "blue"},{from: 30, to: 70, color: "green"},{from: 70, to: 100, color: "red"}]
   }
   constructor(private ea:EventAggregator, private fetcher:FetchClient){

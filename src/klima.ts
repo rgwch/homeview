@@ -1,8 +1,8 @@
 import {autoinject} from 'aurelia-framework'
 import {FetchClient} from './services/fetchclient'
 import {EventAggregator} from "aurelia-event-aggregator"
+import globals from 'globals'
 
-const server="192.168.16.140:8087"
 const _inside_temp='hm-rpc.1.000E5569A24A0E.1.ACTUAL_TEMPERATURE'
 const _inside_humid='hm-rpc.1.000E5569A24A0E.1.HUMIDITY'
 const _outside_temp='hm-rpc.0.OEQ0088064.1.TEMPERATURE'
@@ -56,10 +56,10 @@ export class Klima{
   }
 
   async update(){
-    this.inside_temp=await this.fetcher.fetchJson(`http://${server}/get/${_inside_temp}`)
-    this.inside_humid=await this.fetcher.fetchJson(`http://${server}/get/${_inside_humid}`)
-    this.outside_humid=await this.fetcher.fetchJson(`http://${server}/get/${_outside_humid}`)
-    this.outside_temp=await this.fetcher.fetchJson(`http://${server}/get/${_outside_temp}`)
+    this.inside_temp=await this.fetcher.fetchJson(`http://${globals.server}/get/${_inside_temp}`)
+    this.inside_humid=await this.fetcher.fetchJson(`http://${globals.server}/get/${_inside_humid}`)
+    this.outside_humid=await this.fetcher.fetchJson(`http://${globals.server}/get/${_outside_humid}`)
+    this.outside_temp=await this.fetcher.fetchJson(`http://${globals.server}/get/${_outside_temp}`)
     this.ea.publish(this.outside_gauge.event,{upper: this.outside_temp,lower:this.outside_humid})
     this.ea.publish(this.livingroom_gauge.event,{upper:this.inside_temp, lower: this.inside_humid})
   }

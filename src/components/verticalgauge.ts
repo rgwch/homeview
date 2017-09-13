@@ -36,7 +36,7 @@ export class Verticalgauge{
       padding: 0,
       bands:[{from: 0,to:100,color: "blue"}]
     }, this.cfg)
-    const topspace=(this.cfg.height/INDICATOR_FONT)
+    const topspace=(this.cfg.height/INDICATOR_FONT)+5
     this.scale=scaleLinear().domain([this.cfg.max,this.cfg.min]).range([FRAMEWIDTH+this.cfg.padding+topspace,this.cfg.height-FRAMEWIDTH-this.cfg.padding])
     this.scale.clamp(true)
   }
@@ -86,10 +86,12 @@ export class Verticalgauge{
 
     // value text
     let valueFontSize=(this.cfg.height/INDICATOR_FONT)*0.6
+    let center=FRAMEWIDTH+(this.cfg.width-FRAMEWIDTH)/2
+    this.rectangle(FRAMEWIDTH,FRAMEWIDTH,this.cfg.width-2*FRAMEWIDTH,FRAMEWIDTH+INDICATOR_FONT+2,"white")
     this.value=this.body.append("svg:text")
-      .attr("x",FRAMEWIDTH+1)
+      .attr("x",center)
       .attr("y",FRAMEWIDTH+1+valueFontSize)
-      .attr("text-anchor","left")
+      .attr("text-anchor","middle")
       //.attr("dy",FRAMEWIDTH+this.cfg.height/2)
       .attr("opacity",1.0)
       .style("font-size",valueFontSize)

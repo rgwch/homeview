@@ -14,10 +14,12 @@ Frontend for an ioBroker based home automation system
     
 - point your browser (recommended: chrome) to `localhost:9000/#/showcase`    
 
-## building deployment version
+## Building deployment version
 
 Change values in globals.ts: Set mock to false to use a real server and adjust the server address and port accordingly. Then:
 
     au build --env prod
     
-Then, copy index.html and the folders source and styles to the deployment server    
+After build, copy `index.html`  and the folders `source` and `styles` to the deployment server    
+
+Of course, everything except "showcase" needs major refactoring ro work in your environment.

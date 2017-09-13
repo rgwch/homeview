@@ -5,10 +5,15 @@
 
 .inner{
   fill: #d3d3d3;
-  stroke: "blue";
-  stroke-width: 1;
+  stroke: blue;
+  stroke-width: 0.6;
 }
 
+.white{
+  fill: #e1e1e1;
+  stroke: blue;
+  stroke-width: 0.6
+}
 
 .frame{
   border-style: solid;
