@@ -251,8 +251,11 @@ export class Doublegauge {
    */
   redraw(top, bottom) {
     let center = this.config.size / 2
+    let size = (this.config.size / 2) * 0.9
+    let factor=size/(size-this.arcsize)-0.05
     let valTop = this.upperScale(top)
     let valBottom = this.lowerScale(bottom)
+    /*
     this.upperArrow
       .transition()
       .duration(100)
@@ -263,6 +266,20 @@ export class Doublegauge {
       .duration(100)
       .attr("transform",
       `rotate(${valBottom - 90},${center},${center})`)
+
+      */
+    let tpos=this.valueToPoint(top,factor,this.upperScale)
+    let bpos=this.valueToPoint(bottom,1.2,this.lowerScale)
+    this.upperArrow
+      .transition()
+      .duration(400)
+      .attr("x2",center-tpos.x)
+      .attr("y2",center-tpos.y)
+    this.lowerArrow
+      .transition()
+      .duration(400)
+      .attr("x2",center+bpos.x)
+      .attr("y2",center+bpos.y)
     this.upperValue.text(top + this.config.upperSuffix)
     this.lowerValue.text(bottom + this.config.lowerSuffix)
   }
