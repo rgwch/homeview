@@ -1,5 +1,5 @@
 # homeview
-Frontend for an ioBroker based home automation system
+Frontend for an ioBroker based home automation system.
 
 ## Getting started
 
@@ -22,4 +22,4 @@ Change values in globals.ts: Set mock to false to use a real server and adjust t
     
 After build, copy `index.html`  and the folders `source` and `styles` to the deployment server    
 
-Of course, everything except "showcase" needs major refactoring ro work in your environment.
+Of course, everything except "showcase" needs major refactoring to work in a specific environment. So, this is rather a help to get started, than a ready-to-use app.

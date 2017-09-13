@@ -1,7 +1,7 @@
 import {autoinject} from 'aurelia-framework'
 import {FetchClient} from './services/fetchclient'
 import {EventAggregator} from "aurelia-event-aggregator"
-import globals from 'globals'
+import globals from './globals'
 
 const _inside_temp='hm-rpc.1.000E5569A24A0E.1.ACTUAL_TEMPERATURE'
 const _inside_humid='hm-rpc.1.000E5569A24A0E.1.HUMIDITY'
