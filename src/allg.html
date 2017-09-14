@@ -15,5 +15,27 @@
         <multiswitch cfg.bind="tuerlicht"></multiswitch>
       </div>
     </div>
+    <div class="row">
+      <div class="col-sm-4">
+        <h3>Media-Center</h3>
+        <multiswitch cfg.bind="mediacenter"></multiswitch>
+      </div>
+      <div class="col-sm-4">
+        <h3>WLAN-Extender</h3>
+        <multiswitch cfg.bind="wlanext"></multiswitch>
+      </div>
+      <div class="col-sm-4">
+        <div class="row">
+          <div class="col-sm-8">
+            <h3>Auto-Ladestation</h3>
+            <multiswitch cfg.bind="auto"></multiswitch>
+          </div>
+          <div class="col-sm-4">
+            <h3>Leistung</h3>
+            ${car_power} Watt
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
