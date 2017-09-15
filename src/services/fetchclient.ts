@@ -31,17 +31,8 @@ export class FetchClient {
       return Math.round((r * (upper - lower) + lower) * 10) / 10
     }
     else {
-      let
-        result = await
-
-          fetch(url)
-
-      return (await
-
-          result
-            .json()
-
-      ).val
+      let result = await fetch(url)
+      return (await result.json()).val
     }
   }
 
