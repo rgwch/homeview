@@ -1,7 +1,15 @@
-.h2{
+h3 {
   color: blue;
 }
 
+.tile{
+  border-style: inset;
+  border-color: aqua;
+  border-width: 2px;
+  border-radius: 5px;
+  margin: 5px;
+  padding: 5px;
+}
 
 .inner{
   fill: #d3d3d3;

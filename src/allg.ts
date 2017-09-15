@@ -5,6 +5,7 @@ import {FetchClient} from './services/fetchclient'
 @autoinject
 export class Allg {
   private car_power=1104
+  private default_columns="col-xs-6 col-sm-4 col-md-2"
   private three_buttons_def = {
     buttons: [
       {

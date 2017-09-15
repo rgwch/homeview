@@ -1,41 +1,32 @@
 <template>
   <require from="components/multiswitch"></require>
-  <div class="container">
+  <div class="container-fluid tile">
     <div class="row">
-      <div class="col-sm-4">
-        <h3>Fernsehlicht</h3>
+      <div class="${default_columns} tile">
+        <h3 class=".center">Fernsehlicht</h3>
         <multiswitch cfg.bind="fernsehlicht"></multiswitch>
       </div>
-      <div class="col-sm-4">
+      <div class="${default_columns} tile">
         <h3>Treppenlicht</h3>
         <multiswitch cfg.bind="treppenlicht"></multiswitch>
       </div>
-      <div class="col-sm-4">
+      <div class="${default_columns} tile">
         <h3>Türlicht</h3>
         <multiswitch cfg.bind="tuerlicht"></multiswitch>
       </div>
-    </div>
-    <div class="row">
-      <div class="col-sm-4">
+      <div class="${default_columns} tile">
         <h3>Media-Center</h3>
         <multiswitch cfg.bind="mediacenter"></multiswitch>
       </div>
-      <div class="col-sm-4">
+      <div class="${default_columns} tile">
         <h3>WLAN-Extender</h3>
         <multiswitch cfg.bind="wlanext"></multiswitch>
       </div>
-      <div class="col-sm-4">
-        <div class="row">
-          <div class="col-sm-8">
-            <h3>Auto-Ladestation</h3>
-            <multiswitch cfg.bind="auto"></multiswitch>
-          </div>
-          <div class="col-sm-4">
-            <h3>Leistung</h3>
-            ${car_power} Watt
-          </div>
-        </div>
+      <div class="${default_columns} tile">
+        <h3 class="center">Auto - ${car_power} Watt</h3>
+        <multiswitch cfg.bind="auto"></multiswitch>
       </div>
     </div>
+  </div>
   </div>
 </template>
