@@ -1,0 +1,56 @@
+h3 {
+  color: blue;
+}
+
+.tile{
+  border-style: inset;
+  border-color: aqua;
+  border-width: 2px;
+  border-radius: 5px;
+  margin: 5px;
+  padding: 5px;
+}
+
+.inner{
+  fill: #d3d3d3;
+  stroke: blue;
+  stroke-width: 0.6;
+}
+
+.white{
+  fill: #e1e1e1;
+  stroke: blue;
+  stroke-width: 0.6
+}
+
+.frame{
+  border-style: solid;
+  border-color: #a79ea3;
+  border-width: 5px;
+  border-radius: 5px;
+  fill: #a79ea3;
+  stroke: black;
+  stroke-width: 1;
+}
+
+.flat_button{
+  margin: 3px !important;
+}
+
+.light_on{
+  background: yellow;
+}
+
+.light_off{
+  background: #d3d3d3;
+}
+
+.page-host {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50px;
+  bottom: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+}

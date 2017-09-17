@@ -13,17 +13,10 @@ const _bathroom1_humid='hm-rpc.1.000E57098F247E.1.HUMIDITY'
 @autoinject
 export class Klima{
   private default_columns="col-xs-12 col-md-6 col-lg-3"
-  private inside_temp=0
-  private inside_humid=0
-  private outside_temp=0
-  private outside_humid=0
-  private bathroom1_temp=0
-  private bathroom1_humid=0
   private timer=null
   private outside_gauge
   private livingroom_gauge
   private bathroom1_gauge
-  private empty={}
 
   constructor(private fetcher:FetchClient, private ea:EventAggregator){
     this.outside_gauge={
@@ -71,14 +64,14 @@ export class Klima{
   }
 
   async update(){
-    this.inside_temp=await this.fetcher.fetchJson(`${globals.server}/get/${_inside_temp}`)
-    this.inside_humid=await this.fetcher.fetchJson(`${globals.server}/get/${_inside_humid}`)
-    this.outside_humid=await this.fetcher.fetchJson(`${globals.server}/get/${_outside_humid}`)
-    this.outside_temp=await this.fetcher.fetchJson(`${globals.server}/get/${_outside_temp}`)
-    this.bathroom1_temp=await this.fetcher.fetchJson(`${globals.server}/get/${_bathroom1_temp}`)
-    this.bathroom1_humid=await this.fetcher.fetchJson(`${globals.server}/get/${_bathroom1_humid}`)
-    this.ea.publish(this.outside_gauge.event,{upper: this.outside_temp,lower:this.outside_humid})
-    this.ea.publish(this.livingroom_gauge.event,{upper:this.inside_temp, lower: this.inside_humid})
-    this.ea.publish(this.bathroom1_gauge.event,{upper: this.bathroom1_temp, lower: this.bathroom1_humid})
+    const inside_temp=await this.fetcher.fetchJson(`${globals.server}/get/${_inside_temp}`)
+    const inside_humid=await this.fetcher.fetchJson(`${globals.server}/get/${_inside_humid}`)
+    const outside_humid=await this.fetcher.fetchJson(`${globals.server}/get/${_outside_humid}`)
+    const outside_temp=await this.fetcher.fetchJson(`${globals.server}/get/${_outside_temp}`)
+    const bathroom1_temp=await this.fetcher.fetchJson(`${globals.server}/get/${_bathroom1_temp}`)
+    const bathroom1_humid=await this.fetcher.fetchJson(`${globals.server}/get/${_bathroom1_humid}`)
+    this.ea.publish(this.outside_gauge.event,{upper: outside_temp,lower:outside_humid})
+    this.ea.publish(this.livingroom_gauge.event,{upper:inside_temp, lower: inside_humid})
+    this.ea.publish(this.bathroom1_gauge.event,{upper: bathroom1_temp, lower: bathroom1_humid})
   }
 }
