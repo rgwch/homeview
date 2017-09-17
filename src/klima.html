@@ -3,16 +3,16 @@
   <require from="components/threewayswitch"></require>
   <div class="container">
     <div class="row">
-      <div class="col-sm-3 col-xs-12 col-md-2">
+      <div class="${default_columns}">
         <h3>Draussen</h3>
         <doublegauge config.bind="outside_gauge"></doublegauge>
       </div>
-      <div class="col-sm-3 col-xs-12 col-md-2">
+      <div class="${default_columns}">
         <h3>Wohnzimmer</h3>
         <doublegauge config.bind="livingroom_gauge"></doublegauge>
       </div>
-      <div class="col-sm-3 col-xs-12 col-md-2">
-        <h3>Bad oben</h3>
+      <div class=${default_columns}>
+        <h3>Badezimmer</h3>
         <doublegauge config.bind="bathroom1_gauge"></doublegauge>
       </div>
     </div>

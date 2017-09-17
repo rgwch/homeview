@@ -15,7 +15,7 @@ const KNOWN_SOURCES = [
 export class FetchClient {
 
   public async fetchJson(url) {
-    if (globals.mock) {
+    if (globals.mock || url.startsWith("fake")) {
       let upper = 100
       let lower = -10
       KNOWN_SOURCES.find(source => {

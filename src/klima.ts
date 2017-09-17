@@ -12,6 +12,7 @@ const _bathroom1_humid='hm-rpc.1.000E57098F247E.1.HUMIDITY'
 
 @autoinject
 export class Klima{
+  private default_columns="col-xs-12 col-md-6 col-lg-3"
   private inside_temp=0
   private inside_humid=0
   private outside_temp=0
@@ -36,18 +37,23 @@ export class Klima{
       lowerMin: 20,
       lowerMax: 80,
       lowerSuffix: "%",
-      lowerBands: [{from:20, to: 80, color: "#109618"}]
+      lowerBands: [{from: 20, to: 25, color: "#DC3912"},{from: 25, to: 30, color: "#ffd74c"}, {from: 30, to:70, color: "#109618"},
+        {from:70, to:75, color: "#ffd74c"}, {from: 75, to:80, color: "#DC3912"}]
     }
     this.livingroom_gauge=Object.assign({},this.outside_gauge)
     this.livingroom_gauge.event="livingroom_data_update"
     this.livingroom_gauge.upperMin=10
     this.livingroom_gauge.upperMax=30
-    this.livingroom_gauge.upperBands=[{from: 10, to:18, color: "#bff7ff"}, {from: 18, to: 24, color: "#109618"},
+    this.livingroom_gauge.upperBands=[{from: 10, to:19, color: "#bff7ff"}, {from: 19, to: 24, color: "#109618"},
       {from: 24, to:30, color: "#DC3912"}]
     this.livingroom_gauge.lowerBands=  [{from: 20, to: 30, color: "#DC3912"},{from: 30, to: 40, color: "#ffd74c"}, {from: 40, to:60, color: "#109618"},
       {from:60, to:70, color: "#ffd74c"}, {from: 70, to:80, color: "#DC3912"}]
     this.bathroom1_gauge=Object.assign({},this.livingroom_gauge)
     this.bathroom1_gauge.event="bathroom1_data_update"
+    this.bathroom1_gauge.upperBands=[{from: 10, to:21, color: "#bff7ff"}, {from: 21, to: 25, color: "#109618"},
+      {from: 25, to:30, color: "#DC3912"}]
+
+
 
   }
 
