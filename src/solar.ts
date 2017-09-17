@@ -4,11 +4,11 @@ import * as d3f from 'd3-format'
 import * as d3ax from 'd3-axis'
 import {autoinject} from 'aurelia-framework'
 import {FetchClient} from './services/fetchclient'
+import globals from './globals'
 
 const padding = 25;
 const lower_limit = 0;
 const height = "80px";
-const server = "192.168.16.140:8087";
 const ACT_POWER = "fronius.0.powerflow.P_PV";
 const DAY_ENERGY = "fronius.0.inverter.1.DAY_ENERGY"
 const YEAR_ENERGY = "fronius.0.inverter.1.YEAR_ENERGY"
@@ -99,17 +99,17 @@ export class Solar {
 
   async update() {
 
-    const power= await this.fetcher.fetchJson(`http://${server}/get/${ACT_POWER}`)
+    const power= await this.fetcher.fetchJson(`${globals.server}/get/${ACT_POWER}`)
     this.update_dimensions()
     let bar = d3sel.select("#power_bar")
     bar.attr("width", this.x(power) - this.x(0))
     let text = d3sel.select("#textval")
     text.text(`${power} Watt`)
-    const day=await this.fetcher.fetchJson(`http://${server}/get/${DAY_ENERGY}`)
+    const day=await this.fetcher.fetchJson(`${globals.server}/get/${DAY_ENERGY}`)
     this.day_energy = format(day / 1000)
-    const year = await this.fetcher.fetchJson(`http://${server}/get/${YEAR_ENERGY}`)
+    const year = await this.fetcher.fetchJson(`${globals.server}/get/${YEAR_ENERGY}`)
     this.year_energy = format(year / 1000)
-    const total = await this.fetcher.fetchJson(`http://${server}/get/${TOTAL_ENERGY}`)
+    const total = await this.fetcher.fetchJson(`${globals.server}/get/${TOTAL_ENERGY}`)
     this.total_energy = format(total / 1000000)
   }
 

@@ -36,8 +36,7 @@ export class Klima{
       lowerMin: 20,
       lowerMax: 80,
       lowerSuffix: "%",
-      lowerBands: [{from: 20, to: 30, color: "#DC3912"},{from: 30, to: 40, color: "#ffd74c"}, {from: 40, to:60, color: "#109618"},
-        {from:60, to:70, color: "#ffd74c"}, {from: 70, to:80, color: "#DC3912"}]
+      lowerBands: [{from:20, to: 80, color: "#109618"}]
     }
     this.livingroom_gauge=Object.assign({},this.outside_gauge)
     this.livingroom_gauge.event="livingroom_data_update"
@@ -45,6 +44,8 @@ export class Klima{
     this.livingroom_gauge.upperMax=30
     this.livingroom_gauge.upperBands=[{from: 10, to:18, color: "#bff7ff"}, {from: 18, to: 24, color: "#109618"},
       {from: 24, to:30, color: "#DC3912"}]
+    this.livingroom_gauge.lowerBands=  [{from: 20, to: 30, color: "#DC3912"},{from: 30, to: 40, color: "#ffd74c"}, {from: 40, to:60, color: "#109618"},
+      {from:60, to:70, color: "#ffd74c"}, {from: 70, to:80, color: "#DC3912"}]
     this.bathroom1_gauge=Object.assign({},this.livingroom_gauge)
     this.bathroom1_gauge.event="bathroom1_data_update"
 
@@ -64,12 +65,12 @@ export class Klima{
   }
 
   async update(){
-    this.inside_temp=await this.fetcher.fetchJson(`http://${globals.server}/get/${_inside_temp}`)
-    this.inside_humid=await this.fetcher.fetchJson(`http://${globals.server}/get/${_inside_humid}`)
-    this.outside_humid=await this.fetcher.fetchJson(`http://${globals.server}/get/${_outside_humid}`)
-    this.outside_temp=await this.fetcher.fetchJson(`http://${globals.server}/get/${_outside_temp}`)
-    this.bathroom1_temp=await this.fetcher.fetchJson(`http://${globals.server}/get/${_bathroom1_temp}`)
-    this.bathroom1_humid=await this.fetcher.fetchJson(`http://${globals.server}/get/${_bathroom1_humid}`)
+    this.inside_temp=await this.fetcher.fetchJson(`${globals.server}/get/${_inside_temp}`)
+    this.inside_humid=await this.fetcher.fetchJson(`${globals.server}/get/${_inside_humid}`)
+    this.outside_humid=await this.fetcher.fetchJson(`${globals.server}/get/${_outside_humid}`)
+    this.outside_temp=await this.fetcher.fetchJson(`${globals.server}/get/${_outside_temp}`)
+    this.bathroom1_temp=await this.fetcher.fetchJson(`${globals.server}/get/${_bathroom1_temp}`)
+    this.bathroom1_humid=await this.fetcher.fetchJson(`${globals.server}/get/${_bathroom1_humid}`)
     this.ea.publish(this.outside_gauge.event,{upper: this.outside_temp,lower:this.outside_humid})
     this.ea.publish(this.livingroom_gauge.event,{upper:this.inside_temp, lower: this.inside_humid})
     this.ea.publish(this.bathroom1_gauge.event,{upper: this.bathroom1_temp, lower: this.bathroom1_humid})
