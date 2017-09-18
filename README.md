@@ -8,6 +8,7 @@ Frontend for an ioBroker based home automation system.
 - checkout and setup homeview
 
       git clone https://github.com/rgwch/homeview
+      cd homeview
       npm install aurelia-cli
       npm install
       au run --watch
