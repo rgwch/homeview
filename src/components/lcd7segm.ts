@@ -99,12 +99,14 @@ export class Lcd7segm {
       seg
         .transition()
         .duration(900)
+        .attr("opacity",0.2)
         .attr("fill",this.cfg.off_color)
     })
     segments.forEach(seg=>{
       this.segs[seg-1]
         .transition()
         .duration(600)
+        .attr("opacity",1.0)
         .attr("fill",this.cfg.on_color)
     })
   }

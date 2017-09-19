@@ -11,6 +11,12 @@ export class Showcase{
     event: "l7segm-1",
     width: 90,
     height: 180,
+    on_color: "red"
+  }
+  private clock={
+    event: "clock_upd",
+    width: 90,
+    height: 180
   }
   private emptyObj={}
   doubleg={
@@ -103,5 +109,6 @@ export class Showcase{
     if(this.counter>9){
       this.counter=0
     }
+    this.ea.publish(this.clock.event)
   }
 }
