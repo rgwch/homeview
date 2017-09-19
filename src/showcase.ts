@@ -6,6 +6,12 @@ import {FetchClient} from './services/fetchclient'
 @autoinject
 export class Showcase{
   private timer
+  private counter=0
+  private l7segm={
+    event: "l7segm-1",
+    width: 90,
+    height: 180,
+  }
   private emptyObj={}
   doubleg={
     event: "doublegauge_data_update",
@@ -93,5 +99,9 @@ export class Showcase{
     }
     let vg=await this.fetcher.fetchJson("fake(temperature")
     this.ea.publish(this.vertical.event,vg)
+    this.ea.publish(this.l7segm.event,this.counter++)
+    if(this.counter>9){
+      this.counter=0
+    }
   }
 }

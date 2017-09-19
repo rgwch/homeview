@@ -1,0 +1,6 @@
+<template>
+  <require from="./lcd7segm"></require>
+  <span repeat.for="digit of config.digits">
+    <lcd7segm cfg.bind="config"></lcd7segm>
+  </span>
+</template>
