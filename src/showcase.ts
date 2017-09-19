@@ -15,6 +15,7 @@ export class Showcase{
   }
   private clock={
     event: "clock_upd",
+    seconds: false,
     width: 90,
     height: 180
   }

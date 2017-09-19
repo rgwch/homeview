@@ -1,10 +1,12 @@
 <template>
   <require from="components/doublegauge"></require>
   <require from="components/threewayswitch"></require>
+  <require from="components/verticalgauge"></require>
   <div class="container">
     <div class="row">
       <div class="${default_columns}">
         <h3>Draussen</h3>
+        <verticalgauge cfg.bind="brightness"></verticalgauge>
         <doublegauge config.bind="outside_gauge"></doublegauge>
       </div>
       <div class="${default_columns}">

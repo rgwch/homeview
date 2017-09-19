@@ -9,6 +9,7 @@ const _outside_temp='hm-rpc.0.OEQ0088064.1.TEMPERATURE'
 const _outside_humid='hm-rpc.0.OEQ0088064.1.HUMIDITY'
 const _bathroom1_temp='hm-rpc.1.000E57098F247E.1.ACTUAL_TEMPERATURE'
 const _bathroom1_humid='hm-rpc.1.000E57098F247E.1.HUMIDITY'
+const _brightness='hm-rpc.0.NEQ0320745.1.BRIGHTNESS'
 
 @autoinject
 export class Klima{
@@ -17,6 +18,13 @@ export class Klima{
   private outside_gauge
   private livingroom_gauge
   private bathroom1_gauge
+  private brightness={
+    min: 0,
+    max: 300,
+    height: 180,
+    width: 50,
+    event: "event_brightness"
+  }
 
   constructor(private fetcher:FetchClient, private ea:EventAggregator){
     this.outside_gauge={
@@ -70,8 +78,10 @@ export class Klima{
     const outside_temp=await this.fetcher.fetchJson(`${globals.server}/get/${_outside_temp}`)
     const bathroom1_temp=await this.fetcher.fetchJson(`${globals.server}/get/${_bathroom1_temp}`)
     const bathroom1_humid=await this.fetcher.fetchJson(`${globals.server}/get/${_bathroom1_humid}`)
+    const bright= await this.fetcher.fetchJson(`${globals.server}/get/${_brightness}`)
     this.ea.publish(this.outside_gauge.event,{upper: outside_temp,lower:outside_humid})
     this.ea.publish(this.livingroom_gauge.event,{upper:inside_temp, lower: inside_humid})
     this.ea.publish(this.bathroom1_gauge.event,{upper: bathroom1_temp, lower: bathroom1_humid})
+    this.ea.publish(this.brightness.event, bright)
   }
 }

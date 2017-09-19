@@ -5,4 +5,9 @@
   <svg class="colon"></svg>
   <lcd7segm cfg.bind="m10cfg"></lcd7segm>
   <lcd7segm cfg.bind="m1cfg"></lcd7segm>
+  <span if.bind="cfg.seconds">
+    <svg class="colon"></svg>
+    <lcd7segm cfg.bind="s10cfg"></lcd7segm>
+    <lcd7segm cfg.bind="s1cfg"></lcd7segm>
+  </span>
 </template>
