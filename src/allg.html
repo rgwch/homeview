@@ -1,29 +1,21 @@
 <template>
   <require from="components/multiswitch"></require>
   <div style="position:relative">
-  <div class="tile" id="fernsehlicht">
-    Fernsehlicht
-    <multiswitch cfg.bind="fernsehlicht"></multiswitch>
-  </div>
-  <div class="tile" id="treppenlicht" style="left:210px">
-    Treppenlicht
-    <multiswitch cfg.bind="treppenlicht"></multiswitch>
-  </div>
+    <div class="tile" id="fernsehlicht">
+      Fernsehlicht
+      <multiswitch cfg.bind="fernsehlicht"></multiswitch>
+    </div>
+    <div class="tile" id="treppenlicht" style="left:210px">
+      Treppenlicht
+      <multiswitch cfg.bind="treppenlicht"></multiswitch>
+    </div>
+    <div class="tile" id="tuerlicht" >
+      Türlicht
+      <multiswitch cfg.bind="tuerlicht"></multiswitch>
+    </div>
   </div>
   <!-- div class="container-fluid tile">
     <div class="row">
-      <div class="${default_columns} tile">
-        <h3 class=".center">Fernsehlicht</h3>
-        <multiswitch cfg.bind="fernsehlicht"></multiswitch>
-      </div>
-      <div class="${default_columns} tile">
-        <h3>Treppenlicht</h3>
-        <multiswitch cfg.bind="treppenlicht"></multiswitch>
-      </div>
-      <div class="${default_columns} tile">
-        <h3>Türlicht</h3>
-        <multiswitch cfg.bind="tuerlicht"></multiswitch>
-      </div>
       <div class="${default_columns} tile">
         <h3>Media-Center</h3>
         <multiswitch cfg.bind="mediacenter"></multiswitch>

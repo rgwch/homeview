@@ -1,4 +1,8 @@
 @bordercolor: #a79ea3;
+@fillcolor: #d3d3d3;
+@captioncolor: #1c63ef;
+@strokecolor: blue;
+@fill1: lighten(@fillcolor,20%);
 
 h3 {
   color: blue;
@@ -14,19 +18,20 @@ h3 {
   position: absolute;
   width: 200px;
   text-align:center;
-  color: red;
+  color: @captioncolor;
+  background-color: lighten(@fillcolor,10%);
   font-size:18px;
 }
 
 .inner{
-  fill: #d3d3d3;
-  stroke: blue;
+  fill: @fillcolor;
+  stroke: @strokecolor;
   stroke-width: 0.6;
 }
 
 .white{
   fill: #e1e1e1;
-  stroke: blue;
+  stroke: @strokecolor;
   stroke-width: 0.6
 }
 
@@ -35,7 +40,7 @@ h3 {
   border-color: @bordercolor;
   border-width: 5px;
   border-radius: 5px;
-  fill: #a79ea3;
+  fill: @fillcolor;
   stroke: black;
   stroke-width: 1;
 }

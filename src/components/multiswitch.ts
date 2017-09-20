@@ -8,8 +8,9 @@ export class Multiswitch{
   private light="light_off"
   private basic_id="B"+(Math.random().toString()).substring(2)
 
-  constructor(private ea:EventAggregator){}
+  constructor(private ea:EventAggregator, private element:Element){}
   attached(){
+    this.element.setAttribute("style","width:150px")
     if(undefined == this.cfg['buttons']){
       this.cfg['buttons'] = [{
         caption: "Eins",

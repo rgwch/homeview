@@ -1,6 +1,7 @@
 import {autoinject} from 'aurelia-framework'
 import {EventAggregator} from 'aurelia-event-aggregator'
 import {FetchClient} from './services/fetchclient'
+import {select,selectAll} from 'd3-selection'
 
 @autoinject
 export class Allg {
@@ -49,6 +50,10 @@ export class Allg {
     this.ea.subscribe(this.auto.message+":click",event=>this.clicked(event,this.auto))
   }
 
+  attached(){
+    selectAll("#tuerlicht")
+      .attr("style","left:100px;top:100px;")
+  }
   clicked(event,cfg){
     if(event.value==1){
       this.ea.publish(cfg.message,{state:"on"})
