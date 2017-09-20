@@ -3,13 +3,6 @@ import {FetchClient} from './services/fetchclient'
 import {EventAggregator} from "aurelia-event-aggregator"
 import globals from './globals'
 
-const _inside_temp='hm-rpc.1.000E5569A24A0E.1.ACTUAL_TEMPERATURE'
-const _inside_humid='hm-rpc.1.000E5569A24A0E.1.HUMIDITY'
-const _outside_temp='hm-rpc.0.OEQ0088064.1.TEMPERATURE'
-const _outside_humid='hm-rpc.0.OEQ0088064.1.HUMIDITY'
-const _bathroom1_temp='hm-rpc.1.000E57098F247E.1.ACTUAL_TEMPERATURE'
-const _bathroom1_humid='hm-rpc.1.000E57098F247E.1.HUMIDITY'
-const _brightness='hm-rpc.0.NEQ0320745.1.BRIGHTNESS'
 
 @autoinject
 export class Klima{
@@ -72,13 +65,13 @@ export class Klima{
   }
 
   async update(){
-    const inside_temp=await this.fetcher.fetchJson(`${globals.server}/get/${_inside_temp}`)
-    const inside_humid=await this.fetcher.fetchJson(`${globals.server}/get/${_inside_humid}`)
-    const outside_humid=await this.fetcher.fetchJson(`${globals.server}/get/${_outside_humid}`)
-    const outside_temp=await this.fetcher.fetchJson(`${globals.server}/get/${_outside_temp}`)
-    const bathroom1_temp=await this.fetcher.fetchJson(`${globals.server}/get/${_bathroom1_temp}`)
-    const bathroom1_humid=await this.fetcher.fetchJson(`${globals.server}/get/${_bathroom1_humid}`)
-    const bright= await this.fetcher.fetchJson(`${globals.server}/get/${_brightness}`)
+    const inside_temp=await this.fetcher.fetchJson(`${globals.server}/get/${globals._livingroom_temp}`)
+    const inside_humid=await this.fetcher.fetchJson(`${globals.server}/get/${globals._livingroom_humidity}`)
+    const outside_humid=await this.fetcher.fetchJson(`${globals.server}/get/${globals._outside_humidity}`)
+    const outside_temp=await this.fetcher.fetchJson(`${globals.server}/get/${globals._outside_temp}`)
+    const bathroom1_temp=await this.fetcher.fetchJson(`${globals.server}/get/${globals._bathroom_temp}`)
+    const bathroom1_humid=await this.fetcher.fetchJson(`${globals.server}/get/${globals._bathroom_humidity}`)
+    const bright= await this.fetcher.fetchJson(`${globals.server}/get/${globals._brightness}`)
     this.ea.publish(this.outside_gauge.event,{upper: outside_temp,lower:outside_humid})
     this.ea.publish(this.livingroom_gauge.event,{upper:inside_temp, lower: inside_humid})
     this.ea.publish(this.bathroom1_gauge.event,{upper: bathroom1_temp, lower: bathroom1_humid})

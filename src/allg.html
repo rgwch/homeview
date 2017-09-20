@@ -1,11 +1,13 @@
 <template>
   <require from="components/multiswitch"></require>
+  <require from="components/doublegauge"></require>
+  <require from="components/verticalgauge"></require>
   <div style="position:relative">
     <div class="tile" id="fernsehlicht">
       Fernsehlicht
       <multiswitch cfg.bind="fernsehlicht"></multiswitch>
     </div>
-    <div class="tile" id="treppenlicht" style="left:210px">
+    <div class="tile" id="treppenlicht">
       Treppenlicht
       <multiswitch cfg.bind="treppenlicht"></multiswitch>
     </div>
@@ -13,16 +15,37 @@
       Türlicht
       <multiswitch cfg.bind="tuerlicht"></multiswitch>
     </div>
+    <div class="tile" id="auto_lader">
+      Auto - ${car_power} W
+      <multiswitch cfg.bind="autolader"></multiswitch>
+    </div>
+    <div class="tile" id="wlanext">
+      WLAN-Extender
+      <multiswitch cfg.bind="wlanext"></multiswitch>
+    </div>
+    <div class="tile" id="mediacenter">
+      Media-Center
+      <multiswitch cfg.bind="mediacenter"></multiswitch>
+    </div>
+    <div class="tile" id="outside_climate">
+      Draussen
+      <doublegauge config.bind="outside_gauge"></doublegauge>
+    </div>
+    <div class="tile" id="livingroom_climate">
+      Wohnzimmer
+      <doublegauge config.bind="livingroom_gauge"></doublegauge>
+    </div>
+    <div class="tile" id="bathroom_climate">
+      Badezimmer
+      <doublegauge config.bind="bathroom_gauge"></doublegauge>
+    </div>
+
   </div>
   <!-- div class="container-fluid tile">
     <div class="row">
       <div class="${default_columns} tile">
-        <h3>Media-Center</h3>
-        <multiswitch cfg.bind="mediacenter"></multiswitch>
       </div>
       <div class="${default_columns} tile">
-        <h3>WLAN-Extender</h3>
-        <multiswitch cfg.bind="wlanext"></multiswitch>
       </div>
       <div class="${default_columns} tile">
         <h3 class="center">Auto - ${car_power} Watt</h3>
