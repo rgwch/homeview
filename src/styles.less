@@ -1,14 +1,21 @@
+@bordercolor: #a79ea3;
+
 h3 {
   color: blue;
 }
 
 .tile{
   border-style: inset;
-  border-color: aqua;
+  border-color: @bordercolor;
   border-width: 2px;
   border-radius: 5px;
   margin: 5px;
   padding: 5px;
+  position: absolute;
+  width: 200px;
+  text-align:center;
+  color: red;
+  font-size:18px;
 }
 
 .inner{
@@ -25,7 +32,7 @@ h3 {
 
 .frame{
   border-style: solid;
-  border-color: #a79ea3;
+  border-color: @bordercolor;
   border-width: 5px;
   border-radius: 5px;
   fill: #a79ea3;

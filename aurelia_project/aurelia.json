@@ -158,10 +158,10 @@
     "source": "src/**/*.html"
   },
   "cssProcessor": {
-    "id": "none",
-    "displayName": "None",
-    "fileExtension": ".css",
-    "source": "src/**/*.css"
+    "id": "less",
+    "displayName": "Less",
+    "fileExtension": ".less",
+    "source": "src/**/*.less"
   },
   "editor": {
     "id": "vscode",

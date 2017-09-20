@@ -1,6 +1,16 @@
 <template>
   <require from="components/multiswitch"></require>
-  <div class="container-fluid tile">
+  <div style="position:relative">
+  <div class="tile" id="fernsehlicht">
+    Fernsehlicht
+    <multiswitch cfg.bind="fernsehlicht"></multiswitch>
+  </div>
+  <div class="tile" id="treppenlicht" style="left:210px">
+    Treppenlicht
+    <multiswitch cfg.bind="treppenlicht"></multiswitch>
+  </div>
+  </div>
+  <!-- div class="container-fluid tile">
     <div class="row">
       <div class="${default_columns} tile">
         <h3 class=".center">Fernsehlicht</h3>
@@ -26,7 +36,7 @@
         <h3 class="center">Auto - ${car_power} Watt</h3>
         <multiswitch cfg.bind="auto"></multiswitch>
       </div>
-    </div>
+    </div
   </div>
-  </div>
+  </div -->
 </template>
