@@ -1,5 +1,5 @@
 export default {
-  mock: true,
+  mock: false,
   server: "http://192.168.16.140:8087",
   update_interval_seconds: 30,
   _livingroom_temp: 'hm-rpc.1.000E5569A24A0E.1.ACTUAL_TEMPERATURE',
@@ -12,8 +12,14 @@ export default {
   _stair_light_manual: 'javascript.0.aussenlicht_manuell',
   _stair_light_state: 'lightify.0.904AA200AA3EB07C.on',
   _television_light_manual: 'javascript.0.fernsehlicht_manuell',
+  _television_light_state: 'hue.0.Philips_hue.Wohnzimmer.on',
   _door_light_manual: 'javascript.0.tuerlicht_manuell',
+  _door_light_state: 'lightify.0.64EADA0000261884.on',
   _car_loader_manual: 'javascript.0.loadcar_manual',
   _car_loader_state: 'mystrom.1.switchState',
-  _car_loader_power: 'mystrom.1.power'
+  _car_loader_power: 'mystrom.1.power',
+  _wlan_state: 'mystrom.2.switchState',
+  _wlan_power: 'mystrom.2.power',
+  _mediacenter_state: 'mystrom.0.switchState',
+  _mediacenter_power: 'mystrom.0.power'
 }

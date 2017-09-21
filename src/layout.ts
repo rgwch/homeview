@@ -27,12 +27,17 @@ export class layout{
       }
     ]
   }
-  treppenlicht=Object.assign({message: "treppenlicht_state",id:"treppenlicht", val: global._stair_light_state}, this.three_buttons_def)
-  tuerlicht=Object.assign({message: "tuerlicht_state", id:"tuerlicht", val: "fake://"}, this.three_buttons_def)
-  fernsehlicht=Object.assign({message: "fernsehlicht_state", id:"fernsehlicht", val:"fake://"}, this.three_buttons_def)
-  autolader=Object.assign({message: "auto_state", id:"auto_lader", val: global._car_loader_state}, this.three_buttons_def)
-  mediacenter=Object.assign({message: "mediacenter_state", id:"mediacenter", val: "fake://"}, this.two_buttons_def)
-  wlanext= Object.assign({message: "wlanextender_state", id:"wlanext", val: "fake://"}, this.two_buttons_def)
+  treppenlicht=Object.assign({message: "treppenlicht_state",id:"treppenlicht",
+    val: global._stair_light_state,switch: global._stair_light_manual}, this.three_buttons_def)
+  tuerlicht=Object.assign({message: "tuerlicht_state", id:"tuerlicht",
+    val: global._door_light_state, switch: global._door_light_manual}, this.three_buttons_def)
+  fernsehlicht=Object.assign({message: "fernsehlicht_state", id:"fernsehlicht",
+    val:global._television_light_state, switch: global._television_light_manual}, this.three_buttons_def)
+  autolader=Object.assign({message: "auto_state", id:"auto_lader",
+    val: global._car_loader_state, switch: global._car_loader_manual}, this.three_buttons_def)
+  mediacenter=Object.assign({message: "mediacenter_state", id:"mediacenter",
+    val: global._mediacenter_state}, this.two_buttons_def)
+  wlanext= Object.assign({message: "wlanextender_state", id:"wlanext", val: global._wlan_state}, this.two_buttons_def)
 
   outside_gauge= {
     type: "gauge",
