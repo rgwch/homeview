@@ -18,6 +18,10 @@ export class Lineargauge{
   }
 
   attached(){
+    if(undefined==this.cfg){
+      console.log("error! No configuration for multiswitch")
+      throw(new Error("missing configuration"))
+    }
     this.configure()
     this.render()
     this.ea.subscribe(this.cfg.event,value=>{

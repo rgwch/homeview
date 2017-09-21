@@ -26,6 +26,10 @@ export class Doublegauge {
   }
 
   attached() {
+    if(undefined == this.config){
+      console.log("error! No configuration for doublegauge")
+      throw(new Error("configuration missing"))
+    }
     this.configure()
     this.render()
     this.ea.subscribe(this.config.event, data => {

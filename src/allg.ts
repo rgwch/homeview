@@ -2,8 +2,10 @@ import {autoinject} from 'aurelia-framework'
 import {EventAggregator} from 'aurelia-event-aggregator'
 import {FetchClient} from './services/fetchclient'
 import {select, selectAll} from 'd3-selection'
+import {keys,entries,values} from 'd3-collection'
 import {PLATFORM} from 'aurelia-pal'
 import globals from './globals'
+import layout from './layout'
 
 
 @autoinject
@@ -12,93 +14,25 @@ export class Allg {
   private default_columns = "col-xs-6 col-sm-4 col-md-2"
   private resize_throttle
   private timer
-  private three_buttons_def = {
-    buttons: [
-      {
-        caption: "An",
-        value: 1
-      }, {
-        caption: "Aus",
-        value: 0
-      }, {
-        caption: "Auto",
-        value: 2
-      }
-    ]
-  }
-  private two_buttons_def = {
-    buttons: [
-      {
-        caption: "An",
-        value: 1
-      }, {
-        caption: "Aus",
-        value: 0
-      }
-    ]
-  }
-  private outside_gauge = {
-    event: "outside_data_update",
-    size: 180,
-    upperMin: -20,
-    upperMax: 40,
-    upperSuffix: "°C",
-    upperBands: [{from: -20, to: 0, color: "#1393ff"}, {from: 0, to: 10, color: "#bff7ff"}, {
-      from: 10,
-      to: 25,
-      color: "#109618"
-    },
-      {from: 25, to: 40, color: "#DC3912"}],
-    lowerMin: 20,
-    lowerMax: 80,
-    lowerSuffix: "%",
-    lowerBands: [{from: 20, to: 25, color: "#DC3912"}, {from: 25, to: 30, color: "#ffd74c"}, {
-      from: 30,
-      to: 70,
-      color: "#109618"
-    },
-      {from: 70, to: 75, color: "#ffd74c"}, {from: 75, to: 80, color: "#DC3912"}]
-  }
-  private livingroom_gauge = Object.assign({}, this.outside_gauge,
-    {
-      event: "livingroom_data_update", upperMin: 16, upperMax: 30,
-      upperBands: [{from: 16, to: 19, color: "#bff7ff"}, {from: 19, to: 24, color: "#109618"},
-        {from: 24, to: 30, color: "#DC3912"}],
-      lowerBands: [{from: 20, to: 30, color: "#DC3912"}, {from: 30, to: 40, color: "#ffd74c"}, {
-        from: 40,
-        to: 60,
-        color: "#109618"
-      },
-        {from: 60, to: 70, color: "#ffd74c"}, {from: 70, to: 80, color: "#DC3912"}]
-    })
-  private bathroom_gauge = Object.assign({}, this.livingroom_gauge, {
-    event: "bathroom_data_update",
-    upperBands: [{from: 16, to: 21, color: "#bff7ff"}, {from: 21, to: 25, color: "#109618"},
-      {from: 25, to: 30, color: "#DC3912"}]
-  })
-  private light_sensor = {
-    event: "brightness_update",
-    min: 0,
-    max: 250,
-    height: 200,
-    width: 100
-  }
-
-  private treppenlicht = Object.assign({message: "treppenlicht_state"}, this.three_buttons_def)
-  private tuerlicht = Object.assign({message: "tuerlicht_state"}, this.three_buttons_def)
-  private fernsehlicht = Object.assign({message: "fernsehlicht_state"}, this.three_buttons_def)
-  private autolader = Object.assign({message: "auto_state"}, this.three_buttons_def)
-  private mediacenter = Object.assign({message: "mediacenter_state"}, this.two_buttons_def)
-  private wlanext = Object.assign({message: "wlanextender_state"}, this.two_buttons_def)
-
+  private l
 
   constructor(private ea: EventAggregator, private fetcher: FetchClient) {
-    this.ea.subscribe(this.fernsehlicht.message + ":click", event => this.clicked(event, this.fernsehlicht))
-    this.ea.subscribe(this.treppenlicht.message + ":click", event => this.clicked(event, this.treppenlicht))
-    this.ea.subscribe(this.tuerlicht.message + ":click", event => this.clicked(event, this.tuerlicht))
+    this.l=layout
+    let elements=values(layout)
+    elements.filter(el=>"buttons"==el.type).forEach(el=>{
+      this.ea.subscribe(el.message+":click", event=>this.clicked(event,el))
+    })
+    /*
+    function buttons_subscribe(conf){
+      this.ea.subscribe()
+    }
+    this.ea.subscribe(layout.fernsehlicht.message + ":click", event => this.clicked(event, layout.fernsehlicht))
+    this.ea.subscribe(layout.treppenlicht.message + ":click", event => this.clicked(event, layout.treppenlicht))
+    this.ea.subscribe(layout.tuerlicht.message + ":click", event => this.clicked(event, this.tuerlicht))
     this.ea.subscribe(this.mediacenter.message + ":click", event => this.clicked(event, this.mediacenter))
     this.ea.subscribe(this.wlanext.message + ":click", event => this.clicked(event, this.wlanext))
     this.ea.subscribe(this.autolader.message + ":click", event => this.clicked(event, this.autolader))
+    */
   }
 
 
@@ -190,11 +124,13 @@ export class Allg {
     const carloader_power= await this.fetcher.fetchJson(`${globals.server}/get/${globals._car_loader_power}`)
     const stairlight_state = await this.getIoBrokerValue(globals._stair_light_state)
 
+    /*
     this.ea.publish(this.outside_gauge.event, {upper: outside_temp, lower: outside_humid})
     this.ea.publish(this.livingroom_gauge.event, {upper: inside_temp, lower: inside_humid})
     this.ea.publish(this.bathroom_gauge.event, {upper: bathroom_temp, lower: bathroom_humid})
     this.ea.publish(this.treppenlicht.message, {state: stairlight_state ?  "on" : "off"})
     this.ea.publish(this.autolader.message, {state: carloader_state ? "on" : "off"})
+    */
     this.car_power=Math.round(100*carloader_power)/100
 
   }

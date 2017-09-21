@@ -18,6 +18,10 @@ export class lcdclock{
   constructor(private ea:EventAggregator){}
 
   attached(){
+    if(undefined==this.cfg){
+      console.log("error! No configuration for multiswitch")
+      throw(new Error("missing configuration"))
+    }
     this.cfg=Object.assign({
       digits: {
         height:180,

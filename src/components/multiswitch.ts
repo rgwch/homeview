@@ -9,7 +9,12 @@ export class Multiswitch{
   private basic_id="B"+(Math.random().toString()).substring(2)
 
   constructor(private ea:EventAggregator, private element:Element){}
+
   attached(){
+    if(undefined==this.cfg){
+      console.log("error! No configuration for multiswitch")
+      throw(new Error("missing configuration"))
+    }
     this.element.setAttribute("style","width:150px")
     if(undefined == this.cfg['buttons']){
       this.cfg['buttons'] = [{
