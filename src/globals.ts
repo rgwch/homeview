@@ -1,5 +1,5 @@
 export default {
-  mock: false,
+  mock: true,
   server: "http://192.168.16.140:8087",
   update_interval_seconds: 30,
   _livingroom_temp: 'hm-rpc.1.000E5569A24A0E.1.ACTUAL_TEMPERATURE',

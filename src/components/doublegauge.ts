@@ -32,7 +32,7 @@ export class Doublegauge {
     }
     this.configure()
     this.render()
-    this.ea.subscribe(this.config.event, data => {
+    this.ea.subscribe(this.config.message, data => {
       this.redraw(data.upper, data.lower)
     })
   }
@@ -91,7 +91,7 @@ export class Doublegauge {
    */
   render() {
     // create unique id and attach SVG container
-    this.element.id = "dg_" + this.config.event
+    this.element.id = "dg_" + this.config.message
     this.body = select("#" + this.element.id).append("svg:svg")
       .attr("class", "doublegauge")
       .attr("width", this.config.size)

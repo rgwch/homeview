@@ -37,7 +37,7 @@ export class Lcd7segm {
     }
     this.configure()
     this.render()
-    this.ea.subscribe(this.cfg.event, number=>{
+    this.ea.subscribe(this.cfg.message, number=>{
       this.redraw(number)
     })
   }

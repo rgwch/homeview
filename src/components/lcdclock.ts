@@ -47,7 +47,7 @@ export class lcdclock{
         .attr("cx",unit)
         .attr("cy",2*height_off+"px")
         .attr("r",unit)
-    this.ea.subscribe(this.cfg.event, ()=>{this.update()})
+    this.ea.subscribe(this.cfg.message, ()=>{this.update()})
   }
 
   update(){

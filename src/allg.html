@@ -3,42 +3,42 @@
   <require from="components/doublegauge"></require>
   <require from="components/verticalgauge"></require>
   <div style="position:relative">
-    <div class="tile" id="fernsehlicht">
+    <div class="tile" id="${l.fernsehlicht.id}">
       Fernsehlicht
       <multiswitch cfg.bind="l.fernsehlicht"></multiswitch>
     </div>
-    <!-- div class="tile" id="treppenlicht">
+    <div class="tile" id="${l.treppenlicht.id}">
       Treppenlicht
-      <multiswitch cfg.bind="layout.treppenlicht"></multiswitch>
+      <multiswitch cfg.bind="l.treppenlicht"></multiswitch>
     </div>
-    <div class="tile" id="tuerlicht" >
+    <div class="tile" id="${l.tuerlicht.id}" >
       Türlicht
-      <multiswitch cfg.bind="layout.tuerlicht"></multiswitch>
+      <multiswitch cfg.bind="l.tuerlicht"></multiswitch>
     </div>
-    <div class="tile" id="auto_lader">
+    <div class="tile" id="${l.autolader.id}">
       Auto - ${car_power} W
-      <multiswitch cfg.bind="layout.autolader"></multiswitch>
+      <multiswitch cfg.bind="l.autolader"></multiswitch>
     </div>
-    <div class="tile" id="wlanext">
+    <div class="tile" id="${l.wlanext.id}">
       WLAN-Extender
-      <multiswitch cfg.bind="layout.wlanext"></multiswitch>
+      <multiswitch cfg.bind="l.wlanext"></multiswitch>
     </div>
-    <div class="tile" id="mediacenter">
+    <div class="tile" id="${l.mediacenter.id}">
       Media-Center
-      <multiswitch cfg.bind="layout.mediacenter"></multiswitch>
+      <multiswitch cfg.bind="l.mediacenter"></multiswitch>
     </div>
-    <div class="tile" id="outside_climate">
+    <div class="tile" id="${l.outside_gauge.id}">
       Draussen
-      <doublegauge config.bind="layout.outside_gauge"></doublegauge>
+      <doublegauge config.bind="l.outside_gauge"></doublegauge>
     </div>
-    <div class="tile" id="livingroom_climate">
+    <div class="tile" id="${l.livingroom_gauge.id}">
       Wohnzimmer
-      <doublegauge config.bind="layout.livingroom_gauge"></doublegauge>
+      <doublegauge config.bind="l.livingroom_gauge"></doublegauge>
     </div>
-    <div class="tile" id="bathroom_climate">
+    <div class="tile" id="${l.bathroom_gauge.id}">
       Badezimmer
-      <doublegauge config.bind="layout.bathroom_gauge"></doublegauge>
-    </div -->
+      <doublegauge config.bind="l.bathroom_gauge"></doublegauge>
+    </div>
 
   </div>
 

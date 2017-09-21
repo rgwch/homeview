@@ -24,7 +24,7 @@ export class Lineargauge{
     }
     this.configure()
     this.render()
-    this.ea.subscribe(this.cfg.event,value=>{
+    this.ea.subscribe(this.cfg.message,value=>{
       this.redraw(value)
     })
   }
