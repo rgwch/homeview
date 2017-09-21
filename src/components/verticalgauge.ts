@@ -31,7 +31,7 @@ export class Verticalgauge{
   }
   configure(){
     this.cfg=Object.assign({
-      event: "verticalgauge_value",
+      message: "verticalgauge_value",
       suffix: "",
       min: 0,
       max: 100,

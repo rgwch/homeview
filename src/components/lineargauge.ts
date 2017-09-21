@@ -30,7 +30,7 @@ export class Lineargauge{
   }
   configure(){
     this.cfg=Object.assign({
-      event: "lineargauge_value",
+      message: "lineargauge_value",
       suffix: "",
       min: 0,
       max: 100,
@@ -44,7 +44,7 @@ export class Lineargauge{
   }
 
   render(){
-    this.element.id="lg_"+this.cfg.event
+    this.element.id="lg_"+this.cfg.message
     this.body=select("#"+this.element.id).append("svg:svg")
       .attr("class","lineargauge")
       .attr("width",this.cfg.width)

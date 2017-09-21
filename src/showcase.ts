@@ -8,20 +8,20 @@ export class Showcase{
   private timer
   private counter=0
   private l7segm={
-    event: "l7segm-1",
+    message: "l7segm-1",
     width: 90,
     height: 180,
     on_color: "red"
   }
   private clock={
-    event: "clock_upd",
+    message: "clock_upd",
     seconds: false,
     width: 90,
     height: 180
   }
   private emptyObj={}
   doubleg={
-    event: "doublegauge_data_update",
+    message: "doublegauge_data_update",
     size: 180,
     upperMin: -20,
     upperMax: 40,
@@ -50,7 +50,7 @@ export class Showcase{
     message: "multiswitch_1_state"
   }
   private linear={
-    event: "lineargauge1",
+    message: "lineargauge1",
     suffix: " W",
     min:0,
     max: 10000,
@@ -60,7 +60,7 @@ export class Showcase{
     bands: [{from: 0, to: 1500, color: "red"},{from: 1500, to: 7000, color: "blue"},{from: 7000, to: 10000, color: "yellow"}]
   }
   private vertical={
-    event: "verticalgauge1",
+    message: "verticalgauge1",
     suffix: "°C",
     min:0,
     max: 100,
@@ -95,21 +95,21 @@ export class Showcase{
     let mm=Math.round(await this.fetcher.fetchJson("fake://012"))
     let lg=Math.round(await this.fetcher.fetchJson("fake://power")+0.5)
     this.ea.publish(this.multi.message,{clicked:mm})
-    this.ea.publish(this.linear.event,lg)
+    this.ea.publish(this.linear.message,lg)
     let temp=await this.fetcher.fetchJson("fake://temperatur")
     let humid = Math.round(await this.fetcher.fetchJson("fake://humid")+0.5)
-    this.ea.publish(this.doubleg.event,{upper: temp, lower:humid})
+    this.ea.publish(this.doubleg.message,{upper: temp, lower:humid})
     if(mm==0){
       this.ea.publish(this.multi.message,{state:"on"})
     }else if(mm==1){
       this.ea.publish(this.multi.message,{state: "off"})
     }
     let vg=await this.fetcher.fetchJson("fake(temperature")
-    this.ea.publish(this.vertical.event,vg)
-    this.ea.publish(this.l7segm.event,this.counter++)
+    this.ea.publish(this.vertical.message,vg)
+    this.ea.publish(this.l7segm.message,this.counter++)
     if(this.counter>9){
       this.counter=0
     }
-    this.ea.publish(this.clock.event)
+    this.ea.publish(this.clock.message)
   }
 }

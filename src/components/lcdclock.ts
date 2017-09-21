@@ -7,12 +7,12 @@ import {isNullOrUndefined} from "util";
 export class lcdclock{
   @bindable cfg
 
-  private h10cfg={event: "7seg-h10"}
-  private h1cfg={event: "7seg-h1"}
-  private m10cfg={event:"7seg-m10"}
-  private m1cfg={event:"7seg-m1"}
-  private s10cfg={event: "7-seg-s10"}
-  private s1cfg={event: "7-seg-s1"}
+  private h10cfg={message: "7seg-h10"}
+  private h1cfg={message: "7seg-h1"}
+  private m10cfg={message:"7seg-m10"}
+  private m1cfg={message:"7seg-m1"}
+  private s10cfg={message: "7-seg-s10"}
+  private s1cfg={message: "7-seg-s1"}
   private timer
 
   constructor(private ea:EventAggregator){}
@@ -61,13 +61,13 @@ export class lcdclock{
     let m1v=Math.floor(m-10*m10v)
     let s10v=Math.floor(s/10)
     let s1v=Math.floor(s-10*s10v)
-    this.ea.publish(this.h10cfg.event,h10v)
-    this.ea.publish(this.h1cfg.event,h1v)
-    this.ea.publish(this.m10cfg.event,m10v)
-    this.ea.publish(this.m1cfg.event,m1v)
+    this.ea.publish(this.h10cfg.message,h10v)
+    this.ea.publish(this.h1cfg.message,h1v)
+    this.ea.publish(this.m10cfg.message,m10v)
+    this.ea.publish(this.m1cfg.message,m1v)
     if(this.cfg.seconds){
-      this.ea.publish(this.s10cfg.event,s10v)
-      this.ea.publish(this.s1cfg.event,s1v)
+      this.ea.publish(this.s10cfg.message,s10v)
+      this.ea.publish(this.s1cfg.message,s1v)
     }
   }
 }

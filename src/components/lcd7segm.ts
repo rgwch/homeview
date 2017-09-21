@@ -44,7 +44,7 @@ export class Lcd7segm {
 
   configure() {
     this.cfg = Object.assign({
-      event : "7segment_value",
+      message : "7segment_value",
       height: 100,
       width : 40,
       off_color: "#dcdcdc",
@@ -55,7 +55,7 @@ export class Lcd7segm {
   }
 
   render() {
-    this.element.id = "l7s_" + this.cfg.event
+    this.element.id = "l7s_" + this.cfg.message
     this.body = select("#" + this.element.id).append("svg:svg")
       .attr("class", "lcd7segment")
       .attr("width", this.cfg.width)

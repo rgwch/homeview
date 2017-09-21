@@ -16,12 +16,12 @@ export class Klima{
     max: 300,
     height: 180,
     width: 50,
-    event: "event_brightness"
+    message: "event_brightness"
   }
 
   constructor(private fetcher:FetchClient, private ea:EventAggregator){
     this.outside_gauge={
-      event: "outside_data_update",
+      message: "outside_data_update",
       size: 180,
       upperMin: -20,
       upperMax: 40,
@@ -35,7 +35,7 @@ export class Klima{
         {from:70, to:75, color: "#ffd74c"}, {from: 75, to:80, color: "#DC3912"}]
     }
     this.livingroom_gauge=Object.assign({},this.outside_gauge)
-    this.livingroom_gauge.event="livingroom_data_update"
+    this.livingroom_gauge.message="livingroom_data_update"
     this.livingroom_gauge.upperMin=16
     this.livingroom_gauge.upperMax=30
     this.livingroom_gauge.upperBands=[{from: 16, to:19, color: "#bff7ff"}, {from: 19, to: 24, color: "#109618"},
@@ -43,7 +43,7 @@ export class Klima{
     this.livingroom_gauge.lowerBands=  [{from: 20, to: 30, color: "#DC3912"},{from: 30, to: 40, color: "#ffd74c"}, {from: 40, to:60, color: "#109618"},
       {from:60, to:70, color: "#ffd74c"}, {from: 70, to:80, color: "#DC3912"}]
     this.bathroom1_gauge=Object.assign({},this.livingroom_gauge)
-    this.bathroom1_gauge.event="bathroom1_data_update"
+    this.bathroom1_gauge.message="bathroom1_data_update"
     this.bathroom1_gauge.upperBands=[{from: 16, to:21, color: "#bff7ff"}, {from: 21, to: 25, color: "#109618"},
       {from: 25, to:30, color: "#DC3912"}]
 
@@ -72,9 +72,9 @@ export class Klima{
     const bathroom1_temp=await this.fetcher.fetchJson(`${globals.server}/get/${globals._bathroom_temp}`)
     const bathroom1_humid=await this.fetcher.fetchJson(`${globals.server}/get/${globals._bathroom_humidity}`)
     const bright= await this.fetcher.fetchJson(`${globals.server}/get/${globals._brightness}`)
-    this.ea.publish(this.outside_gauge.event,{upper: outside_temp,lower:outside_humid})
-    this.ea.publish(this.livingroom_gauge.event,{upper:inside_temp, lower: inside_humid})
-    this.ea.publish(this.bathroom1_gauge.event,{upper: bathroom1_temp, lower: bathroom1_humid})
-    this.ea.publish(this.brightness.event, bright)
+    this.ea.publish(this.outside_gauge.message,{upper: outside_temp,lower:outside_humid})
+    this.ea.publish(this.livingroom_gauge.message,{upper:inside_temp, lower: inside_humid})
+    this.ea.publish(this.bathroom1_gauge.message,{upper: bathroom1_temp, lower: bathroom1_humid})
+    this.ea.publish(this.brightness.message, bright)
   }
 }

@@ -48,7 +48,7 @@ export class Doublegauge {
     /* event the component should listen to for updates.
      Must be unique throughout the site
      */
-    this.config.event = this.config.event || "doublegauge_changed"
+    this.config.message = this.config.message || "doublegauge_changed"
 
     /* Size of the component. Height an width are equal */
     this.config.size = this.config.size || 150
