@@ -93,21 +93,21 @@ export class Allg {
   clicked(event, cfg) {
     if (event.value == 1) {
       this.ea.publish(cfg.message, {state: "on"})
-      if(undefined == cfg.switch){
-          this.setValue(cfg.val,0)
-      }else{
-        this.setValue(cfg.switch,0)
+      if (undefined == cfg.switch) {
+        this.setValue(cfg.val, 0)
+      } else {
+        this.setValue(cfg.switch, 0)
       }
     } else if (event.value == 0) {
       this.ea.publish(cfg.message, {state: "off"})
-      if(undefined == cfg.switch){
-        this.setValue(cfg.val,1)
-      }else{
-        this.setValue(cfg.switch,1)
+      if (undefined == cfg.switch) {
+        this.setValue(cfg.val, 1)
+      } else {
+        this.setValue(cfg.switch, 1)
       }
-    }else{
-      if(cfg.switch){
-        this.setValue(cfg.switch,2)
+    } else {
+      if (cfg.switch) {
+        this.setValue(cfg.switch, 2)
       }
     }
   }
@@ -121,20 +121,24 @@ export class Allg {
 
     const carloader_power = await this.getValue(globals._car_loader_power)
     this.car_power = Math.round(100 * carloader_power) / 100
-    const carloader_manual=await this.getValue(globals._car_loader_manual)
-    this.ea.publish(this.l.autolader.message,{clicked: carloader_manual})
-    this.ea.publish(this.l.fernsehlicht.message,{clicked: await this.getValue(globals._television_light_manual)})
-    this.ea.publish(this.l.treppenlicht.message,{clicked: await this.getValue(globals._stair_light_manual)})
-    this.ea.publish(this.l.tuerlicht.message,{clicked: await this.getValue(globals._door_light_manual)})
+    const carloader_manual = await this.getValue(globals._car_loader_manual)
+    this.ea.publish(this.l.autolader.message, {clicked: carloader_manual})
+    this.ea.publish(this.l.fernsehlicht.message, {clicked: await this.getValue(globals._television_light_manual)})
+    this.ea.publish(this.l.treppenlicht.message, {clicked: await this.getValue(globals._stair_light_manual)})
+    this.ea.publish(this.l.tuerlicht.message, {clicked: await this.getValue(globals._door_light_manual)})
 
   }
 
   async dispatch(elem) {
     if (elem.val) {
-      this.ea.publish(elem.message, await this.getValue(elem.val))
+      if ("button" == elem.type) {
+        let msg = await this.getValue(elem.val)
+        this.ea.publish(elem.message, {state: msg ? "on" : "off"})
+      } else {
+        this.ea.publish(elem.message, await this.getValue(elem.val))
+      }
     } else if (elem.vals) {
       let prt = entries(elem.vals)
-      console.log(JSON.stringify(prt))
       let readings = []
       prt.forEach(part => readings.push(this.getValue(part.value)))
       let compound = {}
@@ -154,7 +158,7 @@ export class Allg {
     return await this.fetcher.fetchJson(`${globals.server}/get/${id}`)
   }
 
-  async setValue(id,value){
+  async setValue(id, value) {
     return await this.fetcher.fetchJson(`${globals.server}/set/${id}?value=${value}`)
   }
 
