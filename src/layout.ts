@@ -2,6 +2,11 @@ import global from './globals'
 export class layout{
   private three_buttons_def= {
     type: "button",
+    map: {
+      1:0,
+      0:1,
+      2:2
+    },
     buttons: [
       {
         caption: "An",
@@ -17,6 +22,10 @@ export class layout{
   }
   private two_buttons_def ={
     type: "button",
+    map:{
+      1:1,
+      2:2
+    },
     buttons: [
       {
         caption: "An",
@@ -36,8 +45,9 @@ export class layout{
   autolader=Object.assign({message: "auto_state", id:"auto_lader",
     val: global._car_loader_state, switch: global._car_loader_manual}, this.three_buttons_def)
   mediacenter=Object.assign({message: "mediacenter_state", id:"mediacenter",
-    val: global._mediacenter_state}, this.two_buttons_def)
-  wlanext= Object.assign({message: "wlanextender_state", id:"wlanext", val: global._wlan_state}, this.two_buttons_def)
+    val: global._mediacenter_state, switch: global._mediacenter_state}, this.two_buttons_def)
+  wlanext= Object.assign({message: "wlanextender_state", id:"wlanext",
+    val: global._wlan_state, switch: global._wlan_state}, this.two_buttons_def)
 
   outside_gauge= {
     type: "gauge",
