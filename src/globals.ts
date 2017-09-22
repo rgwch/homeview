@@ -21,5 +21,10 @@ export default {
   _wlan_state: 'mystrom.2.switchState',
   _wlan_power: 'mystrom.2.power',
   _mediacenter_state: 'mystrom.0.switchState',
-  _mediacenter_power: 'mystrom.0.power'
+  _mediacenter_power: 'mystrom.0.power',
+  ACT_POWER: "fronius.0.powerflow.P_PV",
+  DAY_ENERGY: "fronius.0.inverter.1.DAY_ENERGY",
+  YEAR_ENERGY: "fronius.0.inverter.1.YEAR_ENERGY",
+  TOTAL_ENERGY: "fronius.0.inverter.1.TOTAL_ENERGY"
+
 }
