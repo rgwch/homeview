@@ -46,7 +46,7 @@ export class Verticalgauge{
   }
 
   render(){
-    this.element.id="vg_"+this.cfg.event
+    this.element.id="vg_"+this.cfg.id
     this.body=select("#"+this.element.id).append("svg:svg")
       .attr("class","verticalgauge")
       .attr("width",this.cfg.width)
@@ -130,6 +130,10 @@ export class Verticalgauge{
       .duration(300)
       .attr("y1",y)
       .attr("y2",y)
-      this.value.text(value+this.cfg.suffix)
+    let display=Math.round(value)
+    while(display>1000){
+      display=Math.round(display/1000)
+    }
+    this.value.text(display+this.cfg.suffix)
   }
 }

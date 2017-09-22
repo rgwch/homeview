@@ -1,3 +1,8 @@
+/**
+ * Homeview display with "manual" layout as defined in layout.ts
+ * (don't use bootstrap layout but instead line up elements in a responsive way)
+ * (c) 2017 by G. Weirich
+ */
 import {autoinject} from 'aurelia-framework'
 import {EventAggregator} from 'aurelia-event-aggregator'
 import {FetchClient} from './services/fetchclient'
@@ -49,8 +54,10 @@ export class Allg {
     clearTimeout(this.resize_throttle)
     this.resize_throttle = setTimeout(() => {
       const innerWidth = window.innerWidth
-      const elems = ["fernsehlicht", "treppenlicht", "tuerlicht", "auto_lader", "wlanext", "mediacenter", "skip", "outside_climate",
-        "livingroom_climate", "bathroom_climate"]
+      const elems = [this.l.fernsehlicht.id, this.l.treppenlicht.id, this.l.tuerlicht.id,
+        this.l.autolader.id, this.l.wlanext.id, this.l.mediacenter.id, "skip", this.l.light_sensor.id, this.l.pv_energy.id,
+        this.l.energy_flow.id, this.l.outside_gauge.id,
+        this.l.livingroom_gauge.id, this.l.bathroom_gauge.id]
       let lastElem
       let nextRow = 0
       let y = 0

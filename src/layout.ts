@@ -106,12 +106,39 @@ export class layout{
   })
   light_sensor={
     type: "gauge",
+    id: "lightsensor_outside",
     message: "brightness_update",
+    val: global._brightness,
     min: 0,
     max: 250,
-    height: 200,
-    width: 100
+    height: 204,
+    width: 49,
+    padding: 10,
+    bands: [{from:0,to:110,color:"#3917b2"},{from:110,to:130,color:"#5884e5"},{from:130,to:250,color: "#18c5ff"}]
   }
-
+  pv_energy={
+    type: "gauge",
+    id: "sun_energy",
+    message: "pv_energy_update",
+    val: global.ACT_POWER,
+    min: 0,
+    max: 10000,
+    height: 204,
+    width: 49,
+    padding: 10,
+    bands: [{from:0, to:10000,color: "yellow"}]
+  }
+  energy_flow={
+    type:"gauge",
+    id:"energy_flow",
+    message: "fronius_flow",
+    val: global.GRID_FLOW,
+    min: 5000,
+    max:-5000,
+    height:204,
+    width:49,
+    padding:10,
+    bands: [{from: -5000,to:0,color: "green"},{from:0, to: 5000, color: "red"}]
+  }
 
 }
