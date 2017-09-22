@@ -40,8 +40,9 @@ export class Verticalgauge{
       padding: 0,
       bands:[{from: 0,to:100,color: "blue"}]
     }, this.cfg)
-    const topspace=(this.cfg.height/INDICATOR_FONT)+5
-    this.scale=scaleLinear().domain([this.cfg.max,this.cfg.min]).range([FRAMEWIDTH+this.cfg.padding+topspace,this.cfg.height-FRAMEWIDTH-this.cfg.padding])
+    const topspace=(this.cfg.height/INDICATOR_FONT)
+    const bottomspace = this.cfg.units ? topspace: 0
+    this.scale=scaleLinear().domain([this.cfg.max,this.cfg.min]).range([FRAMEWIDTH+this.cfg.padding+topspace,this.cfg.height-FRAMEWIDTH-this.cfg.padding-bottomspace])
     this.scale.clamp(true)
   }
 
@@ -101,6 +102,18 @@ export class Verticalgauge{
       .attr("opacity",1.0)
       .style("font-size",valueFontSize)
       .style("fill","black")
+
+    // Unit text
+    if(this.cfg.units){
+      this.rectangle(FRAMEWIDTH,this.cfg.height-2*FRAMEWIDTH-INDICATOR_FONT-4,this.cfg.width-2*FRAMEWIDTH,INDICATOR_FONT+4+FRAMEWIDTH, "white")
+      this.body.append("svg:text")
+        .attr("x",center-2)
+        .attr("y",this.cfg.height-INDICATOR_FONT)
+        .attr("text-anchor","middle")
+        .style("font-size",valueFontSize)
+        .text(this.cfg.units)
+
+    }
 
   }
 
