@@ -67,6 +67,7 @@ export class Verticalgauge{
     // draw tick marks and text on every second tick
     const ticks=this.scale.ticks(10)
     const tickFormat=this.scale.tickFormat(10,"s")
+
     const fontSize=this.cfg.width/5
     let even=true
     ticks.forEach(tick=>{
@@ -130,10 +131,13 @@ export class Verticalgauge{
       .duration(300)
       .attr("y1",y)
       .attr("y2",y)
+ /*
     let display=Math.round(value)
     while(display>1000){
       display=Math.round(display/1000)
     }
-    this.value.text(display+this.cfg.suffix)
+    */
+    const tickformat=this.scale.tickFormat(100,"s")
+    this.value.text(tickformat(value)+this.cfg.suffix)
   }
 }
