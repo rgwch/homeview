@@ -7,6 +7,16 @@ h3 {
   color: blue;
 }
 
+.frame{
+  border-style: solid;
+  border-color: @bordercolor;
+  border-width: 5px;
+  border-radius: 5px;
+  fill: @fillcolor;
+  stroke: black;
+  stroke-width: 1;
+}
+
 .halftile{
   border-style: inset;
   border-color: @bordercolor;
@@ -15,25 +25,15 @@ h3 {
   margin: 5px;
   padding: 5px;
   position: absolute;
-  //width: 80px;
   text-align:center;
   color: @captioncolor;
   background-color: lighten(@fillcolor,10%);
   font-size:18px;
 }
+
 .tile{
-  border-style: inset;
-  border-color: @bordercolor;
-  border-width: 2px;
-  border-radius: 5px;
-  margin: 5px;
-  padding: 5px;
-  position: absolute;
+  .halftile;
   width: 200px;
-  text-align:center;
-  color: @captioncolor;
-  background-color: lighten(@fillcolor,10%);
-  font-size:18px;
 }
 
 .inner{
@@ -48,15 +48,6 @@ h3 {
   stroke-width: 0.6
 }
 
-.frame{
-  border-style: solid;
-  border-color: @bordercolor;
-  border-width: 5px;
-  border-radius: 5px;
-  fill: @fillcolor;
-  stroke: black;
-  stroke-width: 1;
-}
 
 .flat_button{
   margin: 3px !important;
