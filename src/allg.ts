@@ -18,6 +18,7 @@ export class Allg {
   private car_power = 1104
   private resize_throttle
   private timer
+  resizeEventHandler = () =>this.resize()
   private l = new layout()
 
   /**
@@ -41,7 +42,7 @@ export class Allg {
    * Add listeners for window size and start timer
    */
   attached() {
-    PLATFORM.global.addEventListener("resize", this.resize)
+    PLATFORM.global.addEventListener("resize", this.resizeEventHandler)
     this.resize()
     this.update()
     this.timer = setInterval(() => {
@@ -55,7 +56,7 @@ export class Allg {
    * menu entry. Remove window listner and stop update timer
    */
   detached() {
-    PLATFORM.global.removeEventListener("resize", this.resize)
+    PLATFORM.global.removeEventListener("resize", this.resizeEventHandler)
     if (this.timer != null) {
       clearTimeout(this.timer)
     }
@@ -69,53 +70,56 @@ export class Allg {
    * line up all components
    */
   resize() {
-    // avoid to frequent resize events
-    clearTimeout(this.resize_throttle)
-    this.resize_throttle = setTimeout(() => {
-      const innerWidth = window.innerWidth
-      // define all elements to display (from layout.ts). Must also reside in the html
-      const elems = [this.l.fernsehlicht.id, this.l.treppenlicht.id, this.l.tuerlicht.id,
-        this.l.autolader.id, this.l.wlanext.id, this.l.mediacenter.id, "skip", this.l.light_sensor.id, this.l.pv_energy.id,
-        this.l.energy_flow.id, this.l.outside_gauge.id,
-        this.l.livingroom_gauge.id, this.l.bathroom_gauge.id]
-      let lastElem
-      let nextRow = 0
-      let y = 0
-      let x = 0
+      let l = this.l
+      // wait until resize operation finishes
+      clearTimeout(this.resize_throttle)
+      this.resize_throttle = setTimeout(() => {
+        const innerWidth = window.innerWidth
+        // define all elements to display (from layout.ts). Must also reside in the html
+        const elems = [l.treppenlicht.id, l.tuerlicht.id, l.esszimmer.id,
+          l.korridor.id,l.fernsehlicht.id,
+          this.l.autolader.id, this.l.wlanext.id, this.l.mediacenter.id, "skip", this.l.light_sensor.id, this.l.pv_energy.id,
+          this.l.energy_flow.id, this.l.outside_gauge.id,
+          this.l.livingroom_gauge.id, this.l.bathroom_gauge.id]
+        let lastElem
+        let nextRow = 0
+        let y = 0
+        let x = 0
 
-      function clearLine() {
-        y = nextRow + 5
-        nextRow = 0
-        lastElem = undefined
-        x = 0
+        function clearLine() {
+          y = nextRow + 5
+          nextRow = 0
+          lastElem = undefined
+          x = 0
 
-      }
-      // Line up all alements side by side until the right edge of the window is reached.
-      // Then, start a new line. If an element is not found in the DOM (e.g. "skip" above),
-      // start a new line unconditionally.
-      elems.forEach((tile, index) => {
-        let dom = select("#" + tile)
-        if (dom.size() == 1) {
-          if (lastElem) {
-            let thisElem = dom.node().getBoundingClientRect()
-            x = lastElem.right
-            let bottom = y + lastElem.height
-            if (x + thisElem.right > innerWidth) {
-              clearLine()
-            }
-            if (bottom > nextRow) {
-              nextRow = bottom
-            }
-
-          }
-          dom.attr("style", `left:${x}px;top:${y}px;`)
-          lastElem = dom.node().getBoundingClientRect()
-        } else {
-          clearLine()
         }
-      })
 
-    }, 200)
+        // Line up all alements side by side until the right edge of the window is reached.
+        // Then, start a new line. If an element is not found in the DOM (e.g. "skip" above),
+        // start a new line unconditionally.
+        elems.forEach((tile, index) => {
+          let dom = select("#" + tile)
+          if (dom.size() == 1) {
+            if (lastElem) {
+              let thisElem = dom.node().getBoundingClientRect()
+              x = lastElem.right
+              let bottom = y + lastElem.height
+              if (x + thisElem.right > innerWidth) {
+                clearLine()
+              }
+              if (bottom > nextRow) {
+                nextRow = bottom
+              }
+
+            }
+            dom.attr("style", `left:${x}px;top:${y}px;`)
+            lastElem = dom.node().getBoundingClientRect()
+          } else {
+            clearLine()
+          }
+        })
+
+      }, 400)
   }
 
   /**

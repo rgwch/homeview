@@ -48,6 +48,10 @@ export class layout{
     val: global._mediacenter_state, switch: global._mediacenter_state}, this.two_buttons_def)
   wlanext= Object.assign({message: "wlanextender_state", id:"wlanext",
     val: global._wlan_state, switch: global._wlan_state}, this.two_buttons_def)
+  esszimmer=Object.assign({message: "esszimmer_state", id: "esszimmer",
+    val: global._diningroom_light}, this.two_buttons_def)
+  korridor=Object.assign({message: "korridor_state", id: "korridor",
+    val: global._corridor_light},this.two_buttons_def )
 
   outside_gauge= {
     type: "gauge",
@@ -114,6 +118,7 @@ export class layout{
     height: 204,
     width: 49,
     padding: 10,
+    suffix: "",
     units: "Licht",
     bands: [{from:0,to:110,color:"#3917b2"},{from:110,to:130,color:"#5884e5"},{from:130,to:250,color: "#18c5ff"}]
   }
@@ -128,6 +133,7 @@ export class layout{
     width: 49,
     padding: 10,
     units: "PV",
+    suffix: "",
     bands: [{from:0, to:10000,color: "yellow"}]
   }
   energy_flow={
@@ -141,6 +147,7 @@ export class layout{
     width:49,
     padding:10,
     units: "Netz",
+    suffix: "",
     bands: [{from: -5000,to:0,color: "green"},{from:0, to: 5000, color: "red"}]
   }
 

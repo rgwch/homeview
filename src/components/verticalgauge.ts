@@ -30,9 +30,10 @@ export class Verticalgauge{
     })
   }
   configure(){
-    this.cfg=Object.assign({
+    this.cfg=Object.assign({},{
       message: "verticalgauge_value",
       suffix: "",
+      units: "",
       min: 0,
       max: 100,
       height: 50,
