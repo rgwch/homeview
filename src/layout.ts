@@ -153,6 +153,12 @@ export class Layout{
     units: "Netz",
     bands: [{from: -5000,to:0,color: "green"},{from:0, to: 5000, color: "red"}]
   })
+  fronius_cfg={
+    width: 4*200,
+    height: 180,
+    id:"fronius_widget",
+    message:"fronius_msg"
+  }
 
   async lightify(id){
     let values=await this.fetch.getValues([id+".on",id+".reachable"])

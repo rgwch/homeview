@@ -14,7 +14,6 @@ import {timeFormat} from 'd3-time-format'
 
 @autoinject
 export class Fronius extends component{
-  @bindable cfg
   component_name(){
     return "fronius_adapter"
   }
@@ -23,7 +22,7 @@ export class Fronius extends component{
   private chart
   private scaleX
   private scaleY
-  private format=timeFormat("%H:%M:%S")
+  private format=timeFormat("%H:%M")
 
   configure(){
     this.cfg=Object.assign({},{
@@ -34,23 +33,26 @@ export class Fronius extends component{
     },this.cfg)
     const start=new Date()
     const end=new Date()
-    //start.setHours(0,0,0,0)
-    //end.setHours(23,59,59,999)
-    start.setTime(start.getTime()-3600000*4)
+    start.setHours(6,0,0,0)
+    end.setHours(18,59,59,999)
+    //start.setTime(start.getTime()-3600000*4)
     this.from_time=start.getTime()
     this.until_time=end.getTime()
   }
 
   async render() {
+
+    const result=await this.getSeries(this.from_time,this.until_time)
+    const vals=result.values //.map(val=>[new Date(val[0]),val[1]])
+    this.from_time=vals[0][0]
+    this.until_time=vals[vals.length-1][0]
     this.scaleY = scaleLinear()
       .range([this.cfg.height-this.cfg.paddingBottom,20])
       .domain([0, 10000])
     this.scaleX = scaleLinear()
       .range([this.cfg.paddingLeft,this.cfg.width-20])
-      .domain([new Date(this.from_time), new Date(this.until_time)])
+      .domain([this.from_time, this.until_time])
 
-    const result=await this.getSeries(this.from_time,this.until_time)
-    const vals=result.values.map(val=>[new Date(val[0]),val[1]])
     const line=lineGenerator()
       .x(d=>this.scaleX(d[0]))
       .y(d=>this.scaleY(d[1]))
@@ -91,7 +93,7 @@ export class Fronius extends component{
 
   }
   async getSeries(from,to){
-    const query=`select value from "${global.ACT_POWER}" where time >= ${from} and time <= ${to}ms`
+    const query=`select value from "${global.ACT_POWER}" where time >= ${from}ms and time <= ${to}ms`
     const sql=urlencode(query)
     const raw= await this.fetcher.fetchJson(`${global.influx}/query?db=iobroker&epoch=ms&q=${sql}`)
     return raw.results[0].series[0]

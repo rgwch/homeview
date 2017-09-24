@@ -84,7 +84,7 @@ export class Allg {
           l.korridor.id,l.fernsehlicht.id,
           this.l.autolader.id, this.l.wlanext.id, this.l.mediacenter.id, "skip", this.l.light_sensor.id, this.l.pv_energy.id,
           this.l.energy_flow.id, this.l.outside_gauge.id,
-          this.l.livingroom_gauge.id, this.l.bathroom_gauge.id]
+          this.l.livingroom_gauge.id, this.l.bathroom_gauge.id,"skip",this.l.fronius_cfg.id]
         let lastElem
         let nextRow = 0
         let y = 0

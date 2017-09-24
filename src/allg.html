@@ -6,6 +6,7 @@
   <require from="components/multiswitch"></require>
   <require from="components/doublegauge"></require>
   <require from="components/verticalgauge"></require>
+  <require from="components/fronius"></require>
   <div style="position:relative">
     <div class="tile" id="${l.fernsehlicht.id}">
       Fernsehlicht
@@ -61,7 +62,9 @@
     <div id="${l.energy_flow.id}" class="halftile">
       <verticalgauge cfg.bind="l.energy_flow"></verticalgauge>
     </div>
-
+    <div class="halftile" id="${l.fronius_cfg.id}">
+      <fronius cfg.two-way="l.fronius_cfg"></fronius>
+    </div>
   </div>
 
 </template>
