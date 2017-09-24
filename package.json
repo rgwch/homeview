@@ -28,6 +28,7 @@
     "requirejs": "^2.3.2",
     "suncalc": "^1.8.0",
     "text": "github:requirejs/text#latest",
+    "urlencode": "^1.1.0",
     "whatwg-fetch": "^2.0.3",
     "xmlhttprequest": "^1.8.0"
   },
