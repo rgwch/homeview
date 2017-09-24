@@ -1,3 +1,8 @@
+/**
+ * Homeview -  a simple frontend for a smarthome system
+ * (c) 2017 by G. Weirich
+ */
+
 // http://davismj.me/blog/aurelia-cli-bootstrap/
 
 import {Aurelia} from 'aurelia-framework'

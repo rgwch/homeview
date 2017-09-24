@@ -1,8 +1,8 @@
 /**
- * Homeview display with "manual" layout as defined in layout.ts
- * (don't use bootstrap layout but instead line up elements in a responsive way)
+ * Homeview -  a simple frontend for a smarthome system
  * (c) 2017 by G. Weirich
  */
+
 import {autoinject} from 'aurelia-framework'
 import {EventAggregator} from 'aurelia-event-aggregator'
 import {FetchClient} from './services/fetchclient'
@@ -10,23 +10,27 @@ import {select, selectAll} from 'd3-selection'
 import {entries, keys, values} from 'd3-collection'
 import {PLATFORM} from 'aurelia-pal'
 import globals from './globals'
-import {layout} from './layout'
+import {Layout} from './layout'
 
-
+/*
+ * Display with "manual" layout as defined in layout.ts
+ * (don't use bootstrap layout but instead line up elements in a responsive way)
+*/
 @autoinject
 export class Allg {
   private car_power = 1104
   private resize_throttle
   private timer
   resizeEventHandler = () =>this.resize()
-  private l = new layout()
+  private l
 
   /**
-   * This is called when the component is instantiated. No DOM present at this time
-   * @param {EventAggregator} ea
-   * @param {FetchClient} fetcher
+   * This is called by the aurelia framework when the component is instantiated. No DOM present at this time
+   * @param {EventAggregator} ea - supplied by @autoinject
+   * @param {FetchClient} fetcher - supplied by @autoinject
    */
   constructor(private ea: EventAggregator, private fetcher: FetchClient) {
+    this.l=new Layout(this.fetcher)
     let elements = values(this.l)
 
     // attach a listener for all elements of type "button"
@@ -38,7 +42,7 @@ export class Allg {
   }
 
   /**
-   * This is called when the component is attached to the DOM.
+   * Aurelia calls this when the component is attached to the DOM.
    * Add listeners for window size and start timer
    */
   attached() {
@@ -53,7 +57,7 @@ export class Allg {
 
   /**
    * called, when the component is removed from the dom, e.g. the user choses a different
-   * menu entry. Remove window listner and stop update timer
+   * menu entry. Remove window listener and stop update timer
    */
   detached() {
     PLATFORM.global.removeEventListener("resize", this.resizeEventHandler)
@@ -150,7 +154,7 @@ export class Allg {
     })
 
     // display consumed power of the car loader
-    const carloader_power = await this.getValue(globals._car_loader_power)
+    const carloader_power = await this.fetcher.getValue(globals._car_loader_power)
     this.car_power = Math.round(100 * carloader_power) / 100
 
   }
@@ -161,21 +165,26 @@ export class Allg {
   async dispatch(elem) {
     // if the element has a "val" attribute, get that single value
     if (elem.val) {
+      let state
+      if(elem.statefun){
+        state=await elem.statefun(elem.val)
+      }else{
+        state=await this.fetcher.getValue(elem.val)
+      }
       if ("button" == elem.type) {
-        let msg = await this.getValue(elem.val)
-        this.ea.publish(elem.message, {state: msg ? "on" : "off"})
+        this.ea.publish(elem.message, {state: state ? "on" : "off"})
       } else {
-        this.ea.publish(elem.message, await this.getValue(elem.val))
+        this.ea.publish(elem.message, state)
       }
     } else if (elem.vals) {
       // if the element has a "vals" attribute, it neeeds more than one value to display
-      let prt = entries(elem.vals)
+      let parts = entries(elem.vals)
       let readings = []
-      prt.forEach(part => readings.push(this.getValue(part.value)))
+      parts.forEach(part => readings.push(this.fetcher.getValue(part.value)))
       let compound = {}
       Promise.all(readings).then(vals => {
         for (let i = 0; i < vals.length; i++) {
-          compound[prt[i].key] = vals[i]
+          compound[parts[i].key] = vals[i]
         }
         this.ea.publish(elem.message, compound)
       }).catch(err => {
@@ -185,7 +194,7 @@ export class Allg {
     }
     // if the element has a "switch" attribute, reflect position of the switch
     if(elem.switch){
-      let clickstate=await this.getValue(elem.switch)
+      let clickstate=await this.fetcher.getValue(elem.switch)
       if(typeof(clickstate) == "boolean"){
         clickstate = clickstate ? 1: 0
       }
@@ -194,12 +203,18 @@ export class Allg {
     }
   }
 
-  async getValue(id) {
-    return await this.fetcher.fetchJson(`${globals.server}/get/${id}`)
-  }
 
-  async setValue(id, value) {
-    return await this.fetcher.fetchJson(`${globals.server}/set/${id}?value=${value}`)
+  /**
+   * Set a new value and, after a short delay, call update() to display all
+   * changes and (possible) side effects
+   * @param id
+   * @param value
+   * @returns {Promise<any>}
+   */
+  async setValue(id, value) : Promise<any>{
+    let result=this.fetcher.fetchJson(`${globals.server}/set/${id}?value=${value}`)
+    setTimeout(()=>this.update(),1000)
+    return result
   }
 
 }

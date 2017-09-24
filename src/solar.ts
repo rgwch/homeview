@@ -1,3 +1,8 @@
+/**
+ * Homeview -  a simple frontend for a smarthome system
+ * (c) 2017 by G. Weirich
+ */
+
 import * as d3scale from 'd3-scale';
 import * as d3sel from 'd3-selection'
 import * as d3f from 'd3-format'

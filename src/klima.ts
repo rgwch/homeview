@@ -1,3 +1,8 @@
+/**
+ * Homeview -  a simple frontend for a smarthome system
+ * (c) 2017 by G. Weirich
+ */
+
 import {autoinject} from 'aurelia-framework'
 import {FetchClient} from './services/fetchclient'
 import {EventAggregator} from "aurelia-event-aggregator"

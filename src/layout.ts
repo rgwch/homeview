@@ -1,5 +1,15 @@
+/**
+ * Homeview -  a simple frontend for a smarthome system
+ * (c) 2017 by G. Weirich
+ */
+
 import global from './globals'
-export class layout{
+import {FetchClient} from "./services/fetchclient"
+
+export class Layout{
+
+  constructor(private fetch:FetchClient){}
+
   private three_buttons_def= {
     type: "button",
     map: {
@@ -49,9 +59,9 @@ export class layout{
   wlanext= Object.assign({message: "wlanextender_state", id:"wlanext",
     val: global._wlan_state, switch: global._wlan_state}, this.two_buttons_def)
   esszimmer=Object.assign({message: "esszimmer_state", id: "esszimmer",
-    val: global._diningroom_light}, this.two_buttons_def)
+    val: global._diningroom_light, statefun: this.lightify}, this.two_buttons_def)
   korridor=Object.assign({message: "korridor_state", id: "korridor",
-    val: global._corridor_light},this.two_buttons_def )
+    val: global._corridor_light, statefun: this.lightify},this.two_buttons_def )
 
   outside_gauge= {
     type: "gauge",
@@ -108,47 +118,49 @@ export class layout{
     upperBands: [{from: 16, to: 21, color: "#bff7ff"}, {from: 21, to: 25, color: "#109618"},
       {from: 25, to: 30, color: "#DC3912"}]
   })
-  light_sensor={
+
+  vertical_sensors={
     type: "gauge",
+    height: 204,
+    width: 49,
+    padding: 10,
+    suffix: "",
+  }
+  light_sensor=Object.assign({},this.vertical_sensors,{
     id: "lightsensor_outside",
     message: "brightness_update",
     val: global._brightness,
     min: 0,
     max: 250,
-    height: 204,
-    width: 49,
-    padding: 10,
-    suffix: "",
     units: "Licht",
     bands: [{from:0,to:110,color:"#3917b2"},{from:110,to:130,color:"#5884e5"},{from:130,to:250,color: "#18c5ff"}]
-  }
-  pv_energy={
-    type: "gauge",
+  })
+  pv_energy=Object.assign({}, this.vertical_sensors,{
     id: "sun_energy",
     message: "pv_energy_update",
     val: global.ACT_POWER,
     min: 0,
     max: 10000,
-    height: 204,
-    width: 49,
-    padding: 10,
     units: "PV",
-    suffix: "",
     bands: [{from:0, to:10000,color: "yellow"}]
-  }
-  energy_flow={
-    type:"gauge",
+  })
+  energy_flow=Object.assign({},this.vertical_sensors,{
     id:"energy_flow",
     message: "fronius_flow",
     val: global.GRID_FLOW,
     min: 5000,
     max:-5000,
-    height:204,
-    width:49,
-    padding:10,
     units: "Netz",
-    suffix: "",
     bands: [{from: -5000,to:0,color: "green"},{from:0, to: 5000, color: "red"}]
+  })
+
+  async lightify(id){
+    let values=await this.fetch.getValues([id+".on",id+"reachable"])
+    if(values[1]==0){
+      return false
+    }else{
+      return values[0]
+    }
   }
 
 }

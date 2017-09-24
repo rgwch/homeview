@@ -1,3 +1,8 @@
+/**
+ * Homeview -  a simple frontend for a smarthome system
+ * (c) 2017 by G. Weirich
+ */
+
 import {autoinject,bindable} from 'aurelia-framework'
 import * as d3sel from 'd3-selection'
 

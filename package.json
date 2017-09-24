@@ -1,6 +1,6 @@
 {
-  "name": "hv",
-  "description": "An Aurelia client application.",
+  "name": "HomeView",
+  "description": "A simple frontend for a smarthome system",
   "version": "0.1.0",
   "repository": {
     "type": "???",

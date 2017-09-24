@@ -1,3 +1,8 @@
+/**
+ * Homeview -  a simple frontend for a smarthome system
+ * (c) 2017 by G. Weirich
+ */
+
 import 'whatwg-fetch'
 import globals from '../globals'
 
@@ -36,4 +41,13 @@ export class FetchClient {
     }
   }
 
+  public async getValue(id:String):Promise<any>{
+    return this.fetchJson(`${globals.server}/get/${id}`)
+  }
+
+  public async getValues(ids:Array<String>):Promise<Array<any>>{
+    return Promise.all(ids.map(id=>{return this.getValue(id)})).then(result=>{
+      return result
+    })
+  }
 }

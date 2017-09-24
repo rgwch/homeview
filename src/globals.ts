@@ -1,11 +1,16 @@
+/**
+ * Homeview -  a simple frontend for a smarthome system
+ * (c) 2017 by G. Weirich
+ */
+
 export default {
   mock: false,
   server: "http://192.168.16.140:8087",
   update_interval_seconds: 30,
   _livingroom_temp: 'hm-rpc.1.000E5569A24A0E.1.ACTUAL_TEMPERATURE',
   _livingroom_humidity: 'hm-rpc.1.000E5569A24A0E.1.HUMIDITY',
-  _diningroom_light: 'lightify.0.82EBC90000261884.on',
-  _corridor_light: 'lightify.0.6F910B0000261884.on',
+  _diningroom_light: 'lightify.0.82EBC90000261884',
+  _corridor_light: 'lightify.0.6F910B0000261884',
   _outside_temp: 'hm-rpc.0.OEQ0088064.1.TEMPERATURE',
   _outside_humidity: 'hm-rpc.0.OEQ0088064.1.HUMIDITY',
   _bathroom_temp: 'hm-rpc.1.000E57098F247E.1.ACTUAL_TEMPERATURE',

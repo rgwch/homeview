@@ -1,3 +1,8 @@
+/**
+ * Homeview -  a simple frontend for a smarthome system
+ * (c) 2017 by G. Weirich
+ */
+
 import {Router, RouterConfiguration} from 'aurelia-router'
 export class App {
   public router:Router;
