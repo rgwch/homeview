@@ -9,15 +9,15 @@ import {scaleLinear} from "d3-scale";
 import {select,Selection} from 'd3-selection'
 import {arc} from 'd3-shape'
 import 'd3-transition'
+import {component} from "./component";
 
 
 const MIN_VALUE = 15
 const MAX_VALUE = 165
 
 @autoinject
-export class Doublegauge {
+export class Doublegauge extends component{
   @bindable cfg
-  private body
   private upperScale
   private lowerScale
   private upperArrow
@@ -25,23 +25,14 @@ export class Doublegauge {
   private upperValue
   private lowerValue
   private arcsize = 15
-
-
-  constructor(private ea: EventAggregator, private element: Element) {
+  component_name(){
+    return "Doublegauge"
   }
 
-  attached() {
-    if(undefined == this.cfg){
-      console.log("error! No configuration for doublegauge")
-      throw(new Error("configuration missing"))
-    }
-    this.configure()
-    this.render()
-    this.ea.subscribe(this.cfg.message, data => {
-      this.redraw(data.upper, data.lower)
-    })
-  }
 
+  gotMessage(msg){
+    this.redraw(msg.upper,msg.lower)
+  }
   /**
    * Configure the component with reasonable defaults. So, the application
    * needs only to change presets which are different from the default.
@@ -96,12 +87,13 @@ export class Doublegauge {
    */
   render() {
     // create unique id and attach SVG container
+    /*
     this.element.id = "dg_" + this.cfg.message
     this.body = select("#" + this.element.id).append("svg:svg")
       .attr("class", "doublegauge")
       .attr("width", this.cfg.size)
       .attr("height", this.cfg.size);
-
+*/
     // basic setup
     this.rectangle(0, 0, this.cfg.size, this.cfg.size,
       "black", "#a79ea3")

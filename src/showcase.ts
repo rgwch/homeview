@@ -26,6 +26,10 @@ export class Showcase{
       height: 80
     }
   }
+  private fronius={
+    width:800,
+    height:300
+  }
   private emptyObj={}
   doubleg={
     message: "doublegauge_data_update",

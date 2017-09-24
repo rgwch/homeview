@@ -85,6 +85,10 @@
             "main": "aurelia-testing",
             "env": "dev"
           },
+          {
+            "name": "iconv-lite",
+            "path": "../node_modules/iconv-lite"
+          },
           "text",
           "d3-axis",
           "d3-scale",
