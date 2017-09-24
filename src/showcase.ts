@@ -21,8 +21,10 @@ export class Showcase{
   private clock={
     message: "clock_upd",
     seconds: false,
-    width: 90,
-    height: 180
+    digits: {
+      width: 44,
+      height: 80
+    }
   }
   private emptyObj={}
   doubleg={

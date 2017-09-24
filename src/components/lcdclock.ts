@@ -27,7 +27,7 @@ export class lcdclock{
       console.log("error! No configuration for multiswitch")
       throw(new Error("missing configuration"))
     }
-    this.cfg=Object.assign({
+    this.cfg=Object.assign({},{
       digits: {
         height:180,
         width: 90

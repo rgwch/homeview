@@ -16,7 +16,7 @@ const MAX_VALUE = 165
 
 @autoinject
 export class Doublegauge {
-  @bindable config
+  @bindable cfg
   private body
   private upperScale
   private lowerScale
@@ -31,13 +31,13 @@ export class Doublegauge {
   }
 
   attached() {
-    if(undefined == this.config){
+    if(undefined == this.cfg){
       console.log("error! No configuration for doublegauge")
       throw(new Error("configuration missing"))
     }
     this.configure()
     this.render()
-    this.ea.subscribe(this.config.message, data => {
+    this.ea.subscribe(this.cfg.message, data => {
       this.redraw(data.upper, data.lower)
     })
   }
@@ -53,40 +53,40 @@ export class Doublegauge {
     /* event the component should listen to for updates.
      Must be unique throughout the site
      */
-    this.config.message = this.config.message || "doublegauge_changed"
+    this.cfg.message = this.cfg.message || "doublegauge_changed"
 
     /* Size of the component. Height an width are equal */
-    this.config.size = this.config.size || 150
-    this.arcsize = this.config.size / 10
+    this.cfg.size = this.cfg.size || 150
+    this.arcsize = this.cfg.size / 10
 
     /* minimum value to display */
-    this.config.upperMin = this.config.upperMin || -10
+    this.cfg.upperMin = this.cfg.upperMin || -10
 
     /* maximum value to display */
-    this.config.upperMax = this.config.upperMax || 40
+    this.cfg.upperMax = this.cfg.upperMax || 40
 
     /* Suffix to display after the value */
-    this.config.upperSuffix = this.config.upperSuffix || "°C"
+    this.cfg.upperSuffix = this.cfg.upperSuffix || "°C"
 
     /* Bands with different colors for different value ranges */
-    this.config.upperBands = this.config.upperBands ||
-      [{from: this.config.upperMin, to: this.config.upperMax, color: "blue"}]
+    this.cfg.upperBands = this.cfg.upperBands ||
+      [{from: this.cfg.upperMin, to: this.cfg.upperMax, color: "blue"}]
 
     /* create a scale to convert values (domain) into degrees (range)
      of the gauge pointer */
     this.upperScale = scaleLinear()
-      .domain([this.config.upperMin, this.config.upperMax])
+      .domain([this.cfg.upperMin, this.cfg.upperMax])
       .range([MIN_VALUE, MAX_VALUE])
     this.upperScale.clamp(true)
 
-    this.config.lowerMin = this.config.lowerMin || 0
-    this.config.lowerMax = this.config.lowerMax || 100
-    this.config.lowerSuffix = this.config.lowerSuffix || "%"
-    this.config.lowerBands = this.config.lowerBands ||
-      [{from: this.config.lowerMin, to: this.config.lowerMax, color: "green"}]
+    this.cfg.lowerMin = this.cfg.lowerMin || 0
+    this.cfg.lowerMax = this.cfg.lowerMax || 100
+    this.cfg.lowerSuffix = this.cfg.lowerSuffix || "%"
+    this.cfg.lowerBands = this.cfg.lowerBands ||
+      [{from: this.cfg.lowerMin, to: this.cfg.lowerMax, color: "green"}]
 
     this.lowerScale = scaleLinear()
-      .domain([this.config.lowerMin, this.config.lowerMax])
+      .domain([this.cfg.lowerMin, this.cfg.lowerMax])
       .range([MAX_VALUE, MIN_VALUE])
     this.lowerScale.clamp(true)
   }
@@ -96,27 +96,27 @@ export class Doublegauge {
    */
   render() {
     // create unique id and attach SVG container
-    this.element.id = "dg_" + this.config.message
+    this.element.id = "dg_" + this.cfg.message
     this.body = select("#" + this.element.id).append("svg:svg")
       .attr("class", "doublegauge")
-      .attr("width", this.config.size)
-      .attr("height", this.config.size);
+      .attr("width", this.cfg.size)
+      .attr("height", this.cfg.size);
 
     // basic setup
-    this.rectangle(0, 0, this.config.size, this.config.size,
+    this.rectangle(0, 0, this.cfg.size, this.cfg.size,
       "black", "#a79ea3")
-    this.rectangle(5, 5, this.config.size - 10, this.config.size - 10,
+    this.rectangle(5, 5, this.cfg.size - 10, this.cfg.size - 10,
       "blue", "#d3d3d3")
-    let center = this.config.size / 2
-    let size = (this.config.size / 2) * 0.9
+    let center = this.cfg.size / 2
+    let size = (this.cfg.size / 2) * 0.9
 
     // create colored bands for the scales
-    this.config.upperBands.forEach(band => {
+    this.cfg.upperBands.forEach(band => {
       this.arch(center, center, size - this.arcsize, size,
         this.deg2rad(this.upperScale(band.from)),
         this.deg2rad(this.upperScale(band.to)), band.color, 270)
     })
-    this.config.lowerBands.forEach(band => {
+    this.cfg.lowerBands.forEach(band => {
       this.arch(center, center, size - this.arcsize, size,
         this.deg2rad(this.lowerScale(band.from)),
         this.deg2rad(this.lowerScale(band.to)), band.color, 90)
@@ -146,20 +146,20 @@ export class Doublegauge {
     let markersFontSize = Math.round(size / 6)
 
     /* write min and max values to the upper scale */
-    let lp = this.valueToPoint(this.config.upperMin, 0.9, this.upperScale)
+    let lp = this.valueToPoint(this.cfg.upperMin, 0.9, this.upperScale)
     this.stringElem(center - lp.x, center - lp.y, markersFontSize, "start")
-      .text(this.config.upperMin)
-    lp = this.valueToPoint(this.config.upperMax, 0.9, this.upperScale)
+      .text(this.cfg.upperMin)
+    lp = this.valueToPoint(this.cfg.upperMax, 0.9, this.upperScale)
     this.stringElem(center - lp.x, center - lp.y, markersFontSize, "end")
-      .text(this.config.upperMax)
+      .text(this.cfg.upperMax)
 
     /* write min and max values to the lower scale */
-    lp = this.valueToPoint(this.config.lowerMin, 0.9, this.lowerScale)
+    lp = this.valueToPoint(this.cfg.lowerMin, 0.9, this.lowerScale)
     this.stringElem(center + lp.x, center + lp.y, markersFontSize, "start")
-      .text(this.config.lowerMin)
-    lp = this.valueToPoint(this.config.lowerMax, 0.9, this.lowerScale)
+      .text(this.cfg.lowerMin)
+    lp = this.valueToPoint(this.cfg.lowerMax, 0.9, this.lowerScale)
     this.stringElem(center + lp.x, center + lp.y, markersFontSize, "end")
-      .text(this.config.lowerMax)
+      .text(this.cfg.lowerMax)
 
 
     /* create ticks for upper and lower scales */
@@ -247,7 +247,7 @@ export class Doublegauge {
   valueToPoint(value, factor, scale) {
     let arc = scale(value)
     let rad = this.deg2rad(arc)
-    let r = ((this.config.size / 2) * 0.9 - this.arcsize) * factor
+    let r = ((this.cfg.size / 2) * 0.9 - this.arcsize) * factor
     let x = r * Math.cos(rad)
     let y = r * Math.sin(rad)
     return {"x": x, "y": y}
@@ -259,8 +259,8 @@ export class Doublegauge {
    * @param bottom new value for the lower gauge
    */
   redraw(top, bottom) {
-    let center = this.config.size / 2
-    let size = (this.config.size / 2) * 0.9
+    let center = this.cfg.size / 2
+    let size = (this.cfg.size / 2) * 0.9
     let factor=size/(size-this.arcsize)-0.05
     let tpos=this.valueToPoint(top,factor,this.upperScale)
     let bpos=this.valueToPoint(bottom,1.2,this.lowerScale)
@@ -274,7 +274,7 @@ export class Doublegauge {
       .duration(400)
       .attr("x2",center+bpos.x)
       .attr("y2",center+bpos.y)
-    this.upperValue.text(top + this.config.upperSuffix)
-    this.lowerValue.text(bottom + this.config.lowerSuffix)
+    this.upperValue.text(top + this.cfg.upperSuffix)
+    this.lowerValue.text(bottom + this.cfg.lowerSuffix)
   }
 }
