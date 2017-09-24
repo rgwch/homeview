@@ -155,7 +155,7 @@ export class Layout{
   })
 
   async lightify(id){
-    let values=await this.fetch.getValues([id+".on",id+"reachable"])
+    let values=await this.fetch.getValues([id+".on",id+".reachable"])
     if(values[1]==0){
       return false
     }else{

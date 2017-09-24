@@ -115,7 +115,8 @@
           "d3-zoom",
           "whatwg-fetch",
           "d3-transition",
-          "d3-timer"
+          "d3-timer",
+          "urlencode"
         ]
       }
     ],

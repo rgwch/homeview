@@ -1,6 +1,7 @@
 import {FetchClient} from "../services/fetchclient"
 import {autoinject,bindable} from 'aurelia-framework'
 import global from '../globals'
+import * as urlencode from 'urlencode'
 
 @autoinject
 export class Fronius{
@@ -23,14 +24,17 @@ export class Fronius{
     const end=new Date()
     start.setHours(0,0,0,0)
     end.setHours(23,59,59,999)
-    // let result=this.getSeries(start.getTime(),end.getTime())
+    this.getSeries(start.getTime(),end.getTime()).then( result=>
+      console.log(result)
+    )
+
   }
 
   async getSeries(from,to){
-    const query=`select * from ${global.ACT_POWER} where time >= ${from} and time <= ${to}ms`
-    const sql=(query)
-    const raw= await this.fetcher.fetchValue(`${global.influx}/query?db=iobroker&epoch=ms&q=${sql}`)
-    return raw.series
+    const query=`select value from "${global.ACT_POWER}" where time >= ${from} and time <= ${to}ms`
+    const sql=urlencode(query)
+    const raw= await this.fetcher.fetchJson(`${global.influx}/query?db=iobroker&epoch=ms&q=${sql}`)
+    return raw.results[0].series[0]
   }
 
 }
