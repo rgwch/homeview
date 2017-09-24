@@ -97,19 +97,19 @@ export class Showcase{
   }
 
   async update(){
-    let mm=Math.round(await this.fetcher.fetchJson("fake://012"))
-    let lg=Math.round(await this.fetcher.fetchJson("fake://power")+0.5)
+    let mm=Math.round(await this.fetcher.fetchValue("fake://012"))
+    let lg=Math.round(await this.fetcher.fetchValue("fake://power")+0.5)
     this.ea.publish(this.multi.message,{clicked:mm})
     this.ea.publish(this.linear.message,lg)
-    let temp=await this.fetcher.fetchJson("fake://temperatur")
-    let humid = Math.round(await this.fetcher.fetchJson("fake://humid")+0.5)
+    let temp=await this.fetcher.fetchValue("fake://temperatur")
+    let humid = Math.round(await this.fetcher.fetchValue("fake://humid")+0.5)
     this.ea.publish(this.doubleg.message,{upper: temp, lower:humid})
     if(mm==0){
       this.ea.publish(this.multi.message,{state:"on"})
     }else if(mm==1){
       this.ea.publish(this.multi.message,{state: "off"})
     }
-    let vg=await this.fetcher.fetchJson("fake(temperature")
+    let vg=await this.fetcher.fetchValue("fake(temperature")
     this.ea.publish(this.vertical.message,vg)
     this.ea.publish(this.l7segm.message,this.counter++)
     if(this.counter>9){

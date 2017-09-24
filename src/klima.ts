@@ -70,13 +70,13 @@ export class Klima{
   }
 
   async update(){
-    const inside_temp=await this.fetcher.fetchJson(`${globals.server}/get/${globals._livingroom_temp}`)
-    const inside_humid=await this.fetcher.fetchJson(`${globals.server}/get/${globals._livingroom_humidity}`)
-    const outside_humid=await this.fetcher.fetchJson(`${globals.server}/get/${globals._outside_humidity}`)
-    const outside_temp=await this.fetcher.fetchJson(`${globals.server}/get/${globals._outside_temp}`)
-    const bathroom1_temp=await this.fetcher.fetchJson(`${globals.server}/get/${globals._bathroom_temp}`)
-    const bathroom1_humid=await this.fetcher.fetchJson(`${globals.server}/get/${globals._bathroom_humidity}`)
-    const bright= await this.fetcher.fetchJson(`${globals.server}/get/${globals._brightness}`)
+    const inside_temp=await this.fetcher.fetchValue(`${globals.server}/get/${globals._livingroom_temp}`)
+    const inside_humid=await this.fetcher.fetchValue(`${globals.server}/get/${globals._livingroom_humidity}`)
+    const outside_humid=await this.fetcher.fetchValue(`${globals.server}/get/${globals._outside_humidity}`)
+    const outside_temp=await this.fetcher.fetchValue(`${globals.server}/get/${globals._outside_temp}`)
+    const bathroom1_temp=await this.fetcher.fetchValue(`${globals.server}/get/${globals._bathroom_temp}`)
+    const bathroom1_humid=await this.fetcher.fetchValue(`${globals.server}/get/${globals._bathroom_humidity}`)
+    const bright= await this.fetcher.fetchValue(`${globals.server}/get/${globals._brightness}`)
     this.ea.publish(this.outside_gauge.message,{upper: outside_temp,lower:outside_humid})
     this.ea.publish(this.livingroom_gauge.message,{upper:inside_temp, lower: inside_humid})
     this.ea.publish(this.bathroom1_gauge.message,{upper: bathroom1_temp, lower: bathroom1_humid})

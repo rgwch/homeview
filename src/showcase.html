@@ -10,6 +10,7 @@
   <require from="components/verticalgauge"></require>
   <require from="components/lcd7segm"></require>
   <require from="components/lcdclock"></require>
+  <require from="components/fronius"></require>
   <div class="container">
     <div class="row">
       <div class="col-sm-3">
@@ -32,9 +33,13 @@
         <h3>7-Segment</h3>
         <lcd7segm cfg.bind="l7segm"></lcd7segm>
       </div>
-      <div class=""col-sm-3>
+      <div class="col-sm-3">
         <h3>LCD Clock</h3>
         <lcdclock cfg.bind="clock"></lcdclock>
+      </div>
+      <div class="col-sm-3">
+        <h3>Fronius</h3>
+        <fronius></fronius>
       </div>
     </div>
   </div>

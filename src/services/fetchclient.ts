@@ -19,7 +19,7 @@ const KNOWN_SOURCES = [
 
 export class FetchClient {
 
-  public async fetchJson(url) {
+  public async fetchValue(url) {
     if (globals.mock || url.startsWith("fake")) {
       let upper = 100
       let lower = -10
@@ -41,8 +41,13 @@ export class FetchClient {
     }
   }
 
+  public async fetchJson(url){
+    let result = await fetch(url)
+    return (await result.json())
+  }
+
   public async getValue(id:String):Promise<any>{
-    return this.fetchJson(`${globals.server}/get/${id}`)
+    return this.fetchValue(`${globals.server}/get/${id}`)
   }
 
   public async getValues(ids:Array<String>):Promise<Array<any>>{
