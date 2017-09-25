@@ -212,7 +212,7 @@ export class Allg {
    * @returns {Promise<any>}
    */
   async setValue(id, value) : Promise<any>{
-    let result=this.fetcher.fetchValue(`${globals.server}/set/${id}?value=${value}`)
+    let result=this.fetcher.fetchValue(`${globals.iobroker}/set/${id}?value=${value}`)
     setTimeout(()=>this.update(),1000)
     return result
   }

@@ -10,11 +10,11 @@ let serve = gulp.series(
   build,
   done => {
     browserSync({
-      online: false,
-      open: false,
-      port: 9000,
+      online  : false,
+      open    : false,
+      port    : 9000,
       logLevel: 'silent',
-      server: {
+      iobroker: {
         baseDir: [project.platform.baseDir],
         middleware: [historyApiFallback(), function(req, res, next) {
           res.setHeader('Access-Control-Allow-Origin', '*');

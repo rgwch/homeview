@@ -100,17 +100,17 @@ export class Solar {
 
   async update() {
 
-    const power= await this.fetcher.fetchValue(`${globals.server}/get/${globals.ACT_POWER}`)
+    const power= await this.fetcher.fetchValue(`${globals.iobroker}/get/${globals.ACT_POWER}`)
     this.update_dimensions()
     let bar = d3sel.select("#power_bar")
     bar.attr("width", this.x(power) - this.x(0))
     let text = d3sel.select("#textval")
     text.text(`${power} Watt`)
-    const day=await this.fetcher.fetchValue(`${globals.server}/get/${globals.DAY_ENERGY}`)
+    const day=await this.fetcher.fetchValue(`${globals.iobroker}/get/${globals.DAY_ENERGY}`)
     this.day_energy = format(day / 1000)
-    const year = await this.fetcher.fetchValue(`${globals.server}/get/${globals.YEAR_ENERGY}`)
+    const year = await this.fetcher.fetchValue(`${globals.iobroker}/get/${globals.YEAR_ENERGY}`)
     this.year_energy = format(year / 1000)
-    const total = await this.fetcher.fetchValue(`${globals.server}/get/${globals.TOTAL_ENERGY}`)
+    const total = await this.fetcher.fetchValue(`${globals.iobroker}/get/${globals.TOTAL_ENERGY}`)
     this.total_energy = format(total / 1000000)
   }
 

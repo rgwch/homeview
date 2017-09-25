@@ -5,6 +5,7 @@
 
 import 'whatwg-fetch'
 import globals from '../globals'
+import {range} from 'd3-arrays'
 
 /**
  * In mock mode: create reasonable random values based on URL patterns
@@ -47,12 +48,16 @@ export class FetchClient {
   }
 
   public async getValue(id:String):Promise<any>{
-    return this.fetchValue(`${globals.server}/get/${id}`)
+    return this.fetchValue(`${globals.iobroker}/get/${id}`)
   }
 
   public async getValues(ids:Array<String>):Promise<Array<any>>{
     return Promise.all(ids.map(id=>{return this.getValue(id)})).then(result=>{
       return result
     })
+  }
+
+  fakeSeries(start, end, lower, upper){
+    return range(start,end,30000).map(elem=>[elem,Math.round(Math.random()*(upper-lower)+lower)])
   }
 }
