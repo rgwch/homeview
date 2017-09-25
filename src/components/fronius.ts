@@ -33,8 +33,8 @@ export class Fronius extends component{
     },this.cfg)
     const start=new Date()
     const end=new Date()
-    start.setHours(6,0,0,0)
-    end.setHours(18,59,59,999)
+    start.setHours(0,0,0,0)
+    end.setHours(23,59,59,999)
     //start.setTime(start.getTime()-3600000*4)
     this.from_time=start.getTime()
     this.until_time=end.getTime()
@@ -43,7 +43,9 @@ export class Fronius extends component{
   async render() {
 
     const result=await this.getSeries(this.from_time,this.until_time)
-    const vals=result.values //.map(val=>[new Date(val[0]),val[1]])
+    const pv=result[global.ACT_POWER]
+    const grid=result[global.GRID_FLOW]
+    const vals=grid
     this.from_time=vals[0][0]
     this.until_time=vals[vals.length-1][0]
     this.scaleY = scaleLinear()
@@ -83,20 +85,23 @@ export class Fronius extends component{
   }
 
   async update(){
-    const result=await this.getSeries(this.from_time,this.until_time)
-    const line=lineGenerator()
-      .x(d=>this.scaleX(result.values[0]))
-      .y(d=>this.scaleY(result.values[1]))
-    this.chart
-      .datum(result.values)
-      .attr("d",line)
-
   }
   async getSeries(from,to){
-    const query=`select value from "${global.ACT_POWER}" where time >= ${from}ms and time <= ${to}ms`
+
+    const query=`select value from "${global.ACT_POWER}" where time >= ${from}ms and time <= ${to}ms;
+      select value from "${global.GRID_FLOW}" where time >= ${from}ms and time <= ${to}ms`
     const sql=urlencode(query)
     const raw= await this.fetcher.fetchJson(`${global.influx}/query?db=iobroker&epoch=ms&q=${sql}`)
-    return raw.results[0].series[0]
+    const ret={}
+    raw.results.forEach(result=>{
+         if(result.series){
+           result.series.forEach(serie=>{
+             ret[serie.name]=serie.values
+           })
+         }
+    })
+
+    return ret
   }
 
 }
