@@ -8,8 +8,12 @@ import 'd3-transition'
 import {scaleLinear} from "d3-scale";
 import {line as lineGenerator} from 'd3-shape'
 import {axisBottom, axisLeft} from 'd3-axis'
-import {range} from 'd3-array'
+import {range,merge,mean} from 'd3-array'
 import {timeFormat} from 'd3-time-format'
+import {entries,key,values} from 'd3-collection'
+import * as gridsamples from '../services/samples_grid'
+import * as pvsamples from '../services/samples_pv'
+
 
 
 @autoinject
@@ -31,23 +35,82 @@ export class Fronius extends component{
       paddingLeft:50,
       paddingBottom: 20
     },this.cfg)
-    const start=new Date()
-    const end=new Date()
+    const start=new Date("2017-09-25")
+    const end=new Date("2017-09-26")
     start.setHours(0,0,0,0)
-    end.setHours(23,59,59,999)
+    end.setHours(1,0,0,0)
     //start.setTime(start.getTime()-3600000*4)
     this.from_time=start.getTime()
     this.until_time=end.getTime()
   }
 
+  resample(samples):{PV:Array<any>,GRID:Array<any>,DIFF:Array<any>}{
+    const resolution=3600000
+    const from=this.from_time
+    const until=this.until_time
+
+    function resample(arr){
+      let sampled={}
+      range(from/resolution,until/resolution).forEach(step=>{sampled[step]=[]})
+
+      arr.forEach(sample=>{
+        let bucket=Math.floor(sample[0]/resolution)
+        if(!sampled[bucket]){
+          console.log(bucket)
+        }else {
+          sampled[bucket].push(sample)
+        }
+      })
+
+      let output=[]
+      entries(sampled).forEach(entry=>{
+        let m=mean(entry.value,e=>e[1])
+        output.push([entry.key*3600000,m])
+      })
+      return output
+    }
+    let input={}
+    let field=global.GRID_FLOW
+    if(!samples){
+      input[global.GRID_FLOW]=gridsamples.default.results[0].series[0].values
+      input[global.ACT_POWER]=pvsamples.default.results[0].series[0].values
+    }
+
+    let result={
+      PV: resample(input[global.ACT_POWER]),
+      GRID: resample(input[global.GRID_FLOW]),
+      DIFF: []
+    }
+    let diff=result.DIFF
+    for(let i=0;i<result.GRID.length;i++){
+      diff[i]=[result.PV[i][0],result.PV[i][1]+result.GRID[i][1]]
+    }
+    result.DIFF=diff
+    return result
+   }
+
   async render() {
 
-    const result=await this.getSeries(this.from_time,this.until_time)
+    //const result=await this.getSeries(this.from_time,this.until_time)
+    /*
     const pv=result[global.ACT_POWER]
     const grid=result[global.GRID_FLOW]
-    const vals=grid
-    this.from_time=vals[0][0]
-    this.until_time=vals[vals.length-1][0]
+    const consumed=[]
+    grid.forEach(t=>{
+      const elem=pv.find(pt=>Math.round(pt[0]/1000)==Math.round(t[0]/1000))
+      if(elem){
+        consumed.push([t[0],t[1]+elem[1]])
+      }else[
+        consumed.push(t)
+      ]
+    })
+
+    */
+    let processed=this.resample(null)
+    this.from_time=processed.GRID[0][0]
+    this.until_time=processed.GRID[processed.GRID.length-1][0]
+
+
     this.scaleY = scaleLinear()
       .range([this.cfg.height-this.cfg.paddingBottom,20])
       .domain([0, 10000])
@@ -55,15 +118,25 @@ export class Fronius extends component{
       .range([this.cfg.paddingLeft,this.cfg.width-20])
       .domain([this.from_time, this.until_time])
 
-    const line=lineGenerator()
+    const lineGrid=lineGenerator()
       .x(d=>this.scaleX(d[0]))
       .y(d=>this.scaleY(d[1]))
+
     this.chart=this.body.append("g")
+
       this.chart.append("path")
-      .datum(vals)
-      .attr("d",line)
-      .attr("stroke","blue")
+      .datum(processed.DIFF)
+      .attr("d",lineGrid)
+      .attr("stroke","red")
       .attr("stroke-width",0.8)
+      .attr("fill","none")
+
+
+    this.chart.append("path")
+      .datum(processed.PV)
+      .attr("d",lineGrid)
+      .attr("stroke","blue")
+      .attr("stroke-width",0.9)
       .attr("fill","none")
 
     const xaxis=axisBottom().scale(this.scaleX)

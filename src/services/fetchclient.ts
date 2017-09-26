@@ -5,7 +5,7 @@
 
 import 'whatwg-fetch'
 import globals from '../globals'
-import {range} from 'd3-arrays'
+import {range} from 'd3-array'
 
 /**
  * In mock mode: create reasonable random values based on URL patterns
