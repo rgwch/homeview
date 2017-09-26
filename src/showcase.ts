@@ -27,8 +27,8 @@ export class Showcase{
     }
   }
   private fronius={
-    width:800,
-    height:300
+    width:1000,
+    height:600
   }
   private emptyObj={}
   doubleg={
