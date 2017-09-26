@@ -14,6 +14,7 @@ import {timeMinute} from 'd3-time'
 import {entries, key, values} from 'd3-collection'
 import * as gridsamples from '../services/samples_grid'
 import * as pvsamples from '../services/samples_pv'
+import {isNullOrUndefined} from "util";
 
 
 @autoinject
@@ -36,8 +37,12 @@ export class Fronius extends component {
       paddingLeft  : 50,
       paddingBottom: 20
     }, this.cfg)
-    const start = new Date("2017-09-25")
-    const end = new Date("2017-09-25")
+    let start=new Date()
+    let end=new Date()
+    if(global.mock) {
+      start = new Date("2017-09-25")
+      end = new Date("2017-09-25")
+    }
     start.setHours(0, 0, 0, 0)
     end.setHours(23, 59, 59, 999)
     //start.setTime(start.getTime()-3600000*4)
@@ -57,7 +62,7 @@ export class Fronius extends component {
       arr.forEach(sample => {
         let bucket = Math.floor(sample[0] / resolution)
         if (!sampled[bucket]) {
-          console.log(bucket)
+          console.log(bucket+", "+new Date(sample[0]))
           sampled[bucket] = []
         }
         sampled[bucket].push(sample)
@@ -73,13 +78,13 @@ export class Fronius extends component {
     }
 
     let input = samples || {
-      GRID:  gridsamples.default.results[0].series[0].values,
-      PV: pvsamples.default.results[0].series[0].values
+      [global.GRID_FLOW]:  gridsamples.default.results[0].series[0].values,
+      [global.ACT_POWER]: pvsamples.default.results[0].series[0].values
     }
 
     let result = {
-      PV  : resample_internal(input.PV),
-      GRID: resample_internal(input.GRID),
+      PV  : resample_internal(input[global.ACT_POWER]),
+      GRID: resample_internal(input[global.GRID_FLOW]),
       DIFF: [],
       cumulated: [],
       production: 0,
@@ -108,7 +113,11 @@ export class Fronius extends component {
 
   async render() {
 
-    let processed = this.resample(null)
+    let samples
+    if(!global.mock){
+      samples=await  this.getSeries(this.from_time,this.until_time)
+    }
+    let processed = this.resample(samples)
 
     this.scaleY = scaleLinear()
       .range([this.cfg.height - this.cfg.paddingBottom, 20])
@@ -187,7 +196,8 @@ export class Fronius extends component {
     this.stringElem(textbox,10,10,15,"left","green")
       .text("Produktion: "+this.round2(processed.production/3600000)+" kWh")
   */
-    this.tabbedText(textbox,10,100,["Leistung",max(processed.PV.map(x=>x[1]))+" W"],"blue")
+
+    this.tabbedText(textbox,10,100,["Leistung max:",Math.round(max(processed.PV.map(x=>x[1])))+" W"],"blue")
     this.tabbedText(textbox,28,100,["Produktion:",this.round2(processed.production/3600000)+" kWh"],"green")
     this.tabbedText(textbox,46,100,["Verbrauch:",this.round2(processed.consumation/3600000)+" kWh"],"red")
 
@@ -224,12 +234,13 @@ export class Fronius extends component {
   async update() {
   }
 
-  async getSeries(from, to) {
+  async getSeries(from:number, to:number) {
 
+    console.log("fetch data from "+new Date(from)+" until "+new Date(to))
     const query = `select value from "${global.ACT_POWER}" where time >= ${from}ms and time < ${to}ms;
       select value from "${global.GRID_FLOW}" where time >= ${from}ms and time < ${to}ms`
     const sql = urlencode(query)
-    const raw = await this.fetcher.fetchJson(`${global.influx}/query?db=iobroker&epoch=ms&q=${sql}`)
+    const raw = await this.fetcher.fetchJson(`${global.influx}/query?db=iobroker&epoch=ms&precision=ms&q=${sql}`)
     const ret = {}
     raw.results.forEach(result => {
       if (result.series) {

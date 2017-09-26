@@ -155,7 +155,7 @@ export class Layout{
   })
   fronius_cfg={
     width: 4*200,
-    height: 180,
+    height: 300,
     id:"fronius_widget",
     message:"fronius_msg"
   }
