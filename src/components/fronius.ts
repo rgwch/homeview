@@ -29,12 +29,16 @@ export class Fronius extends component {
   private scaleY
   private format = timeFormat("%H:%M")
 
+  /***
+   * Configure the Widget
+   */
   configure() {
     this.cfg = Object.assign({}, {
-      message: "fronius_update",
-      id: "fronius_adapter",
-      paddingLeft: 50,
-      paddingBottom: 20
+      message      : "fronius_update",
+      id           : "fronius_adapter",
+      paddingLeft  : 50,
+      paddingBottom: 20,
+      paddingRight : 30
     }, this.cfg)
     let start = new Date()
     let end = new Date()
@@ -49,6 +53,11 @@ export class Fronius extends component {
     this.until_time = end.getTime()
   }
 
+  /**
+   * Create a new dataset from PV and Grid samples
+   * @param samples An Object vontaining named Arrays with samples, each being a [timestamp,value] array
+   * @returns {{PV: Array<Array<number>>, GRID: Array<Array<number>>, DIFF: Array, cumulated: Array, production: number, consumation: number, self_consumation: number, imported: number, exported: number}}
+   */
   resample(samples) {
     const resolution = 120000
     const from = this.from_time
@@ -79,20 +88,20 @@ export class Fronius extends component {
     }
 
     let input = samples || {
-      [global.GRID_FLOW]: gridsamples.default.results[0].series[0].values,
-      [global.ACT_POWER]: pvsamples.default.results[0].series[0].values
-    }
+        [global.GRID_FLOW]: gridsamples.default.results[0].series[0].values,
+        [global.ACT_POWER]: pvsamples.default.results[0].series[0].values
+      }
 
     let result = {
-      PV: resample_internal(input[global.ACT_POWER] || []),
-      GRID: resample_internal(input[global.GRID_FLOW]),
-      DIFF: [],
-      cumulated: [],
-      production: 0,
-      consumation: 0,
+      PV              : resample_internal(input[global.ACT_POWER] || []),
+      GRID            : resample_internal(input[global.GRID_FLOW]),
+      DIFF            : [],
+      cumulated       : [],
+      production      : 0,
+      consumation     : 0,
       self_consumation: 0,
-      imported: 0,
-      exported: 0
+      imported        : 0,
+      exported        : 0
     }
     let diff = result.DIFF
     let slotlength = resolution / 1000
@@ -102,12 +111,12 @@ export class Fronius extends component {
         diff[i] = [result.PV[i][0], result.PV[i][1] + result.GRID[i][1]]
         let slot_prod = result.PV[i][1] * slotlength
         let slot_cons = diff[i][1] * slotlength
-        let inout=slot_prod-slot_cons
-        if(inout>0){
-          result.self_consumation+=slot_cons
-          result.exported-=(result.GRID[i][1]*slotlength)
-        }else{
-          result.imported+=(result.GRID[i][1]*slotlength)
+        let inout = slot_prod - slot_cons
+        if (inout > 0) {
+          result.self_consumation += slot_cons
+          result.exported -= (result.GRID[i][1] * slotlength)
+        } else {
+          result.imported += (result.GRID[i][1] * slotlength)
         }
         result.production += slot_prod
         result.consumation += slot_cons
@@ -119,6 +128,10 @@ export class Fronius extends component {
     return result
   }
 
+  /**
+   * Create the visual representation of the data
+   * @returns {Promise<void>}
+   */
   async render() {
 
     let samples
@@ -127,23 +140,34 @@ export class Fronius extends component {
     }
     let processed = this.resample(samples)
 
+    /* Scale for power (left axis) */
     this.scaleY = scaleLinear()
       .range([this.cfg.height - this.cfg.paddingBottom, 20])
       .domain([0, 10000])
+    /* scale for time (X-Axis) */
     this.scaleX = scaleTime()
-      .range([this.cfg.paddingLeft, this.cfg.width - 20])
+      .range([this.cfg.paddingLeft, this.cfg.width - this.cfg.paddingRight])
       .domain([new Date(this.from_time), new Date(this.until_time)])
 
+    /* Scale for cumulated energy (right axis) */
     const scaleCumul = scaleLinear()
       .range(this.scaleY.range())
       .domain([0, processed.cumulated[processed.cumulated.length - 1][1]])
 
+    /* Line Generator for time/power diagrams */
     const lineGrid = lineGenerator()
       .x(d => this.scaleX(d[0]))
       .y(d => this.scaleY(d[1]))
 
+    /* line Generator for time/energy diagram */
+    const lineCumul = lineGenerator()
+      .x(d => this.scaleX(d[0]))
+      .y(d => scaleCumul(d[1]))
+
+    /* Chart element */
     this.chart = this.body.append("g")
 
+    /* power consumation diagram */
     this.chart.append("path")
       .datum(processed.DIFF)
       .attr("d", lineGrid)
@@ -151,7 +175,7 @@ export class Fronius extends component {
       .attr("stroke-width", 0.8)
       .attr("fill", "none")
 
-
+    /* power generation diagram */
     this.chart.append("path")
       .datum(processed.PV)
       .attr("d", lineGrid)
@@ -159,10 +183,8 @@ export class Fronius extends component {
       .attr("stroke-width", 0.9)
       .attr("fill", "none")
 
-    const lineCumul = lineGenerator()
-      .x(d => this.scaleX(d[0]))
-      .y(d => scaleCumul(d[1]))
 
+    /* cumulated energy diagram */
     this.chart.append("path")
       .datum(processed.cumulated)
       .attr("d", lineCumul)
@@ -170,57 +192,77 @@ export class Fronius extends component {
       .attr("stroke-width", 0.8)
       .attr("fill", "none")
 
+    /* X-Axis */
     const xaxis = axisBottom().scale(this.scaleX)
       .ticks(20)
       .tickFormat(this.format)
-
     this.chart.append('g')
       .attr("transform", `translate(0,${this.cfg.height - this.cfg.paddingBottom})`)
       .call(xaxis)
 
+    /* left y-axis */
     const yAxis = axisLeft().scale(this.scaleY)
     this.chart.append('g')
       .attr("transform", `translate(${this.cfg.paddingLeft},0)`)
       .call(yAxis)
 
+    /* right y-axis */
     const raxis = axisRight().scale(scaleCumul)
       .tickFormat(d => d / 1000)
     this.chart.append("g")
-      .attr("transform", `translate(${this.cfg.width - this.cfg.paddingLeft},0)`)
+      .attr("transform", `translate(${this.cfg.width - this.cfg.paddingRight},0)`)
       .call(raxis)
 
+    /* Text box with summary data */
     const textbox = this.chart.append("g")
       .attr("transform", `translate(${20 + this.cfg.paddingLeft},10)`)
 
-    textbox.append("svg:rect")
-      .attr("x", 0)
-      .attr("y", 0)
-      .attr("width", 220)
-      .attr("height", 120)
+    this.rectangle(textbox, 0, 0, 220, 120)
       .attr("stroke", "blue")
       .attr("fill", "white")
 
-    /*
-    this.stringElem(textbox,10,10,15,"left","green")
-      .text("Produktion: "+this.round2(processed.production/3600000)+" kWh")
-  */
-    let round2f=format(".2f")
 
-    this.tabbedText(textbox, 10, 120, ["Leistung max:", Math.round(max(processed.PV.map(x => x[1]))) + " W"], "blue")
-    this.tabbedText(textbox, 28, 120, ["Produktion:", round2f(processed.production / 3600000) + " kWh"], "green")
-    this.tabbedText(textbox, 46, 120, ["Verbrauch:", round2f(processed.consumation / 3600000) + " kWh"], "red")
-    this.tabbedText(textbox, 64,120, ["Eigenverbrauch:", round2f(processed.self_consumation/3600000)+" kWh"],"#8fbb3b")
-    this.tabbedText(textbox, 82,120,["Import:",round2f(processed.imported/3600000)+" kWh"],"#aa3257")
-    this.tabbedText(textbox, 100,120, ["Export",round2f(processed.exported/3600000)+" kWh"], "#aa3257")
+    let round2f = format(".2f")
+
+    this.tabbedText(textbox, 10, 120, ["Leistung max:", Math.round(max(processed.PV.map(x => x[1]))) + " W"], "#2522ff")
+    this.tabbedText(textbox, 28, 120, ["Produktion:", round2f(processed.production / 3600000) + " kWh"], "#2db466")
+    this.tabbedText(textbox, 46, 120, ["Verbrauch:", round2f(processed.consumation / 3600000) + " kWh"], "#ff1e4a")
+    this.tabbedText(textbox, 64, 120, ["Eigenverbrauch:", round2f(processed.self_consumation / 3600000) + " kWh"], "#8fbb3b")
+    this.tabbedText(textbox, 82, 120, ["Import:", round2f(processed.imported / 3600000) + " kWh"], "#aa3257")
+    this.tabbedText(textbox, 100, 120, ["Export", round2f(processed.exported / 3600000) + " kWh"], "#549778")
+
+    /* Button for previous day */
+    this.rectangle(this.chart, 20 + this.cfg.paddingLeft,this.cfg.height / 2,50,50)
+      .attr("fill", "grey")
+      .attr("opacity", 0.4)
+      .on("click", ev => {alert("click")})
+
+    /* Button for next day */
+    this.rectangle(this.chart,this.cfg.width-this.cfg.paddingRight-70, this.cfg.height/2,50,50)
+      .attr("fill","grey")
+      .attr("opacity",0.4)
+
+  } // render
+
+  /* Helper to append a rectangle */
+  private rectangle(parent,x,y,w,h) {
+    return parent.append("svg:rect")
+      .attr("x", x)
+      .attr("y", y)
+      .attr("width", w)
+      .attr("height", h)
   }
 
 
-  round2(x) {
-    return Math.round(100 * x) / 100
-  }
-
-
-  tabbedText(parent, y, tab, text, color) {
+  /**
+   * Helper to append nicely tabbed text elements
+   * @param parent container to append text
+   * @param y   y-Position relative to container
+   * @param tab tab space amount
+   * @param text  an array with texts to append to the tabs
+   * @param color color of the text
+   */
+  private tabbedText(parent, y, tab, text, color) {
     let x = 10
     text.forEach(str => {
       this.stringElem(parent, x, y, 14, color)
@@ -229,7 +271,15 @@ export class Fronius extends component {
     })
   }
 
-  stringElem(parent, x, y, size, color) {
+  /**
+   * Helper to append a String
+   * @param parent parent contianer
+   * @param x x-coordinate of the text
+   * @param y Y-coordinate
+   * @param size size of the text
+   * @param color color of the text
+   */
+  private stringElem(parent, x, y, size, color) {
     return parent.append("svg:text")
       .attr("x", x)
       .attr("y", y)
@@ -246,6 +296,12 @@ export class Fronius extends component {
   async update() {
   }
 
+  /**
+   * Read new data from an influx database (as defined in global.influx)
+   * @param from -  start timestamp (inlcuded) as unix epoch in ms
+   * @param to  - end timestamp (excluded) as unix epoch in ms
+   * @returns {Promise<{}>}
+   */
   async getSeries(from: number, to: number) {
 
     console.log("fetch data from " + new Date(from) + " until " + new Date(to))
