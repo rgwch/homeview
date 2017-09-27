@@ -1,1 +1,32 @@
-<template></template>
+<template>
+  <div class="graph"></div>
+  <div class="summary">
+    <table>
+      <tr style="color:#2522ff">
+        <td>Leistung max.:</td>
+        <td>${max_power}</td>
+      </tr>
+      <tr style="color:#2db466">
+        <td>Produktion:</td>
+        <td>${production}</td>
+      </tr>
+      <tr style="color:#ff1e4a;">
+        <td>Verbrauch:</td>
+        <td>${consumation}</td>
+      </tr>
+      <tr style="color:#8fbb3b">
+        <td>Eigenverbrauch:</td>
+        <td>${self_consumation}</td>
+      </tr>
+      <tr style="color:#aa3257">
+        <td>Import:</td>
+        <td>${import}</td>
+      </tr>
+      <tr style="color:#549778">
+        <td>Export:</td>
+        <td> ${export}</td>
+      </tr>
+    </table>
+
+  </div>
+</template>
