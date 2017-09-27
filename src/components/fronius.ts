@@ -1,5 +1,4 @@
-import {FetchClient} from "../services/fetchclient"
-import {autoinject, bindable} from 'aurelia-framework'
+import {autoinject} from 'aurelia-framework'
 import global from '../globals'
 import * as urlencode from 'urlencode'
 import {component} from "./component";
@@ -8,13 +7,13 @@ import 'd3-transition'
 import {scaleLinear, scaleTime} from "d3-scale";
 import {line as lineGenerator} from 'd3-shape'
 import {axisBottom, axisLeft, axisRight} from 'd3-axis'
-import {range, merge, mean, max} from 'd3-array'
+import {max, mean, merge, range} from 'd3-array'
 import {timeFormat} from 'd3-time-format'
+import {format} from 'd3-format'
 import {timeMinute} from 'd3-time'
 import {entries, key, values} from 'd3-collection'
 import * as gridsamples from '../services/samples_grid'
 import * as pvsamples from '../services/samples_pv'
-import {isNullOrUndefined} from "util";
 
 
 @autoinject
@@ -32,14 +31,14 @@ export class Fronius extends component {
 
   configure() {
     this.cfg = Object.assign({}, {
-      message      : "fronius_update",
-      id           : "fronius_adapter",
-      paddingLeft  : 50,
+      message: "fronius_update",
+      id: "fronius_adapter",
+      paddingLeft: 50,
       paddingBottom: 20
     }, this.cfg)
-    let start=new Date()
-    let end=new Date()
-    if(global.mock) {
+    let start = new Date()
+    let end = new Date()
+    if (global.mock) {
       start = new Date("2017-09-25")
       end = new Date("2017-09-25")
     }
@@ -55,14 +54,16 @@ export class Fronius extends component {
     const from = this.from_time
     const until = this.until_time
 
-    function resample_internal(arr:Array<Array<number>>):Array<Array<number>> {
+    function resample_internal(arr: Array<Array<number>>): Array<Array<number>> {
       let sampled = {}
-      range(from / resolution, until / resolution).forEach(step => {sampled[step] = []})
+      range(from / resolution, until / resolution).forEach(step => {
+        sampled[step] = []
+      })
 
       arr.forEach(sample => {
         let bucket = Math.floor(sample[0] / resolution)
         if (!sampled[bucket]) {
-          console.log(bucket+", "+new Date(sample[0]))
+          console.log(bucket + ", " + new Date(sample[0]))
           sampled[bucket] = []
         }
         sampled[bucket].push(sample)
@@ -78,33 +79,40 @@ export class Fronius extends component {
     }
 
     let input = samples || {
-      [global.GRID_FLOW]:  gridsamples.default.results[0].series[0].values,
+      [global.GRID_FLOW]: gridsamples.default.results[0].series[0].values,
       [global.ACT_POWER]: pvsamples.default.results[0].series[0].values
     }
 
     let result = {
-      PV  : resample_internal(input[global.ACT_POWER]),
+      PV: resample_internal(input[global.ACT_POWER] || []),
       GRID: resample_internal(input[global.GRID_FLOW]),
       DIFF: [],
       cumulated: [],
       production: 0,
       consumation: 0,
-      self_consumation:0,
-      imported:0,
-      exported:0
+      self_consumation: 0,
+      imported: 0,
+      exported: 0
     }
     let diff = result.DIFF
-    let slotlength=resolution/1000
-    let cumul=0
+    let slotlength = resolution / 1000
+    let cumul = 0
     for (let i = 0; i < result.GRID.length; i++) {
-      if(result.PV[i]) {
+      if (result.PV[i]) {
         diff[i] = [result.PV[i][0], result.PV[i][1] + result.GRID[i][1]]
-        let slot_prod=result.PV[i][1]*slotlength
-        let slot_cons=diff[i][1]*slotlength
-        result.production+=slot_prod
-        result.consumation+=slot_cons
-        cumul+=slot_prod
-        result.cumulated[i]=[result.PV[i][0],Math.round(cumul/3600)]
+        let slot_prod = result.PV[i][1] * slotlength
+        let slot_cons = diff[i][1] * slotlength
+        let inout=slot_prod-slot_cons
+        if(inout>0){
+          result.self_consumation+=slot_cons
+          result.exported-=(result.GRID[i][1]*slotlength)
+        }else{
+          result.imported+=(result.GRID[i][1]*slotlength)
+        }
+        result.production += slot_prod
+        result.consumation += slot_cons
+        cumul += slot_prod
+        result.cumulated[i] = [result.PV[i][0], Math.round(cumul / 3600)]
       }
     }
     result.DIFF = diff
@@ -114,8 +122,8 @@ export class Fronius extends component {
   async render() {
 
     let samples
-    if(!global.mock){
-      samples=await  this.getSeries(this.from_time,this.until_time)
+    if (!global.mock) {
+      samples = await  this.getSeries(this.from_time, this.until_time)
     }
     let processed = this.resample(samples)
 
@@ -126,9 +134,9 @@ export class Fronius extends component {
       .range([this.cfg.paddingLeft, this.cfg.width - 20])
       .domain([new Date(this.from_time), new Date(this.until_time)])
 
-    const scaleCumul=scaleLinear()
+    const scaleCumul = scaleLinear()
       .range(this.scaleY.range())
-      .domain([0,processed.cumulated[processed.cumulated.length-1][1]])
+      .domain([0, processed.cumulated[processed.cumulated.length - 1][1]])
 
     const lineGrid = lineGenerator()
       .x(d => this.scaleX(d[0]))
@@ -151,16 +159,16 @@ export class Fronius extends component {
       .attr("stroke-width", 0.9)
       .attr("fill", "none")
 
-    const lineCumul=lineGenerator()
-      .x(d=>this.scaleX(d[0]))
-      .y(d=>scaleCumul(d[1]))
+    const lineCumul = lineGenerator()
+      .x(d => this.scaleX(d[0]))
+      .y(d => scaleCumul(d[1]))
 
     this.chart.append("path")
       .datum(processed.cumulated)
-      .attr("d",lineCumul)
-      .attr("stroke","green")
-      .attr("stroke-width",0.8)
-      .attr("fill","none")
+      .attr("d", lineCumul)
+      .attr("stroke", "green")
+      .attr("stroke-width", 0.8)
+      .attr("fill", "none")
 
     const xaxis = axisBottom().scale(this.scaleX)
       .ticks(20)
@@ -175,45 +183,49 @@ export class Fronius extends component {
       .attr("transform", `translate(${this.cfg.paddingLeft},0)`)
       .call(yAxis)
 
-    const raxis=axisRight().scale(scaleCumul)
-      .tickFormat(d=>d/1000)
+    const raxis = axisRight().scale(scaleCumul)
+      .tickFormat(d => d / 1000)
     this.chart.append("g")
-      .attr("transform",`translate(${this.cfg.width-this.cfg.paddingLeft},0)`)
+      .attr("transform", `translate(${this.cfg.width - this.cfg.paddingLeft},0)`)
       .call(raxis)
 
-    const textbox=this.chart.append("g")
-      .attr("transform",`translate(${20+this.cfg.paddingLeft},10)`)
+    const textbox = this.chart.append("g")
+      .attr("transform", `translate(${20 + this.cfg.paddingLeft},10)`)
 
     textbox.append("svg:rect")
-      .attr("x",0)
-      .attr("y",0)
-      .attr("width",200)
-      .attr("height",100)
-      .attr("stroke","blue")
-      .attr("fill","white")
+      .attr("x", 0)
+      .attr("y", 0)
+      .attr("width", 220)
+      .attr("height", 120)
+      .attr("stroke", "blue")
+      .attr("fill", "white")
 
     /*
     this.stringElem(textbox,10,10,15,"left","green")
       .text("Produktion: "+this.round2(processed.production/3600000)+" kWh")
   */
+    let round2f=format(".2f")
 
-    this.tabbedText(textbox,10,100,["Leistung max:",Math.round(max(processed.PV.map(x=>x[1])))+" W"],"blue")
-    this.tabbedText(textbox,28,100,["Produktion:",this.round2(processed.production/3600000)+" kWh"],"green")
-    this.tabbedText(textbox,46,100,["Verbrauch:",this.round2(processed.consumation/3600000)+" kWh"],"red")
-
-
+    this.tabbedText(textbox, 10, 120, ["Leistung max:", Math.round(max(processed.PV.map(x => x[1]))) + " W"], "blue")
+    this.tabbedText(textbox, 28, 120, ["Produktion:", round2f(processed.production / 3600000) + " kWh"], "green")
+    this.tabbedText(textbox, 46, 120, ["Verbrauch:", round2f(processed.consumation / 3600000) + " kWh"], "red")
+    this.tabbedText(textbox, 64,120, ["Eigenverbrauch:", round2f(processed.self_consumation/3600000)+" kWh"],"#8fbb3b")
+    this.tabbedText(textbox, 82,120,["Import:",round2f(processed.imported/3600000)+" kWh"],"#aa3257")
+    this.tabbedText(textbox, 100,120, ["Export",round2f(processed.exported/3600000)+" kWh"], "#aa3257")
   }
 
-  round2(x){
-    return Math.round(100*x)/100
+
+  round2(x) {
+    return Math.round(100 * x) / 100
   }
 
-  tabbedText(parent,y,tab,text,color){
-    let x=10
-    text.forEach(str=>{
-      this.stringElem(parent,x,y,15,color)
+
+  tabbedText(parent, y, tab, text, color) {
+    let x = 10
+    text.forEach(str => {
+      this.stringElem(parent, x, y, 14, color)
         .text(str)
-      x+=tab
+      x += tab
     })
   }
 
@@ -234,9 +246,9 @@ export class Fronius extends component {
   async update() {
   }
 
-  async getSeries(from:number, to:number) {
+  async getSeries(from: number, to: number) {
 
-    console.log("fetch data from "+new Date(from)+" until "+new Date(to))
+    console.log("fetch data from " + new Date(from) + " until " + new Date(to))
     const query = `select value from "${global.ACT_POWER}" where time >= ${from}ms and time < ${to}ms;
       select value from "${global.GRID_FLOW}" where time >= ${from}ms and time < ${to}ms`
     const sql = urlencode(query)
