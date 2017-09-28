@@ -28,3 +28,4 @@ scripts
 
 deploy
 /src/globals_orig.ts
+/src/globals.ts
