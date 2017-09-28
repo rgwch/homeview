@@ -1,5 +1,5 @@
 # homeview
-Simple frontend for an ioBroker based home controle and automation system.
+Simple frontend for an ioBroker based home control and automation system.
 
 ![Homeview](img/homeview_2017_09_23.jpg)
 ![solar](img/homeview_2017_09_25.jpg)
