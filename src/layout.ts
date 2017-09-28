@@ -122,7 +122,7 @@ export class Layout{
   vertical_sensors={
     type: "gauge",
     height: 204,
-    width: 49,
+    width: 53,
     padding: 10,
     suffix: "",
   }
@@ -148,14 +148,15 @@ export class Layout{
     id:"energy_flow",
     message: "fronius_flow",
     val: global.GRID_FLOW,
+    width: 53,
     min: 5000,
     max:-5000,
     units: "Netz",
     bands: [{from: -5000,to:0,color: "green"},{from:0, to: 5000, color: "red"}]
   })
   fronius_cfg={
-    width: 4*200,
-    height: 300,
+    width: 4*210,
+    height: 420,
     id:"fronius_widget",
     message:"fronius_msg"
   }

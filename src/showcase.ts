@@ -3,7 +3,7 @@
  * (c) 2017 by G. Weirich
  */
 
-import {autoinject, bindable} from 'aurelia-framework';
+import {autoinject} from 'aurelia-framework';
 import {EventAggregator} from "aurelia-event-aggregator"
 import {FetchClient} from './services/fetchclient'
 

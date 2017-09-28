@@ -6,7 +6,6 @@
 import {autoinject, bindable} from 'aurelia-framework';
 import {EventAggregator} from "aurelia-event-aggregator"
 import {selectAll} from 'd3-selection'
-import {isNullOrUndefined} from "util";
 
 @autoinject
 export class lcdclock{

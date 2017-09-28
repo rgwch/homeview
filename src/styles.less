@@ -8,9 +8,7 @@ h3 {
 }
 
 .frame{
-  border-style: solid;
-  border-color: @bordercolor;
-  border-width: 5px;
+  border: 5px solid @bordercolor;
   border-radius: 5px;
   fill: @fillcolor;
   stroke: black;
@@ -19,9 +17,7 @@ h3 {
 }
 
 .halftile{
-  border-style: inset;
-  border-color: @bordercolor;
-  border-width: 2px;
+  border: 2px inset @bordercolor;
   border-radius: 5px;
   margin: 5px;
   padding: 5px;
@@ -34,7 +30,7 @@ h3 {
 
 .tile{
   .halftile;
-  width: 200px;
+  width: 210px;
 }
 
 .inner{

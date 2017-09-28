@@ -4,7 +4,7 @@
  */
 
 export default {
-  mock                   : false,
+  mock                   : true,
   iobroker               : "http://192.168.16.140:8087",
   influx                 : "http://192.168.16.140:8086",
   update_interval_seconds: 30,

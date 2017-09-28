@@ -1,6 +1,7 @@
 <template>
   <div class="graph"></div>
   <div class="summary">
+    <p>${today}</p>
     <table>
       <tr style="color:#2522ff">
         <td>Leistung max.:</td>
@@ -15,16 +16,16 @@
         <td style="text-align:right">${consumation}</td>
       </tr>
       <tr style="color:#8fbb3b">
-        <td style="padding-right:5px;text-align:right">Eigenverbrauch:</td>
-        <td>${self_consumation}</td>
+        <td style="padding-right:5px;">Eigenverbrauch:</td>
+        <td style="text-align:right;">${self_consumation}</td>
       </tr>
       <tr style="color:#aa3257">
         <td>Import:</td>
-        <td style="text-align:right">${import}</td>
+        <td style="text-align:right">${imported}</td>
       </tr>
       <tr style="color:#549778">
         <td>Export:</td>
-        <td> ${export}</td>
+        <td> ${exported}</td>
       </tr>
     </table>
 

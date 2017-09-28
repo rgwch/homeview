@@ -85,10 +85,6 @@
             "main": "aurelia-testing",
             "env": "dev"
           },
-          {
-            "name": "iconv-lite",
-            "path": "../node_modules/iconv-lite"
-          },
           "text",
           "d3-axis",
           "d3-scale",
@@ -119,8 +115,7 @@
           "d3-zoom",
           "whatwg-fetch",
           "d3-transition",
-          "d3-timer",
-          "urlencode"
+          "d3-timer"
         ]
       }
     ],
@@ -167,10 +162,6 @@
     "displayName": "Less",
     "fileExtension": ".less",
     "source": "src/**/*.less"
-  },
-  "editor": {
-    "id": "vscode",
-    "displayName": "Visual Studio Code"
   },
   "unitTestRunner": {
     "id": "karma",

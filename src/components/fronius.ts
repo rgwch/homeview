@@ -1,6 +1,6 @@
 import {autoinject} from 'aurelia-framework'
 import global from '../globals'
-import * as urlencode from 'urlencode'
+import {UrlEncoder} from '../services/urlencode'
 import {component} from "./component";
 import {select, Selection} from 'd3-selection'
 import 'd3-transition'
@@ -8,7 +8,7 @@ import {scaleLinear, scaleTime} from "d3-scale";
 import {line as lineGenerator} from 'd3-shape'
 import {axisBottom, axisLeft, axisRight} from 'd3-axis'
 import {max, mean, merge, range} from 'd3-array'
-import {timeFormat} from 'd3-time-format'
+import {timeFormat,timeFormatLocale} from 'd3-time-format'
 import {format} from 'd3-format'
 import {timeMinute} from 'd3-time'
 import {entries, key, values} from 'd3-collection'
@@ -22,6 +22,7 @@ export class Fronius extends component {
     return "fronius_adapter"
   }
 
+  private urlencoder=new UrlEncoder()
   private from_time
   private until_time
   private chart
@@ -33,10 +34,12 @@ export class Fronius extends component {
   private production:String
   private consumation:String
   private self_consumation: String
-  private export:String
-  private import:String
+  private exported:String
+  private imported:String
+  private today:String
 
   private format = timeFormat("%H:%M")
+  private dayspec=timeFormat("%a, %d.%m.%Y")
 
   /***
    * Configure the Widget
@@ -164,7 +167,13 @@ export class Fronius extends component {
       .ticks(20)
       .tickFormat(this.format)
 
+    const raxis = axisRight().scale(this.scaleCumul)
+      .tickFormat(d => d / 1000)
+
+
     this.chart.select(".xaxis").call(xaxis)
+    this.chart.select(".raxis").call(raxis)
+
     this.chart.select(".power_prod").datum(processed.PV).attr("d",lineGrid) //
     this.chart.select(".cumulated_energy").datum(processed.cumulated).attr("d", lineCumul)
     this.chart.select(".power_use").datum(processed.DIFF).attr("d",lineGrid)
@@ -174,14 +183,13 @@ export class Fronius extends component {
     this.production=round2f(processed.production / 3600000) + " kWh"
     this.consumation=round2f(processed.consumation / 3600000) + " kWh"
     this.self_consumation=round2f(processed.self_consumation / 3600000) + " kWh"
-    this.import=round2f(processed.imported / 3600000) + " kWh"
-    this.export=round2f(processed.exported / 3600000) + " kWh"
+    this.imported=round2f(processed.imported / 3600000) + " kWh"
+    this.exported=round2f(processed.exported / 3600000) + " kWh"
+    this.today=this.dayspec(new Date(this.from_time))
 
-    let mine=select(this.element).select(".summary")
-    mine
+    select(this.element).select(".summary")
       .classed("frame",true)
       .attr("style","position:absolute;top:20px;left:100px;width:200px;height:150px;font-size:13px;text-align:left")
-      //.attr("style","position:absolute;top:20px;left:100px;width:200px;height:150px;border-color:blue;border-style:solid;border-width:1px;font-size:12px;text-align:left")
 
   }
   /**
@@ -217,7 +225,7 @@ export class Fronius extends component {
     this.chart.append("path")
       .classed("power_prod",true)
       .attr("stroke", "blue")
-      .attr("stroke-width", 0.9)
+      .attr("stroke-width", 1.0)
       .attr("fill", "none")
 
 
@@ -241,28 +249,31 @@ export class Fronius extends component {
       .call(yAxis)
 
     /* right y-axis */
-    const raxis = axisRight().scale(this.scaleCumul)
-      .tickFormat(d => d / 1000)
     this.chart.append("g")
+      .classed("raxis",true)
       .attr("transform", `translate(${this.cfg.width - this.cfg.paddingRight},0)`)
-      .call(raxis)
 
-
-    /*
-    this.tabbedText(textbox, 10, 120, ["Leistung max:", Math.round(max(processed.PV.map(x => x[1]))) + " W"], "#2522ff")
-    this.tabbedText(textbox, 28, 120, ["Produktion:", round2f(processed.production / 3600000) + " kWh"], "#2db466")
-    this.tabbedText(textbox, 46, 120, ["Verbrauch:", round2f(processed.consumation / 3600000) + " kWh"], "#ff1e4a")
-    this.tabbedText(textbox, 64, 120, ["Eigenverbrauch:", round2f(processed.self_consumation / 3600000) + " kWh"], "#8fbb3b")
-    this.tabbedText(textbox, 82, 120, ["Import:", round2f(processed.imported / 3600000) + " kWh"], "#aa3257")
-    this.tabbedText(textbox, 100, 120, ["Export", round2f(processed.exported / 3600000) + " kWh"], "#549778")
-*/
     /* Button for previous day */
-    this.rectangle(this.chart, 20 + this.cfg.paddingLeft,this.cfg.height / 2,50,50)
+    const prevDay=this.chart.append('g')
+      .attr("transform",`translate(${20 + this.cfg.paddingLeft},${this.cfg.height / 2})`)
+
+      this.rectangle(prevDay, 0,0,50,50)
       .attr("fill", "grey")
       .attr("opacity", 0.4)
       .on("click", event => {
         this.update(this.from_time-24*60*60*1000,this.until_time-86400000)
       })
+    prevDay.append("svg:polyline")
+      .attr("points","40,10 10,20 40,40")
+      .attr("stroke-width",3)
+      .attr("stroke","#1111aa")
+      .attr("fill","none")
+      .attr("opacity",0.6)
+    prevDay.append("svg:polyline")
+      .attr("points","42,12,12,20,38,38")
+      .attr("stroke-width",2)
+      .attr("stroke","#2222ff")
+      .attr("fill","none")
 
     /* Button for next day */
     this.rectangle(this.chart,this.cfg.width-this.cfg.paddingRight-70, this.cfg.height/2,50,50)
@@ -284,23 +295,6 @@ export class Fronius extends component {
       .attr("height", h)
   }
 
-
-  /**
-   * Helper to append nicely tabbed text elements
-   * @param parent container to append text
-   * @param y   y-Position relative to container
-   * @param tab tab space amount
-   * @param text  an array with texts to append to the tabs
-   * @param color color of the text
-   */
-  private tabbedText(parent, y, tab, text, color) {
-    let x = 10
-    text.forEach(str => {
-      this.stringElem(parent, x, y, 14, color)
-        .text(str)
-      x += tab
-    })
-  }
 
   /**
    * Helper to append a String
@@ -336,7 +330,7 @@ export class Fronius extends component {
     console.log("fetch data from " + new Date(from) + " until " + new Date(to))
     const query = `select value from "${global.ACT_POWER}" where time >= ${from}ms and time < ${to}ms;
       select value from "${global.GRID_FLOW}" where time >= ${from}ms and time < ${to}ms`
-    const sql = urlencode(query)
+    const sql = this.urlencoder.encode(query)
     const raw = await this.fetcher.fetchJson(`${global.influx}/query?db=iobroker&epoch=ms&precision=ms&q=${sql}`)
     const ret = {}
     raw.results.forEach(result => {
