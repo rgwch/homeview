@@ -263,6 +263,7 @@ export class Fronius extends component {
       .on("click", event => {
         this.update(this.from_time-24*60*60*1000,this.until_time-86400000)
       })
+    /*
     prevDay.append("svg:polyline")
       .attr("points","40,10 10,20 40,40")
       .attr("stroke-width",3)
@@ -274,7 +275,7 @@ export class Fronius extends component {
       .attr("stroke-width",2)
       .attr("stroke","#2222ff")
       .attr("fill","none")
-
+*/
     /* Button for next day */
     this.rectangle(this.chart,this.cfg.width-this.cfg.paddingRight-70, this.cfg.height/2,50,50)
       .attr("fill","grey")

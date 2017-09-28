@@ -1,3 +1,10 @@
+/**
+ * taken and modified from
+ * https://www.npmjs.com/package/x-www-form-urlencode
+ */
+
+
+
 export class UrlEncoder {
 
   encode(s) {

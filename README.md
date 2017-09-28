@@ -2,6 +2,7 @@
 Simple frontend for an ioBroker based home controle and automation system.
 
 ![Homeview](img/homeview_2017_09_23.jpg)
+![solar](img/homeview_2017_09_25.jpg)
 
 ## Getting started
 
@@ -25,4 +26,5 @@ Change values in globals.ts: Set mock to false to use a real iobroker and adjust
     
 After build, copy `index.html`  and the folders `source` and `styles` to the deployment server    
 
-Of course, everything except "showcase" needs major refactoring to work in a specific environment. So, this is rather a help to get started, than a ready-to-use app.
+Of course, everything except "showcase" needs major refactoring to work in a specific environment.
+So, this is rather an idea on how to get started, than a ready-to-use app.
