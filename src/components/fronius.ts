@@ -1,3 +1,8 @@
+/**
+ * Widget to display values from a fronius inverter for solar energy systems
+ * Assumes an ioBroker instance with the fronius adapter installed and writing its data
+ * to an influx database named "iobroker"
+ */
 import {autoinject} from 'aurelia-framework'
 import global from '../globals'
 import {UrlEncoder} from '../services/urlencode'
@@ -263,27 +268,37 @@ export class Fronius extends component {
       .on("click", event => {
         this.update(this.from_time-24*60*60*1000,this.until_time-86400000)
       })
-    /*
+
     prevDay.append("svg:polyline")
-      .attr("points","40,10 10,20 40,40")
-      .attr("stroke-width",3)
+      .attr("points","30,16 10,25 30,36")
+      .attr("stroke-width",2)
       .attr("stroke","#1111aa")
       .attr("fill","none")
-      .attr("opacity",0.6)
+      .attr("opacity",0.5)
+    /*
     prevDay.append("svg:polyline")
-      .attr("points","42,12,12,20,38,38")
+      .attr("points","35,15 15,20")
       .attr("stroke-width",2)
-      .attr("stroke","#2222ff")
+      .attr("stroke","#a2cbff")
       .attr("fill","none")
 */
+    const nextDay=this.chart.append("g")
+      .attr("transform",`translate(${this.cfg.width-this.cfg.paddingRight-70},${this.cfg.height / 2})`)
+
     /* Button for next day */
-    this.rectangle(this.chart,this.cfg.width-this.cfg.paddingRight-70, this.cfg.height/2,50,50)
+    this.rectangle(nextDay,0,0,50,50)
       .attr("fill","grey")
       .attr("opacity",0.4)
       .on("click",(event)=>{
         this.update(this.from_time+86400000,this.until_time+86400000)
       })
 
+    nextDay.append("svg:polyline")
+      .attr("points","18,16 38,25 18,36")
+      .attr("stroke-width",2)
+      .attr("stroke","#1111aa")
+      .attr("fill","none")
+      .attr("opacity",0.5)
     this.update(this.from_time,this.until_time)
   } // render
 
