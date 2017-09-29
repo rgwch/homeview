@@ -13,7 +13,7 @@ import {scaleLinear, scaleTime} from "d3-scale";
 import {line as lineGenerator} from 'd3-shape'
 import {axisBottom, axisLeft, axisRight} from 'd3-axis'
 import {max, mean, merge, range} from 'd3-array'
-import {timeFormat,timeFormatLocale} from 'd3-time-format'
+import {timeFormat, timeFormatLocale} from 'd3-time-format'
 import {format} from 'd3-format'
 import {timeMinute} from 'd3-time'
 import {entries, key, values} from 'd3-collection'
@@ -27,7 +27,7 @@ export class Fronius extends component {
     return "fronius_adapter"
   }
 
-  private urlencoder=new UrlEncoder()
+  private urlencoder = new UrlEncoder()
   private from_time
   private until_time
   private chart
@@ -35,16 +35,16 @@ export class Fronius extends component {
   private scaleY
   private scaleCumul
 
-  private  max_power="10"
-  private production:String
-  private consumation:String
+  private max_power = "10"
+  private production: String
+  private consumation: String
   private self_consumation: String
-  private exported:String
-  private imported:String
-  private today:String
+  private exported: String
+  private imported: String
+  private today: String
 
   private format = timeFormat("%H:%M")
-  private dayspec=timeFormat("%a, %d.%m.%Y")
+  private dayspec = timeFormat("%a, %d.%m.%Y")
 
   /***
    * Configure the Widget
@@ -73,7 +73,8 @@ export class Fronius extends component {
   /**
    * Create a new dataset from PV and Grid samples
    * @param samples An Object vontaining named Arrays with samples, each being a [timestamp,value] array
-   * @returns {{PV: Array<Array<number>>, GRID: Array<Array<number>>, DIFF: Array, cumulated: Array, production: number, consumation: number, self_consumation: number, imported: number, exported: number}}
+   * @returns {{PV: Array<Array<number>>, GRID: Array<Array<number>>, DIFF: Array, cumulated: Array, production:
+   *     number, consumation: number, self_consumation: number, imported: number, exported: number}}
    */
   resample(samples) {
     const resolution = 120000
@@ -145,17 +146,18 @@ export class Fronius extends component {
     return result
   }
 
-  async update(new_start,new_end){
-    this.from_time=new_start
-    this.until_time=new_end
-    console.log(new Date(this.from_time)+", "+new Date(this.until_time))
+  async update(new_start, new_end) {
+    select(this.element).select(".fronius_adapter").classed("wait",true)
+    this.from_time = new_start
+    this.until_time = new_end
+    console.log(new Date(this.from_time) + ", " + new Date(this.until_time))
     let samples
     if (!global.mock) {
       samples = await  this.getSeries(this.from_time, this.until_time)
     }
     let processed = this.resample(samples)
 
-    this.scaleX.domain([new Date(this.from_time),new Date(this.until_time)])
+    this.scaleX.domain([new Date(this.from_time), new Date(this.until_time)])
     this.scaleCumul.domain([0, processed.cumulated[processed.cumulated.length - 1][1]])
 
     /* Line Generator for time/power diagrams */
@@ -179,24 +181,26 @@ export class Fronius extends component {
     this.chart.select(".xaxis").call(xaxis)
     this.chart.select(".raxis").call(raxis)
 
-    this.chart.select(".power_prod").datum(processed.PV).attr("d",lineGrid) //
+    this.chart.select(".power_prod").datum(processed.PV).attr("d", lineGrid) //
     this.chart.select(".cumulated_energy").datum(processed.cumulated).attr("d", lineCumul)
-    this.chart.select(".power_use").datum(processed.DIFF).attr("d",lineGrid)
+    this.chart.select(".power_use").datum(processed.DIFF).attr("d", lineGrid)
 
     let round2f = format(".2f")
-    this.max_power=Math.round(max(processed.PV.map(x => x[1]))) + " W"
-    this.production=round2f(processed.production / 3600000) + " kWh"
-    this.consumation=round2f(processed.consumation / 3600000) + " kWh"
-    this.self_consumation=round2f(processed.self_consumation / 3600000) + " kWh"
-    this.imported=round2f(processed.imported / 3600000) + " kWh"
-    this.exported=round2f(processed.exported / 3600000) + " kWh"
-    this.today=this.dayspec(new Date(this.from_time))
+    this.max_power = Math.round(max(processed.PV.map(x => x[1]))) + " W"
+    this.production = round2f(processed.production / 3600000) + " kWh"
+    this.consumation = round2f(processed.consumation / 3600000) + " kWh"
+    this.self_consumation = round2f(processed.self_consumation / 3600000) + " kWh"
+    this.imported = round2f(processed.imported / 3600000) + " kWh"
+    this.exported = round2f(processed.exported / 3600000) + " kWh"
+    this.today = this.dayspec(new Date(this.from_time))
 
     select(this.element).select(".summary")
-      .classed("frame",true)
-      .attr("style","position:absolute;top:20px;left:100px;width:200px;height:150px;font-size:13px;text-align:left")
+      .classed("frame", true)
+      .attr("style", "position:absolute;top:20px;left:100px;width:200px;height:150px;font-size:13px;text-align:left")
 
+    select(this.element).select(".fronius_adapter").classed("wait",false)
   }
+
   /**
    * Create the visual representation of the data
    * @returns {Promise<void>}
@@ -210,7 +214,7 @@ export class Fronius extends component {
     /* scale for time (X-Axis) */
     this.scaleX = scaleTime()
       .range([this.cfg.paddingLeft, this.cfg.width - this.cfg.paddingRight])
-      //.domain([new Date(this.from_time), new Date(this.until_time)])
+    //.domain([new Date(this.from_time), new Date(this.until_time)])
 
     /* Scale for cumulated energy (right axis) */
     this.scaleCumul = scaleLinear()
@@ -221,14 +225,14 @@ export class Fronius extends component {
 
     /* power consumation diagram */
     this.chart.append("path")
-      .classed("power_use",true)
+      .classed("power_use", true)
       .attr("stroke", "red")
       .attr("stroke-width", 0.8)
       .attr("fill", "none")
 
     /* power generation diagram */
     this.chart.append("path")
-      .classed("power_prod",true)
+      .classed("power_prod", true)
       .attr("stroke", "blue")
       .attr("stroke-width", 1.0)
       .attr("fill", "none")
@@ -236,16 +240,16 @@ export class Fronius extends component {
 
     /* cumulated energy diagram */
     this.chart.append("path")
-      .classed("cumulated_energy",true)
+      .classed("cumulated_energy", true)
       .attr("stroke", "green")
       .attr("stroke-width", 0.8)
       .attr("fill", "none")
 
     /* X-Axis */
     this.chart.append('g')
-      .classed("xaxis",true)
+      .classed("xaxis", true)
       .attr("transform", `translate(0,${this.cfg.height - this.cfg.paddingBottom})`)
-      //.call(xaxis)
+    //.call(xaxis)
 
     /* left y-axis */
     const yAxis = axisLeft().scale(this.scaleY)
@@ -255,55 +259,56 @@ export class Fronius extends component {
 
     /* right y-axis */
     this.chart.append("g")
-      .classed("raxis",true)
+      .classed("raxis", true)
       .attr("transform", `translate(${this.cfg.width - this.cfg.paddingRight},0)`)
 
     /* Button for previous day */
-    const prevDay=this.chart.append('g')
-      .attr("transform",`translate(${20 + this.cfg.paddingLeft},${this.cfg.height / 2})`)
+    const prevDay = this.chart.append('g')
+      .attr("transform", `translate(${20 + this.cfg.paddingLeft},${this.cfg.height / 2})`)
 
-      this.rectangle(prevDay, 0,0,50,50)
-      .attr("fill", "grey")
+    prevDay.append("svg:polyline")
+      .attr("points", "30,12 10,25 30,40")
+      .attr("stroke-width", 8)
+      .attr("stroke", "#1111aa")
+      .attr("fill", "none")
       .attr("opacity", 0.4)
+
+    this.rectangle(prevDay, 0, 0, 50, 50)
+      .attr("fill", "#a1a1a1")
+      .attr("opacity", 0.6)
+      .attr("rx", 10)
+      .attr("ry", 10)
       .on("click", event => {
-        this.update(this.from_time-24*60*60*1000,this.until_time-86400000)
+        this.update(this.from_time - 24 * 60 * 60 * 1000, this.until_time - 86400000)
       })
 
-    prevDay.append("svg:polyline")
-      .attr("points","30,16 10,25 30,36")
-      .attr("stroke-width",2)
-      .attr("stroke","#1111aa")
-      .attr("fill","none")
-      .attr("opacity",0.5)
-    /*
-    prevDay.append("svg:polyline")
-      .attr("points","35,15 15,20")
-      .attr("stroke-width",2)
-      .attr("stroke","#a2cbff")
-      .attr("fill","none")
-*/
-    const nextDay=this.chart.append("g")
-      .attr("transform",`translate(${this.cfg.width-this.cfg.paddingRight-70},${this.cfg.height / 2})`)
 
     /* Button for next day */
-    this.rectangle(nextDay,0,0,50,50)
-      .attr("fill","grey")
-      .attr("opacity",0.4)
-      .on("click",(event)=>{
-        this.update(this.from_time+86400000,this.until_time+86400000)
-      })
+    const nextDay = this.chart.append("g")
+      .attr("transform", `translate(${this.cfg.width - this.cfg.paddingRight - 70},${this.cfg.height / 2})`)
 
     nextDay.append("svg:polyline")
-      .attr("points","18,16 38,25 18,36")
-      .attr("stroke-width",2)
-      .attr("stroke","#1111aa")
-      .attr("fill","none")
-      .attr("opacity",0.5)
-    this.update(this.from_time,this.until_time)
+      .attr("points", "18,12 38,25 18,40")
+      .attr("stroke-width", 8)
+      .attr("stroke", "#1111aa")
+      .attr("fill", "none")
+      .attr("opacity", 0.4)
+
+    this.rectangle(nextDay, 0, 0, 50, 50)
+      .attr("fill", "#a1a1a1")
+      .attr("opacity", 0.6)
+      .attr("rx", 10)
+      .attr("ry", 10)
+      .on("click", (event) => {
+        this.update(this.from_time + 86400000, this.until_time + 86400000)
+      })
+
+
+    this.update(this.from_time, this.until_time)
   } // render
 
   /* Helper to append a rectangle */
-  private rectangle(parent,x,y,w,h) {
+  private rectangle(parent, x, y, w, h) {
     return parent.append("svg:rect")
       .attr("x", x)
       .attr("y", y)

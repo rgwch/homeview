@@ -20,7 +20,9 @@ Simple frontend for an ioBroker based home control and automation system.
 
 ## Building deployment version
 
-Change values in globals.ts: Set mock to false to use a real iobroker and adjust the iobroker address and port accordingly. Then:
+Copy globals-sample.ts to globals.ts and adjust the constants therein.
+
+Then:
 
     au build --env prod
     
