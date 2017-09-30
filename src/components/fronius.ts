@@ -55,7 +55,8 @@ export class Fronius extends component {
       id           : "fronius_adapter",
       paddingLeft  : 50,
       paddingBottom: 20,
-      paddingRight : 30
+      paddingRight : 30,
+      paddingTop:    20
     }, this.cfg)
     let start = new Date()
     let end = new Date()
@@ -194,9 +195,12 @@ export class Fronius extends component {
     this.exported = round2f(processed.exported / 3600000) + " kWh"
     this.today = this.dayspec(new Date(this.from_time))
 
+    const summary_width=Math.round(this.cfg.width/4)
+    const summary_height=Math.round(this.cfg.height/3)
+    const font_size=summary_height/12
     select(this.element).select(".summary")
       .classed("frame", true)
-      .attr("style", "position:absolute;top:20px;left:100px;width:200px;height:150px;font-size:13px;text-align:left")
+      .attr("style", `position:absolute;top:20px;left:100px;width:${summary_width}px;height:${summary_height}px;font-size:${font_size}px;text-align:left`)
 
     select(this.element).select(".fronius_adapter").classed("wait",false)
   }
@@ -207,9 +211,10 @@ export class Fronius extends component {
    */
   async render() {
 
+
     /* Scale for power (left axis) */
     this.scaleY = scaleLinear()
-      .range([this.cfg.height - this.cfg.paddingBottom, 20])
+      .range([this.cfg.height - this.cfg.paddingBottom, this.cfg.paddingTop])
       .domain([0, 10000])
     /* scale for time (X-Axis) */
     this.scaleX = scaleTime()
@@ -262,9 +267,15 @@ export class Fronius extends component {
       .classed("raxis", true)
       .attr("transform", `translate(${this.cfg.width - this.cfg.paddingRight},0)`)
 
+    /* Buttons */
+    const button_size=Math.round(this.cfg.height/8)
+    const button_offs=Math.round(this.cfg.width/40)
+    const button_pos=Math.round((this.cfg.height/2)-(button_size/2))
+    const button_radius=Math.round(button_size/5)
+
     /* Button for previous day */
     const prevDay = this.chart.append('g')
-      .attr("transform", `translate(${20 + this.cfg.paddingLeft},${this.cfg.height / 2})`)
+      .attr("transform", `translate(${button_offs + this.cfg.paddingLeft},${button_pos})`)
 
     prevDay.append("svg:polyline")
       .attr("points", "30,12 10,25 30,40")
@@ -273,11 +284,11 @@ export class Fronius extends component {
       .attr("fill", "none")
       .attr("opacity", 0.4)
 
-    this.rectangle(prevDay, 0, 0, 50, 50)
+    this.rectangle(prevDay, 0, 0, button_size, button_size)
       .attr("fill", "#a1a1a1")
       .attr("opacity", 0.6)
-      .attr("rx", 10)
-      .attr("ry", 10)
+      .attr("rx", button_radius)
+      .attr("ry", button_radius)
       .on("click", event => {
         this.update(this.from_time - 24 * 60 * 60 * 1000, this.until_time - 86400000)
       })
@@ -285,7 +296,7 @@ export class Fronius extends component {
 
     /* Button for next day */
     const nextDay = this.chart.append("g")
-      .attr("transform", `translate(${this.cfg.width - this.cfg.paddingRight - 70},${this.cfg.height / 2})`)
+      .attr("transform", `translate(${this.cfg.width - this.cfg.paddingRight - button_offs-button_size},${button_pos})`)
 
     nextDay.append("svg:polyline")
       .attr("points", "18,12 38,25 18,40")
@@ -294,15 +305,17 @@ export class Fronius extends component {
       .attr("fill", "none")
       .attr("opacity", 0.4)
 
-    this.rectangle(nextDay, 0, 0, 50, 50)
+    this.rectangle(nextDay, 0, 0, button_size, button_size)
       .attr("fill", "#a1a1a1")
       .attr("opacity", 0.6)
-      .attr("rx", 10)
-      .attr("ry", 10)
+      .attr("rx", button_radius)
+      .attr("ry", button_radius)
       .on("click", (event) => {
         this.update(this.from_time + 86400000, this.until_time + 86400000)
       })
 
+    const summary=select(this.element).select(".summary")
+      .style("width",60)
 
     this.update(this.from_time, this.until_time)
   } // render

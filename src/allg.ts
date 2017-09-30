@@ -21,7 +21,7 @@ export class Allg {
   private car_power = 1104
   private resize_throttle
   private timer
-  resizeEventHandler = () =>this.resize()
+  resizeEventHandler = () => this.resize()
   private l
 
   /**
@@ -30,7 +30,7 @@ export class Allg {
    * @param {FetchClient} fetcher - supplied by @autoinject
    */
   constructor(private ea: EventAggregator, private fetcher: FetchClient) {
-    this.l=new Layout(this.fetcher)
+    this.l = new Layout(this.fetcher)
     let elements = values(this.l)
 
     // attach a listener for all elements of type "button"
@@ -68,62 +68,108 @@ export class Allg {
 
   }
 
+  resize_new() {
+    let l = this.l
+    clearTimeout(this.resize_throttle)
+    this.resize_throttle = setTimeout(() => {
+      const elems = [l.treppenlicht, l.tuerlicht, l.esszimmer, l.korridor, l.fernsehlicht, this.l.autolader,
+        this.l.wlanext, this.l.mediacenter, "skip", this.l.light_sensor, this.l.pv_energy, this.l.energy_flow,
+        this.l.outside_gauge, this.l.livingroom_gauge, this.l.bathroom_gauge, "skip", this.l.fronius_cfg]
+
+      const innerWidth = window.innerWidth
+      let elemWidth = 180
+      let numCols = 4
+      if (innerWidth < 2 * elemWidth) {
+        elemWidth = Math.max(elemWidth, innerWidth)
+        numCols = 1
+      } else if (innerWidth < 4 * elemWidth) {
+        elemWidth = Math.max(innerWidth / 2, elemWidth)
+        numCols = 2
+      }
+      let lastElem
+      let nextRow = 0
+      let y = 0
+      let x = 0
+      let elemInRow=0
+      function clearLine() {
+        y = nextRow + 5
+        nextRow = 0
+        lastElem = undefined
+        x = 0
+        elemInRow=0
+      }
+      elems.forEach((elem,index)=>{
+        let dom=select(`#${elem.id}`)
+        if(dom.size!=1 || elemInRow>numCols){
+          clearLine()
+        }else{
+
+        }
+      })
+
+
+    }, 400)
+
+
+  }
+
   /**
    * Called on initial setup and when the window is resized, or the device is turned from
    * portrait to landscape and vive versa.
    * line up all components
    */
   resize() {
-      let l = this.l
-      // wait until resize operation finishes
-      clearTimeout(this.resize_throttle)
-      this.resize_throttle = setTimeout(() => {
-        const innerWidth = window.innerWidth
-        // define all elements to display (from layout.ts). Must also reside in the html
-        const elems = [l.treppenlicht.id, l.tuerlicht.id, l.esszimmer.id,
-          l.korridor.id,l.fernsehlicht.id,
-          this.l.autolader.id, this.l.wlanext.id, this.l.mediacenter.id, "skip", this.l.light_sensor.id, this.l.pv_energy.id,
-          this.l.energy_flow.id, this.l.outside_gauge.id,
-          this.l.livingroom_gauge.id, this.l.bathroom_gauge.id,"skip",this.l.fronius_cfg.id]
-        let lastElem
-        let nextRow = 0
-        let y = 0
-        let x = 0
+    let l = this.l
+    // wait until resize operation finishes
+    clearTimeout(this.resize_throttle)
+    this.resize_throttle = setTimeout(() => {
+      const innerWidth = window.innerWidth
+      // define all elements to display (from layout.ts). Must also reside in the html
+      const elems = [l.treppenlicht.id, l.tuerlicht.id, l.esszimmer.id,
+        l.korridor.id, l.fernsehlicht.id,
+        this.l.autolader.id, this.l.wlanext.id, this.l.mediacenter.id, "skip", this.l.light_sensor.id, this.l.pv_energy.id,
+        this.l.energy_flow.id, this.l.outside_gauge.id,
+        this.l.livingroom_gauge.id, this.l.bathroom_gauge.id, "skip", this.l.fronius_cfg.id]
+      let lastElem
+      let nextRow = 0
+      let y = 0
+      let x = 0
 
-        function clearLine() {
-          y = nextRow + 5
-          nextRow = 0
-          lastElem = undefined
-          x = 0
+      function clearLine() {
+        y = nextRow + 5
+        nextRow = 0
+        lastElem = undefined
+        x = 0
 
-        }
+      }
 
-        // Line up all alements side by side until the right edge of the window is reached.
-        // Then, start a new line. If an element is not found in the DOM (e.g. "skip" above),
-        // start a new line unconditionally.
-        elems.forEach((tile, index) => {
-          let dom = select("#" + tile)
-          if (dom.size() == 1) {
-            if (lastElem) {
-              let thisElem = dom.node().getBoundingClientRect()
-              x = lastElem.right
-              let bottom = y + lastElem.height
-              if (x + thisElem.right > innerWidth) {
-                clearLine()
-              }
-              if (bottom > nextRow) {
-                nextRow = bottom
-              }
-
+      // Line up all alements side by side until the right edge of the window is reached.
+      // Then, start a new line. If an element is not found in the DOM (e.g. "skip" above),
+      // start a new line unconditionally.
+      elems.forEach((tile, index) => {
+        let dom = select("#" + tile)
+        if (dom.size() == 1) {
+          if (lastElem) {
+            let thisElem = dom.node().getBoundingClientRect()
+            x = lastElem.right
+            let bottom = y + lastElem.height
+            if (bottom > nextRow) {
+              nextRow = bottom
             }
-            dom.attr("style", `left:${x}px;top:${y}px;`)
-            lastElem = dom.node().getBoundingClientRect()
-          } else {
-            clearLine()
-          }
-        })
 
-      }, 400)
+            if (x + thisElem.right > innerWidth) {
+              clearLine()
+            }
+
+          }
+          dom.attr("style", `left:${x}px;top:${y}px;`)
+          lastElem = dom.node().getBoundingClientRect()
+        } else {
+          clearLine()
+        }
+      })
+
+    }, 400)
   }
 
   /**
@@ -138,7 +184,7 @@ export class Allg {
     } else if (event.value == 0) {
       this.ea.publish(cfg.message, {state: "off"})
     }
-    this.setValue(cfg.switch ? cfg.switch:cfg.val, cfg.map[event.value])
+    this.setValue(cfg.switch ? cfg.switch : cfg.val, cfg.map[event.value])
   }
 
   /**
@@ -166,10 +212,10 @@ export class Allg {
     // if the element has a "val" attribute, get that single value
     if (elem.val) {
       let state
-      if(elem.statefun){
-        state=await elem.statefun(elem.val)
-      }else{
-        state=await this.fetcher.getValue(elem.val)
+      if (elem.statefun) {
+        state = await elem.statefun(elem.val)
+      } else {
+        state = await this.fetcher.getValue(elem.val)
       }
       if ("button" == elem.type) {
         this.ea.publish(elem.message, {state: state ? "on" : "off"})
@@ -193,13 +239,13 @@ export class Allg {
 
     }
     // if the element has a "switch" attribute, reflect position of the switch
-    if(elem.switch){
-      let clickstate=await this.fetcher.getValue(elem.switch)
-      if(typeof(clickstate) == "boolean"){
-        clickstate = clickstate ? 1: 0
+    if (elem.switch) {
+      let clickstate = await this.fetcher.getValue(elem.switch)
+      if (typeof(clickstate) == "boolean") {
+        clickstate = clickstate ? 1 : 0
       }
 
-      this.ea.publish(elem.message,{clicked: elem.map[clickstate]})
+      this.ea.publish(elem.message, {clicked: elem.map[clickstate]})
     }
   }
 
@@ -211,9 +257,9 @@ export class Allg {
    * @param value
    * @returns {Promise<any>}
    */
-  async setValue(id, value) : Promise<any>{
-    let result=this.fetcher.fetchValue(`${globals.iobroker}/set/${id}?value=${value}`)
-    setTimeout(()=>this.update(),1000)
+  async setValue(id, value): Promise<any> {
+    let result = this.fetcher.fetchValue(`${globals.iobroker}/set/${id}?value=${value}`)
+    setTimeout(() => this.update(), 1000)
     return result
   }
 
