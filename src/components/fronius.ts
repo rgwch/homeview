@@ -10,7 +10,7 @@ import {component} from "./component";
 import {select, Selection} from 'd3-selection'
 import 'd3-transition'
 import {scaleLinear, scaleTime} from "d3-scale";
-import {line as lineGenerator} from 'd3-shape'
+import {line as lineGenerator, area as areaGenerator} from 'd3-shape'
 import {axisBottom, axisLeft, axisRight} from 'd3-axis'
 import {max, mean, merge, range} from 'd3-array'
 import {timeFormat, timeFormatLocale} from 'd3-time-format'
@@ -20,6 +20,7 @@ import {entries, key, values} from 'd3-collection'
 import * as gridsamples from '../services/samples_grid'
 import * as pvsamples from '../services/samples_pv'
 
+const MAX_POWER=10000
 
 @autoinject
 export class Fronius extends component {
@@ -43,9 +44,22 @@ export class Fronius extends component {
   private imported: String
   private today: String
   private percent: String
+  private percent_power:String
 
   private format = timeFormat("%H:%M")
-  private dayspec = timeFormat("%a, %d.%m.%Y")
+  private dateSpec=timeFormat("%a, %d.%m.%Y")
+  private dayspec = () => {
+    let begin=new Date(this.from_time)
+    let end=new Date(this.until_time)
+    if(begin.getDate()===end.getDate()){
+      return this.dateSpec(begin)
+    }else{
+      let fmt1=timeFormat("%a, %d.%m")
+      return fmt1(begin)+" - "+this.dateSpec(end)
+    }
+
+  }
+
 
   /***
    * Configure the Widget
@@ -87,7 +101,7 @@ export class Fronius extends component {
   resample(samples) {
     // resolution of the samples. 3'600'000 = 1/h;
     // factor: 750
-    const resolution = 3600000
+    const resolution = 400000
     const from = this.from_time
     const until = this.until_time
 
@@ -125,6 +139,7 @@ export class Fronius extends component {
       GRID            : resample_internal(input[global.GRID_FLOW]),
       DIFF            : [],
       cumulated       : [],
+      used            : [],
       production      : 0,
       consumation     : 0,
       self_consumation: 0,
@@ -150,6 +165,7 @@ export class Fronius extends component {
         result.consumation += slot_cons
         cumul += slot_prod
         result.cumulated[i] = [result.PV[i][0], Math.round(cumul / 3600)]
+        result.used[i]=[result.PV[i][0], Math.round(result.consumation / 3600)]
       }
     }
     result.DIFF = diff
@@ -167,21 +183,11 @@ export class Fronius extends component {
     }
     let processed = this.resample(samples)
 
+
     this.scaleX.domain([new Date(this.from_time), new Date(this.until_time)])
-    this.scaleCumul.domain([0, processed.cumulated[processed.cumulated.length - 1][1]])
-
-    /* Line Generator for time/power diagrams */
-    const lineGrid = lineGenerator()
-      .x(d => this.scaleX(d[0]))
-      .y(d => this.scaleY(d[1]))
-
-    /* line Generator for time/energy diagram */
-    const lineCumul = lineGenerator()
-      .x(d => this.scaleX(d[0]))
-      .y(d => this.scaleCumul(d[1]))
-
+    this.scaleCumul.domain([0, 70000 /*processed.cumulated[processed.cumulated.length - 1][1]*/])
     const xaxis = axisBottom().scale(this.scaleX)
-      //.ticks(20)
+    //.ticks(20)
       .tickFormat(this.format)
 
     const raxis = axisRight().scale(this.scaleCumul)
@@ -191,26 +197,57 @@ export class Fronius extends component {
     this.chart.select(".xaxis").call(xaxis)
     this.chart.select(".raxis").call(raxis)
 
-    this.chart.select(".power_prod").datum(processed.PV).attr("d", lineGrid) //
-    this.chart.select(".cumulated_energy").datum(processed.cumulated).attr("d", lineCumul)
-    this.chart.select(".power_use").datum(processed.DIFF).attr("d", lineGrid)
 
-    let round2f = format(".1f")
-    let consumation=round2f(processed.consumation/3600000)
-    let production=round2f(processed.production/3600000)
-    let self_consumation=round2f(processed.self_consumation / 3600000)
-    this.max_power = Math.round(max(processed.PV.map(x => x[1]))) + " W"
+    /* Line Generator for time/power diagrams */
+    const lineGrid = lineGenerator()
+      .x(d => this.scaleX(d[0]))
+      .y(d => this.scaleY(d[1]))
+    this.chart.select(".power_prod").datum(processed.PV).attr("d", lineGrid) //
+
+
+    /* line Generator for time/energy diagram
+    const lineCumul = lineGenerator()
+      .x(d => this.scaleX(d[0]))
+      .y(d => this.scaleCumul(d[1]))
+      */
+    const lineCumul = areaGenerator()
+      .x(d => this.scaleX(d[0]))
+      .y0(this.scaleY(0))
+      .y1(d => this.scaleCumul(d[1]))
+
+    this.chart.select(".cumulated_energy").datum(processed.cumulated).attr("d", lineCumul)
+
+    /* Area generator for cumulated consuption diagram */
+    const areaCumulCons=areaGenerator()
+      .x(d=>this.scaleX(d[0]))
+      .y0(this.scaleY(0))
+      .y1(d=>this.scaleCumul(d[1]))
+
+
+    this.chart.select(".power_use").datum(processed.DIFF).attr("d", lineGrid)
+    this.chart.select(".cumulated_consumption").datum(processed.used).attr("d", areaCumulCons)
+
+    // Summary numbers
+    let round1f = format(".1f")
+    let consumation=round1f(processed.consumation/3600000)
+    let production=round1f(processed.production/3600000)
+    let self_consumation=round1f(processed.self_consumation / 3600000)
+    let max_power=Math.round(max(processed.PV.map(x => x[1])))
+    this.max_power =  max_power + " W"
+    this.percent_power="("+Math.round(max_power*100/MAX_POWER)+"%)"
     this.production = production + " kWh"
     this.consumation = consumation + " kWh"
     this.self_consumation =  self_consumation+ " kWh "
     this.percent="("+Math.round(self_consumation*100/production)+"%)"
-    this.imported = round2f(processed.imported / 3600000) + " kWh"
-    this.exported = round2f(processed.exported / 3600000) + " kWh"
-    this.today = this.dayspec(new Date(this.from_time))
+    this.imported = round1f(processed.imported / 3600000) + " kWh"
+    this.exported = round1f(processed.exported / 3600000) + " kWh"
+    this.today = this.dayspec()
 
-    const summary_width=Math.max(180,Math.round(this.cfg.width/4))
+    const summary_table=select(this.element).select(".summary_table").node().getBoundingClientRect()
+    // summary rectangle
+    const summary_width=Math.max(summary_table.width+40,this.cfg.width-this.cfg.paddingLeft-this.cfg.paddingRight)
     const summary_height=Math.round(this.cfg.height/3)
-    const summary_left=this.cfg.width>250 ? 100:this.cfg.paddingLeft
+    const summary_left=this.cfg.width > 200 ? 100:this.cfg.paddingLeft
     const font_size=summary_height/12
     select(this.element).select(".summary")
       .classed("frame", true)
@@ -229,7 +266,7 @@ export class Fronius extends component {
     /* Scale for power (left axis) */
     this.scaleY = scaleLinear()
       .range([this.cfg.height - this.cfg.paddingBottom, this.cfg.paddingTop])
-      .domain([0, 10000])
+      .domain([0, MAX_POWER])
     /* scale for time (X-Axis) */
     this.scaleX = scaleTime()
       .range([this.cfg.paddingLeft, this.cfg.width - this.cfg.paddingRight])
@@ -262,7 +299,17 @@ export class Fronius extends component {
       .classed("cumulated_energy", true)
       .attr("stroke", "green")
       .attr("stroke-width", 0.8)
-      .attr("fill", "none")
+      .attr("fill", "#c7e9b2")
+      .attr("opacity",0.5)
+
+    /* cumulated consumation diagram */
+    this.chart.append("path")
+      .classed("cumulated_consumption",true)
+      .attr("stroke","#aa0000")
+      .attr("stroke-width",0.4)
+      .attr("fill","#f7cea7")
+      .attr("opacity",0.4)
+
 
     /* X-Axis */
     this.chart.append('g')
@@ -307,7 +354,7 @@ export class Fronius extends component {
       .attr("rx", button_radius)
       .attr("ry", button_radius)
       .on("click", event => {
-        this.update(this.from_time - 24 * 60 * 60 * 1000, this.until_time - 86400000)
+        this.update(this.from_time - 12 * 60 * 60 * 1000, this.until_time - 43200000)
       })
 
 
