@@ -3,12 +3,16 @@
  * (c) 2017 by G. Weirich
  */
 
+import {autoinject} from 'aurelia-framework'
 import global from './globals'
 import {FetchClient} from "./services/fetchclient"
 
+@autoinject
 export class Layout{
 
   constructor(private fetch:FetchClient){}
+
+  lightify=(id)=>this.do_lightify(id)
 
   private three_buttons_def= {
     type: "button",
@@ -161,7 +165,8 @@ export class Layout{
     message:"fronius_msg"
   }
 
-  async lightify(id){
+
+  async do_lightify(id){
     let values=await this.fetch.getValues([id+".on",id+".reachable"])
     if(values[1]==0){
       return false

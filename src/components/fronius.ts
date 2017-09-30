@@ -61,6 +61,9 @@ export class Fronius extends component {
     if(this.cfg.width>window.innerWidth-this.cfg.paddingRight){
       this.cfg.width=window.innerWidth-this.cfg.paddingRight
     }
+    if(this.cfg.height>window.innerHeight-this.cfg.paddingBottom-this.cfg.paddingTop){
+      this.cfg.height=window.innerHeight-this.cfg.paddingBottom-this.cfg.paddingTop
+    }
     let start = new Date()
     let end = new Date()
     if (global.mock) {
@@ -276,13 +279,16 @@ export class Fronius extends component {
     const button_offs=Math.round(this.cfg.width/40)
     const button_pos=Math.round((this.cfg.height/2)-(button_size/2))
     const button_radius=Math.round(button_size/5)
+    const arrow_pos=Math.round(button_size/3)
+    const left_arrow:String=`${button_size-arrow_pos},${arrow_pos/2} ${arrow_pos},${Math.round(button_size/2)} ${button_size-arrow_pos},${button_size-arrow_pos/2}`
+    const right_arrow:String=`${arrow_pos},${arrow_pos/2} ${button_size-arrow_pos},${Math.round(button_size/2)} ${arrow_pos},${button_size-arrow_pos/2}`
 
     /* Button for previous day */
     const prevDay = this.chart.append('g')
       .attr("transform", `translate(${button_offs + this.cfg.paddingLeft},${button_pos})`)
 
     prevDay.append("svg:polyline")
-      .attr("points", "30,12 10,25 30,40")
+      .attr("points",  left_arrow)    //"30,12 10,25 30,40")
       .attr("stroke-width", 8)
       .attr("stroke", "#1111aa")
       .attr("fill", "none")
@@ -303,7 +309,7 @@ export class Fronius extends component {
       .attr("transform", `translate(${this.cfg.width - this.cfg.paddingRight - button_offs-button_size},${button_pos})`)
 
     nextDay.append("svg:polyline")
-      .attr("points", "18,12 38,25 18,40")
+      .attr("points", right_arrow)
       .attr("stroke-width", 8)
       .attr("stroke", "#1111aa")
       .attr("fill", "none")
