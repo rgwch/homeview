@@ -9,6 +9,7 @@ import {FetchClient} from './services/fetchclient'
 import {select, selectAll} from 'd3-selection'
 import {entries, keys, values} from 'd3-collection'
 import {PLATFORM} from 'aurelia-pal'
+import {Util} from './services/util'
 import globals from './globals'
 import {Layout} from './layout'
 
@@ -170,7 +171,7 @@ export class Allg {
         }
       })
 
-    }, 400)
+    }, 600)
   }
 
   /**

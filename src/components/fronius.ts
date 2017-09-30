@@ -5,7 +5,7 @@
  */
 import {autoinject} from 'aurelia-framework'
 import global from '../globals'
-import {UrlEncoder} from '../services/urlencode'
+import {Util} from '../services/util'
 import {component} from "./component";
 import {select, Selection} from 'd3-selection'
 import 'd3-transition'
@@ -27,7 +27,7 @@ export class Fronius extends component {
     return "fronius_adapter"
   }
 
-  private urlencoder = new UrlEncoder()
+
   private from_time
   private until_time
   private chart
@@ -42,6 +42,7 @@ export class Fronius extends component {
   private exported: String
   private imported: String
   private today: String
+  private percent: String
 
   private format = timeFormat("%H:%M")
   private dayspec = timeFormat("%a, %d.%m.%Y")
@@ -84,7 +85,9 @@ export class Fronius extends component {
    *     number, consumation: number, self_consumation: number, imported: number, exported: number}}
    */
   resample(samples) {
-    const resolution = 120000
+    // resolution of the samples. 3'600'000 = 1/h;
+    // factor: 750
+    const resolution = 3600000
     const from = this.from_time
     const until = this.until_time
 
@@ -133,7 +136,7 @@ export class Fronius extends component {
     let cumul = 0
     for (let i = 0; i < result.GRID.length; i++) {
       if (result.PV[i]) {
-        diff[i] = [result.PV[i][0], result.PV[i][1] + result.GRID[i][1]]
+        diff[i] = [result.GRID[i][0], result.PV[i][1] + result.GRID[i][1]]
         let slot_prod = result.PV[i][1] * slotlength
         let slot_cons = diff[i][1] * slotlength
         let inout = slot_prod - slot_cons
@@ -192,11 +195,15 @@ export class Fronius extends component {
     this.chart.select(".cumulated_energy").datum(processed.cumulated).attr("d", lineCumul)
     this.chart.select(".power_use").datum(processed.DIFF).attr("d", lineGrid)
 
-    let round2f = format(".2f")
+    let round2f = format(".1f")
+    let consumation=round2f(processed.consumation/3600000)
+    let production=round2f(processed.production/3600000)
+    let self_consumation=round2f(processed.self_consumation / 3600000)
     this.max_power = Math.round(max(processed.PV.map(x => x[1]))) + " W"
-    this.production = round2f(processed.production / 3600000) + " kWh"
-    this.consumation = round2f(processed.consumation / 3600000) + " kWh"
-    this.self_consumation = round2f(processed.self_consumation / 3600000) + " kWh"
+    this.production = production + " kWh"
+    this.consumation = consumation + " kWh"
+    this.self_consumation =  self_consumation+ " kWh "
+    this.percent="("+Math.round(self_consumation*100/production)+"%)"
     this.imported = round2f(processed.imported / 3600000) + " kWh"
     this.exported = round2f(processed.exported / 3600000) + " kWh"
     this.today = this.dayspec(new Date(this.from_time))
@@ -374,7 +381,7 @@ export class Fronius extends component {
     console.log("fetch data from " + new Date(from) + " until " + new Date(to))
     const query = `select value from "${global.ACT_POWER}" where time >= ${from}ms and time < ${to}ms;
       select value from "${global.GRID_FLOW}" where time >= ${from}ms and time < ${to}ms`
-    const sql = this.urlencoder.encode(query)
+    const sql = Util.urlencode(query)
     const raw = await this.fetcher.fetchJson(`${global.influx}/query?db=iobroker&epoch=ms&precision=ms&q=${sql}`)
     const ret = {}
     raw.results.forEach(result => {
