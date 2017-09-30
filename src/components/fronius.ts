@@ -58,6 +58,9 @@ export class Fronius extends component {
       paddingRight : 30,
       paddingTop:    20
     }, this.cfg)
+    if(this.cfg.width>window.innerWidth-this.cfg.paddingRight){
+      this.cfg.width=window.innerWidth-this.cfg.paddingRight
+    }
     let start = new Date()
     let end = new Date()
     if (global.mock) {
@@ -172,7 +175,7 @@ export class Fronius extends component {
       .y(d => this.scaleCumul(d[1]))
 
     const xaxis = axisBottom().scale(this.scaleX)
-      .ticks(20)
+      //.ticks(20)
       .tickFormat(this.format)
 
     const raxis = axisRight().scale(this.scaleCumul)
@@ -195,12 +198,13 @@ export class Fronius extends component {
     this.exported = round2f(processed.exported / 3600000) + " kWh"
     this.today = this.dayspec(new Date(this.from_time))
 
-    const summary_width=Math.round(this.cfg.width/4)
+    const summary_width=Math.max(180,Math.round(this.cfg.width/4))
     const summary_height=Math.round(this.cfg.height/3)
+    const summary_left=this.cfg.width>250 ? 100:this.cfg.paddingLeft
     const font_size=summary_height/12
     select(this.element).select(".summary")
       .classed("frame", true)
-      .attr("style", `position:absolute;top:20px;left:100px;width:${summary_width}px;height:${summary_height}px;font-size:${font_size}px;text-align:left`)
+      .attr("style", `position:absolute;top:20px;left:${summary_left}px;width:${summary_width}px;height:${summary_height}px;font-size:${font_size}px;text-align:left`)
 
     select(this.element).select(".fronius_adapter").classed("wait",false)
   }

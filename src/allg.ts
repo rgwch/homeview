@@ -123,7 +123,7 @@ export class Allg {
     // wait until resize operation finishes
     clearTimeout(this.resize_throttle)
     this.resize_throttle = setTimeout(() => {
-      const innerWidth = window.innerWidth
+      const innerWidth = window.innerWidth // Math.min(window.innerWidth,1000)
       // define all elements to display (from layout.ts). Must also reside in the html
       const elems = [l.treppenlicht.id, l.tuerlicht.id, l.esszimmer.id,
         l.korridor.id, l.fernsehlicht.id,
