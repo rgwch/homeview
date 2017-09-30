@@ -165,6 +165,7 @@ export class Allg {
           dom.attr("style", `left:${x}px;top:${y}px;`)
           lastElem = dom.node().getBoundingClientRect()
         } else {
+          nextRow=y+lastElem.height
           clearLine()
         }
       })
