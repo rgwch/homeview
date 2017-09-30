@@ -5,6 +5,7 @@
  */
 import {autoinject} from 'aurelia-framework'
 import global from '../globals'
+import environment from '../environment'
 import {Util} from '../services/util'
 import {component} from "./component";
 import {select, Selection} from 'd3-selection'
@@ -282,33 +283,19 @@ export class Fronius extends component {
     /* power consumation diagram */
     this.chart.append("path")
       .classed("power_use", true)
-      .attr("stroke", "red")
-      .attr("stroke-width", 0.8)
-      .attr("fill", "none")
 
     /* power generation diagram */
     this.chart.append("path")
       .classed("power_prod", true)
-      .attr("stroke", "blue")
-      .attr("stroke-width", 1.0)
-      .attr("fill", "none")
 
 
     /* cumulated energy diagram */
     this.chart.append("path")
       .classed("cumulated_energy", true)
-      .attr("stroke", "green")
-      .attr("stroke-width", 0.8)
-      .attr("fill", "#c7e9b2")
-      .attr("opacity",0.5)
 
     /* cumulated consumation diagram */
     this.chart.append("path")
       .classed("cumulated_consumption",true)
-      .attr("stroke","#aa0000")
-      .attr("stroke-width",0.4)
-      .attr("fill","#f7cea7")
-      .attr("opacity",0.4)
 
 
     /* X-Axis */
@@ -342,15 +329,11 @@ export class Fronius extends component {
       .attr("transform", `translate(${button_offs + this.cfg.paddingLeft},${button_pos})`)
 
     prevDay.append("svg:polyline")
+      .classed("navsymbol",true)
       .attr("points",  left_arrow)    //"30,12 10,25 30,40")
-      .attr("stroke-width", 8)
-      .attr("stroke", "#1111aa")
-      .attr("fill", "none")
-      .attr("opacity", 0.4)
 
     this.rectangle(prevDay, 0, 0, button_size, button_size)
-      .attr("fill", "#a1a1a1")
-      .attr("opacity", 0.6)
+      .classed("navbutton",true)
       .attr("rx", button_radius)
       .attr("ry", button_radius)
       .on("click", event => {
@@ -363,15 +346,11 @@ export class Fronius extends component {
       .attr("transform", `translate(${this.cfg.width - this.cfg.paddingRight - button_offs-button_size},${button_pos})`)
 
     nextDay.append("svg:polyline")
+      .classed("navsymbol",true)
       .attr("points", right_arrow)
-      .attr("stroke-width", 8)
-      .attr("stroke", "#1111aa")
-      .attr("fill", "none")
-      .attr("opacity", 0.4)
 
     this.rectangle(nextDay, 0, 0, button_size, button_size)
-      .attr("fill", "#a1a1a1")
-      .attr("opacity", 0.6)
+      .classed("navbutton",true)
       .attr("rx", button_radius)
       .attr("ry", button_radius)
       .on("click", (event) => {
@@ -425,7 +404,9 @@ export class Fronius extends component {
    */
   async getSeries(from: number, to: number) {
 
-    console.log("fetch data from " + new Date(from) + " until " + new Date(to))
+    if(environment.debug) {
+      console.log("fetch data from " + new Date(from) + " until " + new Date(to))
+    }
     const query = `select value from "${global.ACT_POWER}" where time >= ${from}ms and time < ${to}ms;
       select value from "${global.GRID_FLOW}" where time >= ${from}ms and time < ${to}ms`
     const sql = Util.urlencode(query)
