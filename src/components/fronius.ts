@@ -355,6 +355,7 @@ export class Fronius extends component {
         this.offset-=12*60*60*1000
         this.zoomFactor=1.0
         this.update()
+        this.zooom.scaleTo(this.body,1.0)
       })
 
 
@@ -374,11 +375,14 @@ export class Fronius extends component {
         this.offset=Math.min(0,this.offset+86400000)
         this.zoomFactor=1.0
         this.update()
+        let xoff=this.scaleX(new Date(this.anchor+this.offset))
+        this.zooom.translateTo(this.body,xoff)
+        this.zooom.scaleTo(this.body,1.0)
       })
 
     const summary = select(this.element).select(".summary")
       .style("width", 60)
-    this.zooom=zoom().on("zoom", this.zoomer)
+    this.zooom=zoom().on("end", this.zoomer)
     this.body.call(this.zooom)
     this.update()
   } // render
@@ -425,7 +429,7 @@ export class Fronius extends component {
       console.log("zoomed factor: "+k+", " + new Date().toString()+new Date(this.getBounds().start)+", "+new Date(this.getBounds().end))
 
       this.update()
-    }, 500)
+    }, 10)
   }
 
   gotMessage(msg) {
