@@ -6,22 +6,64 @@ export class Util {
   // N milliseconds. If `immediate` is passed, trigger the function on the
   // leading edge, instead of the trailing.
    From David Walsh (https://davidwalsh.name/javascript-debounce-function)
-  */
-  public static debounce(func, wait, immediate) {
+
+  public static debounce(func, wait,parms) {
+    let timeout
+    let delayer=(parms)=>{
+      clearTimeout(timeout)
+      setTimeout(()=>func(),timeout)
+    }
+    return delayer
+  };
+*/
+  /**
+   * debouncing, executes the function if there was no new event in $wait milliseconds
+   * @param func
+   * @param wait
+   * @param scope
+   * @returns {Function}
+   */
+  static debounce(func, wait, scope) {
     var timeout;
-    return function () {
-      var context = this, args = arguments;
-      var later = function () {
+    return function() {
+      var context = scope || this, args = arguments;
+      var later = function() {
         timeout = null;
-        if (!immediate) func.apply(context, args);
+        func.apply(context, args);
       };
-      var callNow = immediate && !timeout;
       clearTimeout(timeout);
       timeout = setTimeout(later, wait);
-      if (callNow) func.apply(context, args);
     };
-  };
+  }
 
+  /**
+   * In case of a "storm of events", this executes once every $threshold
+   * @param fn
+   * @param threshold
+   * @param scope
+   * @returns {Function}
+   */
+  static throttle(fn, threshold, scope) {
+    threshold || (threshold = 250);
+    var last, deferTimer;
+
+    return function(arg={}) {
+      var context = scope || this;
+      var now = +new Date, args = arguments;
+
+      if (last && now < last + threshold) {
+        // Hold on to it
+        clearTimeout(deferTimer);
+        deferTimer = setTimeout(function() {
+          last = now;
+          fn.apply(context, args);
+        }, threshold);
+      } else {
+        last = now;
+        fn.apply(context, args);
+      }
+    };
+  }
   /**
    * taken and modified from
    * https://www.npmjs.com/package/x-www-form-urlencode
