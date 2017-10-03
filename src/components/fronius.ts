@@ -9,7 +9,7 @@ import {component} from "./component";
 import {event, select, Selection} from 'd3-selection'
 import 'd3-transition'
 import {scaleLinear, scaleTime} from "d3-scale";
-import {zoom} from 'd3-zoom'
+import {zoom, zoomTransform} from 'd3-zoom'
 import {area as areaGenerator, line as lineGenerator} from 'd3-shape'
 import {axisBottom, axisLeft, axisRight} from 'd3-axis'
 import {max, mean, merge, range} from 'd3-array'
@@ -29,13 +29,17 @@ export class Fronius extends component {
   private loader = new FroniusLoader(this.fetcher)
   private throttles = {}
   private chart
-  private scaleX
-  private scaleY
+  private axes
+  private xaxis
+  private scales={
+    base_X:null,
+    X: null,
+    Y:null,
+    cumul: null
+  }
   private anchor
   private zoomFactor = 1.0
   private offset = 0
-  private scaleCumul
-
   private max_power = "10"
   private production: String
   private consumation: String
@@ -54,12 +58,12 @@ export class Fronius extends component {
     this.anchor = dAnchor.getTime()
   }
 
-  private getBounds = () => {
+  private getBounds():[number,number]{
     let extend = 86400000 / this.zoomFactor
-    return {
-      start: Math.round(this.anchor+this.offset),
-      end  : Math.round(this.anchor + this.offset+extend-1)
-    }
+    return [
+      Math.round(this.anchor+this.offset),
+      Math.round(this.anchor + this.offset+extend-1)
+    ]
   }
 
 
@@ -67,8 +71,8 @@ export class Fronius extends component {
   private dateSpec = timeFormat("%a, %d.%m.%Y")
   private dayspec: () => String = () => {
     let bounds = this.getBounds()
-    let begin = new Date(bounds.start)
-    let end = new Date(bounds.end)
+    let begin = new Date(bounds[0])
+    let end = new Date(bounds[1])
     if (begin.getDate() === end.getDate()) {
       return this.dateSpec(begin)
     } else {
@@ -107,49 +111,40 @@ export class Fronius extends component {
   }
 
 
-  async update(new_anchor: number = null) {
-    /* use wait aspect while calculating */
+  async update() {
+    /* use wait aspect while processing new data */
     select(this.element).select(".fronius_adapter").classed("wait", true)
 
-    if (new_anchor) {
-      this.setAnchor(new_anchor)
-    }
     let bounds = this.getBounds()
-    console.log(new Date(bounds.start) + ", " + new Date(bounds.end))
+    console.log(new Date(bounds[0]) + ", " + new Date(bounds[1]))
 
     let processed = await this.loader.resample(bounds)
 
-    this.scaleX.domain([new Date(bounds.start), new Date(bounds.end)])
-    const xaxis = axisBottom().scale(this.scaleX)
-      .tickFormat(this.format)
-
-
-    this.chart.select(".xaxis").call(xaxis)
-
-
+    this.update_scales(bounds)
     /* Line Generator for time/power diagrams */
     const lineGrid = lineGenerator()
-      .x(d => this.scaleX(d[0]))
-      .y(d => this.scaleY(d[1]))
-    this.chart.select(".power_prod").datum(processed.PV).attr("d", lineGrid) //
+      .x(d => this.scales.X(d[0]))
+      .y(d => this.scales.Y(d[1]))
+    // this.chart.select(".power_prod").datum(processed.PV).attr("d", lineGrid) //
     this.chart.select(".power_use").datum(processed.DIFF).attr("d", lineGrid)
 
 
-    /* Area Generator for time/energy diagram */
+    /* Area Generator for time/energy diagram
     const lineCumul = areaGenerator()
-      .x(d => this.scaleX(d[0]))
-      .y0(this.scaleY(0))
-      .y1(d => this.scaleCumul(d[1]))
+      .x(d => this.scales.X(d[0]))
+      .y0(this.scales.Y(0))
+      .y1(d => this.scales.cumul(d[1]))
 
     this.chart.select(".cumulated_energy").datum(processed.cumulated).attr("d", lineCumul)
-
-    /* Area generator for cumulated consuption diagram */
+*/
+    /* Area generator for cumulated consuption diagram
     const areaCumulCons = areaGenerator()
-      .x(d => this.scaleX(d[0]))
-      .y0(this.scaleY(0))
-      .y1(d => this.scaleCumul(d[1]))
+      .x(d => this.scales.X(d[0]))
+      .y0(this.scales.Y(0))
+      .y1(d => this.scales.cumul(d[1]))
 
     this.chart.select(".cumulated_consumption").datum(processed.used).attr("d", areaCumulCons)
+    */
 
     /* Summary numbers */
     let round1f = format(".1f")
@@ -189,18 +184,43 @@ export class Fronius extends component {
   async render() {
 
     /* Scale for power (left axis) */
-    this.scaleY = scaleLinear()
+    this.scales.Y = scaleLinear()
       .range([this.cfg.height - this.cfg.paddingBottom, this.cfg.paddingTop])
       .domain([0, global.MAX_POWER])
+
     /* scale for time (X-Axis) */
-    this.scaleX = scaleTime()
+    this.scales.base_X = scaleTime()
       .range([this.cfg.paddingLeft, this.cfg.width - this.cfg.paddingRight])
-    //.domain([new Date(this.from_time), new Date(this.until_time)])
+      .domain(this.getBounds())
 
     /* Scale for cumulated energy (right axis) */
-    this.scaleCumul = scaleLinear()
+    this.scales.cumul = scaleLinear()
       .domain([0, global.MAX_DAILY_ENERGY])
-      .range(this.scaleY.range())
+      .range(this.scales.Y.range())
+
+
+    this.axes=this.body.append("g")
+    /* X-Axis */
+    this.xaxis = axisBottom().scale(this.scales.base_X)
+      .tickFormat(this.format)
+    this.axes.append('g')
+      .classed("xaxis", true)
+      .attr("transform", `translate(0,${this.cfg.height - this.cfg.paddingBottom})`)
+      .call(this.xaxis)
+
+    /* left y-axis */
+    const yAxis = axisLeft().scale(this.scales.Y)
+    this.axes.append('g')
+      .attr("transform", `translate(${this.cfg.paddingLeft},0)`)
+      .call(yAxis)
+
+    /* right y-axis */
+    const raxis = axisRight().scale(this.scales.cumul)
+      .tickFormat(d => d / 1000)
+    this.axes.append("g")
+      .classed("raxis", true)
+      .attr("transform", `translate(${this.cfg.width - this.cfg.paddingRight},0)`)
+      .call(raxis)
 
 
     /* Chart element */
@@ -219,30 +239,12 @@ export class Fronius extends component {
     this.chart.append("path")
       .classed("cumulated_energy", true)
 
+
     /* cumulated consumation diagram */
     this.chart.append("path")
       .classed("cumulated_consumption", true)
 
 
-    /* X-Axis */
-    this.chart.append('g')
-      .classed("xaxis", true)
-      .attr("transform", `translate(0,${this.cfg.height - this.cfg.paddingBottom})`)
-    //.call(xaxis)
-
-    /* left y-axis */
-    const yAxis = axisLeft().scale(this.scaleY)
-    this.chart.append('g')
-      .attr("transform", `translate(${this.cfg.paddingLeft},0)`)
-      .call(yAxis)
-
-    /* right y-axis */
-    const raxis = axisRight().scale(this.scaleCumul)
-      .tickFormat(d => d / 1000)
-    this.chart.append("g")
-      .classed("raxis", true)
-      .attr("transform", `translate(${this.cfg.width - this.cfg.paddingRight},0)`)
-      .call(raxis)
 
     /* Buttons */
     const button_size = Math.round(this.cfg.height / 8)
@@ -254,7 +256,7 @@ export class Fronius extends component {
     const right_arrow: String = `${arrow_pos},${arrow_pos / 2} ${button_size - arrow_pos},${Math.round(button_size / 2)} ${arrow_pos},${button_size - arrow_pos / 2}`
 
     /* Button for previous day */
-    const prevDay = this.chart.append('g')
+    const prevDay = this.axes.append('g')
       .attr("transform", `translate(${button_offs + this.cfg.paddingLeft},${button_pos})`)
 
     prevDay.append("svg:polyline")
@@ -274,7 +276,7 @@ export class Fronius extends component {
 
 
     /* Button for next day */
-    const nextDay = this.chart.append("g")
+    const nextDay = this.axes.append("g")
       .attr("transform", `translate(${this.cfg.width - this.cfg.paddingRight - button_offs - button_size},${button_pos})`)
 
     nextDay.append("svg:polyline")
@@ -296,8 +298,8 @@ export class Fronius extends component {
 
     const summary = select(this.element).select(".summary")
       .style("width", 60)
-    this.zooom = zoom().on("zoom", this.zoomer)
-    this.body.call(this.zooom)
+    this.zooom = zoom().on("zoom", this.zoomer).on("end",()=>this.endzoom())
+    this.chart.call(this.zooom)
     this.update()
   } // render
 
@@ -329,12 +331,39 @@ export class Fronius extends component {
       .style("fill", color)
   }
 
+  /**
+   * Zoom and pan. We modify only the x axis and the scale factor, and let y on 0.
+   */
   zoomed() {
+
     let x = event.transform.x
     let y = event.transform.y
     let k = event.transform.k
-    let tr=event.transform
-    this.body.attr("transform",event.transform.toString())
+    //console.log(event.transform.toString())
+
+    let transform=event.transform
+    let tr=`translate(${x},0) scale(${k})`
+    this.chart.attr("transform",tr)
+    let newscale=transform.rescaleX(this.scales.base_X)
+    this.xaxis.scale(newscale)
+    this.axes.select(".xaxis").call(this.xaxis)
+    this.scales.X=newscale
+    this.offset=newscale.invert(x).getTime()-this.anchor
+
+  }
+
+  endzoom(){
+    console.log("Endzoom "+event.transform)
+    this.update()
+  }
+
+  update_scales(bounds){
+    let transform=zoomTransform(this.chart.node())
+    let newscale=transform.rescaleX(this.scales.base_X)
+    this.xaxis.scale(newscale)
+    this.axes.select(".xaxis").call(this.xaxis)
+    this.scales.X=newscale
+
   }
 
   gotMessage(msg) {

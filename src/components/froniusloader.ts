@@ -23,14 +23,14 @@ export class FroniusLoader {
    *     number, consumation: number, self_consumation: number, imported: number, exported: number}}
    */
 
-  async resample(bounds) {
+  async resample(bounds:[number,number]) {
     // resolution of the samples. 3'600'000 = 1/h;
     // factor: 750
 
 
     function resample_internal(arr: Array<Array<number>>): Array<Array<number>> {
       let sampled = {}
-      range(Math.round(bounds.start / resolution), Math.round((bounds.end) / resolution)).forEach(step => {
+      range(Math.round(bounds[0] / resolution), Math.round((bounds[1]) / resolution)).forEach(step => {
         sampled[step] = []
       })
 
@@ -52,7 +52,7 @@ export class FroniusLoader {
       return output
     }
 
-    const input = await  this.getSeries(bounds.start, bounds.end)
+    const input = await  this.getSeries(bounds[0], bounds[1])
 
 
     let result = {

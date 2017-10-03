@@ -34,6 +34,8 @@ export default {
   DAY_ENERGY: "fronius.0.inverter.1.DAY_ENERGY",
   YEAR_ENERGY: "fronius.0.inverter.1.YEAR_ENERGY",
   TOTAL_ENERGY: "fronius.0.inverter.1.TOTAL_ENERGY",
-  GRID_FLOW: "fronius.0.powerflow.P_Grid"
+  GRID_FLOW: "fronius.0.powerflow.P_Grid",
+  MAX_POWER: 10000,
+  MAX_DAILY_ENERGY: 70000
 
 }
