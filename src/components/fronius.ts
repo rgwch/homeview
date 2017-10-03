@@ -115,7 +115,7 @@ export class Fronius extends component {
     /* use wait aspect while processing new data */
     select(this.element).select(".fronius_adapter").classed("wait", true)
 
-    let bounds = this.getBounds()
+    let bounds:[number,number] = this.getBounds()
     console.log(new Date(bounds[0]) + ", " + new Date(bounds[1]))
 
     let processed = await this.loader.resample(bounds)
@@ -129,22 +129,22 @@ export class Fronius extends component {
     this.chart.select(".power_use").datum(processed.DIFF).attr("d", lineGrid)
 
 
-    /* Area Generator for time/energy diagram
+    /* Area Generator for time/energy diagram */
     const lineCumul = areaGenerator()
       .x(d => this.scales.X(d[0]))
       .y0(this.scales.Y(0))
       .y1(d => this.scales.cumul(d[1]))
 
     this.chart.select(".cumulated_energy").datum(processed.cumulated).attr("d", lineCumul)
-*/
-    /* Area generator for cumulated consuption diagram
+
+    /* Area generator for cumulated consuption diagram */
     const areaCumulCons = areaGenerator()
       .x(d => this.scales.X(d[0]))
       .y0(this.scales.Y(0))
       .y1(d => this.scales.cumul(d[1]))
 
     this.chart.select(".cumulated_consumption").datum(processed.used).attr("d", areaCumulCons)
-    */
+
 
     /* Summary numbers */
     let round1f = format(".1f")
@@ -185,8 +185,9 @@ export class Fronius extends component {
 
     /* Scale for power (left axis) */
     this.scales.Y = scaleLinear()
-      .range([this.cfg.height - this.cfg.paddingBottom, this.cfg.paddingTop])
       .domain([0, global.MAX_POWER])
+      .range([this.cfg.height - this.cfg.paddingBottom, this.cfg.paddingTop])
+
 
     /* scale for time (X-Axis) */
     this.scales.base_X = scaleTime()
@@ -217,6 +218,7 @@ export class Fronius extends component {
     /* right y-axis */
     const raxis = axisRight().scale(this.scales.cumul)
       .tickFormat(d => d / 1000)
+
     this.axes.append("g")
       .classed("raxis", true)
       .attr("transform", `translate(${this.cfg.width - this.cfg.paddingRight},0)`)
