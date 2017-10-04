@@ -38,7 +38,7 @@ export class Layout{
     type: "button",
     map:{
       1:1,
-      2:2
+      0:0
     },
     buttons: [
       {
@@ -61,7 +61,7 @@ export class Layout{
   mediacenter=Object.assign({message: "mediacenter_state", id:"mediacenter",
     val: global._mediacenter_state, switch: global._mediacenter_state}, this.two_buttons_def)
   wlanext= Object.assign({message: "wlanextender_state", id:"wlanext",
-    val: global._wlan_state, switch: global._wlan_state}, this.two_buttons_def)
+    val: global._wlan_state, switch: global._wlan_state}, this.two_buttons_def,{map:{0:0,1:1}})
   esszimmer=Object.assign({message: "esszimmer_state", id: "esszimmer",
     val: global._diningroom_light, statefun: this.lightify}, this.two_buttons_def)
   korridor=Object.assign({message: "korridor_state", id: "korridor",
