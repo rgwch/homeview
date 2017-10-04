@@ -38,8 +38,6 @@ export class Fronius extends component {
     cumul: null
   }
   private anchor
-  private zoomFactor = 1.0
-  private offset = 0
   private max_power = "10"
   private production: String
   private consumation: String
@@ -59,11 +57,15 @@ export class Fronius extends component {
   }
 
   private getBounds():[number,number]{
+    let transform=zoomTransform(this.chart.node())
+    return this.scales.X.domain()
+    /*
     let extend = 86400000 / this.zoomFactor
     return [
       Math.round(this.anchor+this.offset),
       Math.round(this.anchor + this.offset+extend-1)
     ]
+    */
   }
 
 
@@ -115,12 +117,12 @@ export class Fronius extends component {
     /* use wait aspect while processing new data */
     select(this.element).select(".fronius_adapter").classed("wait", true)
 
+    this.update_scales()
     let bounds:[number,number] = this.getBounds()
     console.log(new Date(bounds[0]) + ", " + new Date(bounds[1]))
 
     let processed = await this.loader.resample(bounds)
 
-    this.update_scales(bounds)
     /* Line Generator for time/power diagrams */
     const lineGrid = lineGenerator()
       .x(d => this.scales.X(d[0]))
@@ -183,24 +185,33 @@ export class Fronius extends component {
    */
   async render() {
 
-    /* Scale for power (left axis) */
-    this.scales.Y = scaleLinear()
-      .domain([0, global.MAX_POWER])
-      .range([this.cfg.height - this.cfg.paddingBottom, this.cfg.paddingTop])
 
 
     /* scale for time (X-Axis) */
     this.scales.base_X = scaleTime()
       .range([this.cfg.paddingLeft, this.cfg.width - this.cfg.paddingRight])
-      .domain(this.getBounds())
+      .domain([new Date(this.anchor),new Date(this.anchor+86400000)])
+
+    /* Scale for power (left axis) */
+    this.scales.Y = scaleLinear()
+      .domain([0, global.MAX_POWER])
+      .range([this.cfg.height - this.cfg.paddingBottom, this.cfg.paddingTop])
 
     /* Scale for cumulated energy (right axis) */
     this.scales.cumul = scaleLinear()
       .domain([0, global.MAX_DAILY_ENERGY])
       .range(this.scales.Y.range())
 
-
+    /* horizontal and vertical axes */
     this.axes=this.body.append("g")
+    /* Chart element */
+    this.chart = this.body.append("g")
+
+    this.zooom = zoom().on("zoom", this.zoomer).on("end",()=>this.endzoom())
+    this.chart.call(this.zooom)
+
+
+
     /* X-Axis */
     this.xaxis = axisBottom().scale(this.scales.base_X)
       .tickFormat(this.format)
@@ -225,8 +236,6 @@ export class Fronius extends component {
       .call(raxis)
 
 
-    /* Chart element */
-    this.chart = this.body.append("g")
 
     /* power consumation diagram */
     this.chart.append("path")
@@ -270,7 +279,7 @@ export class Fronius extends component {
       .attr("rx", button_radius)
       .attr("ry", button_radius)
       .on("click", event => {
-        this.offset -= 24 * 60 * 60 * 1000
+        // this.offset -= 24 * 60 * 60 * 1000
         //this.zoomFactor=1.0
         this.update()
         //this.zooom.scaleTo(this.body,1.0)
@@ -290,7 +299,7 @@ export class Fronius extends component {
       .attr("rx", button_radius)
       .attr("ry", button_radius)
       .on("click", (event) => {
-        this.offset = Math.min(0, this.offset + 86400000)
+        //this.offset = Math.min(0, this.offset + 86400000)
         //this.zoomFactor=1.0
         this.update()
         //let xoff=this.scaleX(new Date(this.anchor+this.offset))
@@ -300,8 +309,6 @@ export class Fronius extends component {
 
     const summary = select(this.element).select(".summary")
       .style("width", 60)
-    this.zooom = zoom().on("zoom", this.zoomer).on("end",()=>this.endzoom())
-    this.chart.call(this.zooom)
     this.update()
   } // render
 
@@ -350,7 +357,7 @@ export class Fronius extends component {
     this.xaxis.scale(newscale)
     this.axes.select(".xaxis").call(this.xaxis)
     this.scales.X=newscale
-    this.offset=newscale.invert(x).getTime()-this.anchor
+    // this.offset=newscale.invert(x).getTime()-this.anchor
 
   }
 
@@ -359,7 +366,7 @@ export class Fronius extends component {
     this.update()
   }
 
-  update_scales(bounds){
+  update_scales(){
     let transform=zoomTransform(this.chart.node())
     let newscale=transform.rescaleX(this.scales.base_X)
     this.xaxis.scale(newscale)
