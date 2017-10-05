@@ -16,6 +16,10 @@ const resolution = 3600000 //400000
 export class FroniusLoader {
 
   constructor(private fetcher:FetchClient){}
+  private data={
+    [global.GRID_FLOW]: [],
+    [global.ACT_POWER]: []
+  }
   /**
    * Create a new dataset from PV and Grid samples
    * @param bounds upper and lower timestamp for new samples
@@ -51,8 +55,24 @@ export class FroniusLoader {
       })
       return output
     }
+    let input
+    if(this.data[global.GRID_FLOW].length && bounds[0]>=this.data[global.GRID_FLOW][0][0] && bounds[1]<=this.data[global.GRID_FLOW][this.data[global.GRID_FLOW].length-1][0]){
+      let first=this.data[global.GRID_FLOW].findIndex(elem=>{
+        return (elem[0]>=bounds[0])
+      })
+      let last=this.data[global.GRID_FLOW].findIndex(elem=>{
+        return elem[0]<=bounds[1]
+      })
+      input= {
+        [global.GRID_FLOW]: this.data[global.GRID_FLOW].slice(first, last),
+        [global.ACT_POWER]: this.data[global.ACT_POWER].slice(first,last)
+      }
+    }else {
+      input = await  this.getSeries(bounds[0], bounds[1])
+      this.data[global.ACT_POWER]=(input[global.ACT_POWER].concat(this.data[global.ACT_POWER])).sort((a,b)=>{return a[0]-b[0]})
+      this.data[global.GRID_FLOW]=(input[global.GRID_FLOW].concat(this.data[global.GRID_FLOW])).sort((a,b)=>{return a[0]-b[0]})
 
-    const input = await  this.getSeries(bounds[0], bounds[1])
+    }
 
 
     let result = {
@@ -104,6 +124,7 @@ export class FroniusLoader {
     if (environment.debug) {
       console.log("fetch data from " + new Date(from) + " until " + new Date(to))
     }
+
     if(global.mock){
       let dummydata=(f,t)=>{
         return range(Math.round(f/resolution),Math.round(t/resolution)).map(item=>{
@@ -127,6 +148,7 @@ export class FroniusLoader {
           })
         }
       })
+
       return ret
     }
   }

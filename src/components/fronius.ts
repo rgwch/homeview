@@ -363,7 +363,7 @@ export class Fronius extends component {
 
   endzoom(){
     console.log("Endzoom "+event.transform)
-    this.update()
+    //this.update()
   }
 
   update_scales(){

@@ -6,7 +6,6 @@
   <require from="components/lcd7segm"></require>
   <require from="./components/lcdclock"></require>
   <require from="./components/fronius"></require>
-  <require from="./components/threewayswitch"></require>
   <div class="container">
     <div class="row">
       <div class="col-sm-3">
@@ -32,10 +31,6 @@
       <div class="col-sm-3">
         <h3>LCD Clock</h3>
         <lcdclock cfg.bind="clock" class="tile"></lcdclock>
-      </div>
-      <div class="col-sm-3">
-        <h3>three-way-switch</h3>
-        <threewayswitch class="tile" cfg.bind="tws"></threewayswitch>
       </div>
       <div class="col-xs-12">
         <h3>Fronius</h3>
