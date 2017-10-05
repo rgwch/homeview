@@ -80,6 +80,9 @@ export class Showcase{
     padding: 5,
     bands: [{from: 0, to: 30, color: "blue"},{from: 30, to: 70, color: "green"},{from: 70, to: 100, color: "red"}]
   }
+  private tws={
+
+  }
   constructor(private ea:EventAggregator, private fetcher:FetchClient){
     this.ea.subscribe(this.multi.message+":click", event=>{
       if(event.value==0){

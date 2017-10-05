@@ -12,7 +12,8 @@ export abstract class component{
   abstract gotMessage(any)
   protected body
 
-  constructor(protected ea:EventAggregator, protected fetcher:FetchClient,protected element:Element){}
+  constructor(protected ea:EventAggregator, protected fetcher:FetchClient,protected element:Element){
+  }
 
   attached(){
     if(undefined == this.cfg){
