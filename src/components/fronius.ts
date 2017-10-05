@@ -58,14 +58,7 @@ export class Fronius extends component {
 
   private getBounds():[number,number]{
     let transform=zoomTransform(this.chart.node())
-    return this.scales.X.domain()
-    /*
-    let extend = 86400000 / this.zoomFactor
-    return [
-      Math.round(this.anchor+this.offset),
-      Math.round(this.anchor + this.offset+extend-1)
-    ]
-    */
+    return this.scales.X.domain().map(d=>d.getTime())
   }
 
 
@@ -117,23 +110,24 @@ export class Fronius extends component {
     /* use wait aspect while processing new data */
     select(this.element).select(".fronius_adapter").classed("wait", true)
 
-    this.update_scales()
+    // this.update_scales()
     let bounds:[number,number] = this.getBounds()
     console.log(new Date(bounds[0]) + ", " + new Date(bounds[1]))
 
     let processed = await this.loader.resample(bounds)
+    // console.log(processed.PV.map(el=>{return[new Date(el[0]),el[1]]}))
 
     /* Line Generator for time/power diagrams */
     const lineGrid = lineGenerator()
-      .x(d => this.scales.X(d[0]))
+      .x(d => this.scales.base_X(d[0]))
       .y(d => this.scales.Y(d[1]))
-    // this.chart.select(".power_prod").datum(processed.PV).attr("d", lineGrid) //
+    this.chart.select(".power_prod").datum(processed.PV).attr("d", lineGrid)
     this.chart.select(".power_use").datum(processed.DIFF).attr("d", lineGrid)
 
 
     /* Area Generator for time/energy diagram */
     const lineCumul = areaGenerator()
-      .x(d => this.scales.X(d[0]))
+      .x(d => this.scales.base_X(d[0]))
       .y0(this.scales.Y(0))
       .y1(d => this.scales.cumul(d[1]))
 
@@ -141,7 +135,7 @@ export class Fronius extends component {
 
     /* Area generator for cumulated consuption diagram */
     const areaCumulCons = areaGenerator()
-      .x(d => this.scales.X(d[0]))
+      .x(d => this.scales.base_X(d[0]))
       .y0(this.scales.Y(0))
       .y1(d => this.scales.cumul(d[1]))
 
@@ -309,6 +303,7 @@ export class Fronius extends component {
 
     const summary = select(this.element).select(".summary")
       .style("width", 60)
+    this.update_scales()
     this.update()
   } // render
 
@@ -353,17 +348,19 @@ export class Fronius extends component {
     let transform=event.transform
     let tr=`translate(${x},0) scale(${k})`
     this.chart.attr("transform",tr)
+
+    this.update_scales()
+    /*
     let newscale=transform.rescaleX(this.scales.base_X)
     this.xaxis.scale(newscale)
     this.axes.select(".xaxis").call(this.xaxis)
     this.scales.X=newscale
-    // this.offset=newscale.invert(x).getTime()-this.anchor
-
+  */
   }
 
   endzoom(){
     console.log("Endzoom "+event.transform)
-    //this.update()
+    this.update()
   }
 
   update_scales(){

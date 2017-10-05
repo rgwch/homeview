@@ -69,8 +69,8 @@ export class FroniusLoader {
       }
     }else {
       input = await  this.getSeries(bounds[0], bounds[1])
-      this.data[global.ACT_POWER]=(input[global.ACT_POWER].concat(this.data[global.ACT_POWER])).sort((a,b)=>{return a[0]-b[0]})
-      this.data[global.GRID_FLOW]=(input[global.GRID_FLOW].concat(this.data[global.GRID_FLOW])).sort((a,b)=>{return a[0]-b[0]})
+      //this.data[global.ACT_POWER]=(input[global.ACT_POWER].concat(this.data[global.ACT_POWER])).sort((a,b)=>{return a[0]-b[0]})
+      //this.data[global.GRID_FLOW]=(input[global.GRID_FLOW].concat(this.data[global.GRID_FLOW])).sort((a,b)=>{return a[0]-b[0]})
 
     }
 
