@@ -207,9 +207,9 @@ export class Fronius extends component {
     this.zooom = zoom()
       .on("zoom", this.zoomer)
       .on("end",()=>this.endzoom())
-      //.scaleExtent([1,Infinity])
+      .scaleExtent([0.2,5])
       //.translateExtent([[0,0],[this.cfg.width,this.cfg.height]])
-      // .extent([[0,0],[this.cfg.width,this.cfg.height]])
+      .extent([[0,0],[this.cfg.width,this.cfg.height]])
     this.chart.call(this.zooom)
 
 
@@ -282,10 +282,9 @@ export class Fronius extends component {
       .attr("rx", button_radius)
       .attr("ry", button_radius)
       .on("click", event => {
-        // this.offset -= 24 * 60 * 60 * 1000
-        //this.zoomFactor=1.0
         this.update()
-        //this.zooom.scaleTo(this.body,1.0)
+        this.zooom.scaleTo(this.chart,1.0)
+        this.do_transform(-1000)
       })
 
 
@@ -302,10 +301,7 @@ export class Fronius extends component {
       .attr("rx", button_radius)
       .attr("ry", button_radius)
       .on("click", (event) => {
-        //this.offset = Math.min(0, this.offset + 86400000)
-        //this.zoomFactor=1.0
         this.update()
-        //let xoff=this.scaleX(new Date(this.anchor+this.offset))
         //this.zooom.translateTo(this.body,xoff)
         //this.zooom.scaleTo(this.body,1.0)
       })
@@ -355,6 +351,7 @@ export class Fronius extends component {
     let ev=event
     let transform=event.transform
     let tr=`scale(${k},1) translate(${x},0)`
+    //this.body.style("transform-origin","50 0")
     this.chart.attr("transform",tr)
 
     this.update_scales(transform)
@@ -379,6 +376,12 @@ export class Fronius extends component {
     this.scales.X=newscale
   }
 
+  do_transform(offset,zoom){
+    const transform=zoomTransform(this.chart.node())
+    const x=transform.x+offset
+    this.zooom.translateTo(this.chart,x,translate.y)
+
+  }
   gotMessage(msg) {
 
   }
