@@ -198,11 +198,12 @@ export class Fronius extends component {
       .domain([0, global.MAX_DAILY_ENERGY])
       .range(this.scales.base_Y.range())
 
-    /* horizontal and vertical axes */
-    this.axes=this.body.append("g")
     /* Chart element */
     this.chart = this.body.append("g")
-      // .attr("transform",`translate(${this.cfg.paddingLeft},0)`)
+    // .attr("transform",`translate(${this.cfg.paddingLeft},0)`)
+
+    /* horizontal and vertical axes */
+    this.axes=this.body.append("g")
 
     this.zooom = zoom()
       .on("zoom", this.zoomer)
@@ -283,8 +284,8 @@ export class Fronius extends component {
       .attr("ry", button_radius)
       .on("click", event => {
         this.update()
-        this.zooom.scaleTo(this.chart,1.0)
-        this.do_transform(-1000)
+        this.do_transform(100,1.0)
+        this.update()
       })
 
 
@@ -301,9 +302,8 @@ export class Fronius extends component {
       .attr("rx", button_radius)
       .attr("ry", button_radius)
       .on("click", (event) => {
+        this.do_transform(-100,1.0)
         this.update()
-        //this.zooom.translateTo(this.body,xoff)
-        //this.zooom.scaleTo(this.body,1.0)
       })
 
     const summary = select(this.element).select(".summary")
@@ -378,8 +378,8 @@ export class Fronius extends component {
 
   do_transform(offset,zoom){
     const transform=zoomTransform(this.chart.node())
-    const x=transform.x+offset
-    this.zooom.translateTo(this.chart,x,translate.y)
+    this.zooom.translateBy(this.chart,offset,transform.y)
+    this.update_scales()
 
   }
   gotMessage(msg) {
