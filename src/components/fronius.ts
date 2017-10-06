@@ -31,8 +31,10 @@ export class Fronius extends component {
   private chart
   private axes
   private xaxis
+  private yaxis
   private scales={
     base_X:null,
+    base_Y:null,
     X: null,
     Y:null,
     cumul: null
@@ -110,7 +112,7 @@ export class Fronius extends component {
     /* use wait aspect while processing new data */
     select(this.element).select(".fronius_adapter").classed("wait", true)
 
-    // this.update_scales()
+    this.update_scales()
     let bounds:[number,number] = this.getBounds()
     console.log(new Date(bounds[0]) + ", " + new Date(bounds[1]))
 
@@ -120,7 +122,7 @@ export class Fronius extends component {
     /* Line Generator for time/power diagrams */
     const lineGrid = lineGenerator()
       .x(d => this.scales.base_X(d[0]))
-      .y(d => this.scales.Y(d[1]))
+      .y(d => this.scales.base_Y(d[1]))
     this.chart.select(".power_prod").datum(processed.PV).attr("d", lineGrid)
     this.chart.select(".power_use").datum(processed.DIFF).attr("d", lineGrid)
 
@@ -128,7 +130,7 @@ export class Fronius extends component {
     /* Area Generator for time/energy diagram */
     const lineCumul = areaGenerator()
       .x(d => this.scales.base_X(d[0]))
-      .y0(this.scales.Y(0))
+      .y0(this.scales.base_Y(0))
       .y1(d => this.scales.cumul(d[1]))
 
     this.chart.select(".cumulated_energy").datum(processed.cumulated).attr("d", lineCumul)
@@ -136,7 +138,7 @@ export class Fronius extends component {
     /* Area generator for cumulated consuption diagram */
     const areaCumulCons = areaGenerator()
       .x(d => this.scales.base_X(d[0]))
-      .y0(this.scales.Y(0))
+      .y0(this.scales.base_Y(0))
       .y1(d => this.scales.cumul(d[1]))
 
     this.chart.select(".cumulated_consumption").datum(processed.used).attr("d", areaCumulCons)
@@ -187,21 +189,27 @@ export class Fronius extends component {
       .domain([new Date(this.anchor),new Date(this.anchor+86400000)])
 
     /* Scale for power (left axis) */
-    this.scales.Y = scaleLinear()
+    this.scales.base_Y = scaleLinear()
       .domain([0, global.MAX_POWER])
       .range([this.cfg.height - this.cfg.paddingBottom, this.cfg.paddingTop])
 
     /* Scale for cumulated energy (right axis) */
     this.scales.cumul = scaleLinear()
       .domain([0, global.MAX_DAILY_ENERGY])
-      .range(this.scales.Y.range())
+      .range(this.scales.base_Y.range())
 
     /* horizontal and vertical axes */
     this.axes=this.body.append("g")
     /* Chart element */
     this.chart = this.body.append("g")
+      // .attr("transform",`translate(${this.cfg.paddingLeft},0)`)
 
-    this.zooom = zoom().on("zoom", this.zoomer).on("end",()=>this.endzoom())
+    this.zooom = zoom()
+      .on("zoom", this.zoomer)
+      .on("end",()=>this.endzoom())
+      //.scaleExtent([1,Infinity])
+      //.translateExtent([[0,0],[this.cfg.width,this.cfg.height]])
+      // .extent([[0,0],[this.cfg.width,this.cfg.height]])
     this.chart.call(this.zooom)
 
 
@@ -215,10 +223,11 @@ export class Fronius extends component {
       .call(this.xaxis)
 
     /* left y-axis */
-    const yAxis = axisLeft().scale(this.scales.Y)
+    this.yaxis = axisLeft().scale(this.scales.base_Y)
     this.axes.append('g')
+      .classed("yaxis",true)
       .attr("transform", `translate(${this.cfg.paddingLeft},0)`)
-      .call(yAxis)
+      .call(this.yaxis)
 
     /* right y-axis */
     const raxis = axisRight().scale(this.scales.cumul)
@@ -302,8 +311,7 @@ export class Fronius extends component {
       })
 
     const summary = select(this.element).select(".summary")
-      .style("width", 60)
-    this.update_scales()
+      .attr("style", "width:100px")
     this.update()
   } // render
 
@@ -343,13 +351,13 @@ export class Fronius extends component {
     let x = event.transform.x
     let y = event.transform.y
     let k = event.transform.k
-    //console.log(event.transform.toString())
-
+    console.log(event.transform.toString())
+    let ev=event
     let transform=event.transform
-    let tr=`translate(${x},0) scale(${k})`
+    let tr=`scale(${k},1) translate(${x},0)`
     this.chart.attr("transform",tr)
 
-    this.update_scales()
+    this.update_scales(transform)
     /*
     let newscale=transform.rescaleX(this.scales.base_X)
     this.xaxis.scale(newscale)
@@ -363,13 +371,12 @@ export class Fronius extends component {
     this.update()
   }
 
-  update_scales(){
-    let transform=zoomTransform(this.chart.node())
+  update_scales(tra=null){
+    let transform=tra || zoomTransform(this.chart.node())
     let newscale=transform.rescaleX(this.scales.base_X)
     this.xaxis.scale(newscale)
     this.axes.select(".xaxis").call(this.xaxis)
     this.scales.X=newscale
-
   }
 
   gotMessage(msg) {

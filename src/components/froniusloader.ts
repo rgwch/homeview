@@ -5,6 +5,7 @@
 import global from '../globals'
 import {Util} from '../services/util'
 import {max, mean, merge, range} from 'd3-array'
+import {scaleLinear} from 'd3-scale'
 import {entries, key, values} from 'd3-collection'
 import environment from '../environment'
 import {Fronius} from './fronius'
@@ -14,8 +15,19 @@ const DEFAULT_RESOLUTION = 400000
 const resolution = 3600000 //400000
 
 export class FroniusLoader {
+  private linearScale
 
-  constructor(private fetcher:FetchClient){}
+  constructor(private fetcher:FetchClient){
+    const today=new Date()
+    today.setHours(0)
+    today.setMinutes(0)
+    today.setSeconds(0)
+    today.setMilliseconds(0)
+    const begin=today.getTime()-2*86400000
+    const end=today.getTime()+2*86400000
+    this.linearScale=scaleLinear().domain([begin/resolution,end/resolution]).range([0,10000])
+
+  }
   private data={
     [global.GRID_FLOW]: [],
     [global.ACT_POWER]: []
@@ -128,7 +140,7 @@ export class FroniusLoader {
     if(global.mock){
       let dummydata=(f,t)=>{
         return range(Math.round(f/resolution),Math.round(t/resolution)).map(item=>{
-          return [item*resolution,Math.random()*global.MAX_POWER]
+          return [item*resolution, this.linearScale(item)] // //Math.random()*global.MAX_POWER]
         })
       }
       return {
@@ -151,5 +163,8 @@ export class FroniusLoader {
 
       return ret
     }
+  }
+
+  makeLine(from:number,to:number){
   }
 }
