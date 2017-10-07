@@ -32,6 +32,7 @@ export class Fronius extends component {
   private axes
   private xaxis
   private yaxis
+  private sensitive
   private scales={
     base_X:null,
     base_Y:null,
@@ -203,8 +204,8 @@ export class Fronius extends component {
     this.chart = this.body.append("g")
       //.attr("transform",`translate(${this.owncfg.paddingLeft},0)`)
 
-    this.rectangle(this.chart,this.cfg.paddingLeft,0,this.cfg.width-this.cfg.paddingRight-this.cfg.paddingLeft,this.cfg.height-this.cfg.paddingBottom)
-      .attr("fill","#c8e8be")
+    this.sensitive=this.rectangle(this.chart,this.cfg.paddingLeft,0,this.cfg.width-this.cfg.paddingRight-this.cfg.paddingLeft,this.cfg.height-this.cfg.paddingBottom)
+      .attr("fill", "#e8e8e8")
 
     /* horizontal and vertical axes */
     this.axes=this.body.append("g")
@@ -221,7 +222,9 @@ export class Fronius extends component {
 
     /* X-Axis */
     this.xaxis = axisBottom().scale(this.scales.base_X)
+      .tickArguments([timeMinute.every(60)])
       .tickFormat(this.format)
+
     this.axes.append('g')
       .classed("xaxis", true)
       .attr("transform", `translate(0,${this.cfg.height - this.cfg.paddingBottom})`)
@@ -353,8 +356,10 @@ export class Fronius extends component {
     let k = event.transform.k
     // console.log(event.transform.toString())
     let transform=event.transform
-    let tr=`scale(${k},1) translate(${x},0)`
+    let tr=`translate(${x},0) scale(${k},1)`
     this.chart.attr("transform",tr)
+    this.sensitive.attr("transform",`translate(${x*-1},0)`)
+
     this.update_scales()
   }
 
