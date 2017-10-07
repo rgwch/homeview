@@ -20,7 +20,7 @@ import {entries, key, values} from 'd3-collection'
 
 
 export class Fronius extends component {
-
+  private owncfg
 
   component_name() {
     return "fronius_adapter"
@@ -78,7 +78,6 @@ export class Fronius extends component {
     }
   }
 
-  private zoomer = () => this.zoomed()
   private zooom
 
   /***
@@ -105,6 +104,7 @@ export class Fronius extends component {
     today.setSeconds(0)
     today.setMilliseconds(0)
     this.setAnchor(today.getTime())
+    this.owncfg=this.cfg
   }
 
 
@@ -112,12 +112,15 @@ export class Fronius extends component {
     /* use wait aspect while processing new data */
     select(this.element).select(".fronius_adapter").classed("wait", true)
 
+    // console.log("before: "+this.scales.X.domain()+", "+this.scales.X.range())
     this.update_scales()
+    console.log("after: "+this.scales.X.domain()+", "+this.scales.X.range())
+
     let bounds:[number,number] = this.getBounds()
-    console.log(new Date(bounds[0]) + ", " + new Date(bounds[1]))
 
     let processed = await this.loader.resample(bounds)
     // console.log(processed.PV.map(el=>{return[new Date(el[0]),el[1]]}))
+    console.log("first: "+new Date(processed.GRID[0][0])+", last: "+new Date(processed.GRID[processed.GRID.length-1][0]))
 
     /* Line Generator for time/power diagrams */
     const lineGrid = lineGenerator()
@@ -181,8 +184,6 @@ export class Fronius extends component {
    */
   async render() {
 
-
-
     /* scale for time (X-Axis) */
     this.scales.base_X = scaleTime()
       .range([this.cfg.paddingLeft, this.cfg.width - this.cfg.paddingRight])
@@ -200,17 +201,20 @@ export class Fronius extends component {
 
     /* Chart element */
     this.chart = this.body.append("g")
-    // .attr("transform",`translate(${this.cfg.paddingLeft},0)`)
+      //.attr("transform",`translate(${this.owncfg.paddingLeft},0)`)
+
+    this.rectangle(this.chart,this.cfg.paddingLeft,0,this.cfg.width-this.cfg.paddingRight-this.cfg.paddingLeft,this.cfg.height-this.cfg.paddingBottom)
+      .attr("fill","#c8e8be")
 
     /* horizontal and vertical axes */
     this.axes=this.body.append("g")
 
     this.zooom = zoom()
-      .on("zoom", this.zoomer)
+      .on("zoom", ()=>this.zoomed())
       .on("end",()=>this.endzoom())
       .scaleExtent([0.2,5])
       //.translateExtent([[0,0],[this.cfg.width,this.cfg.height]])
-      .extent([[0,0],[this.cfg.width,this.cfg.height]])
+      .extent([[this.cfg.paddingLeft,0],[this.cfg.width-this.cfg.paddingLeft-this.cfg.paddingRight,this.cfg.height-this.cfg.paddingBottom]])
     this.chart.call(this.zooom)
 
 
@@ -347,20 +351,11 @@ export class Fronius extends component {
     let x = event.transform.x
     let y = event.transform.y
     let k = event.transform.k
-    console.log(event.transform.toString())
-    let ev=event
+    // console.log(event.transform.toString())
     let transform=event.transform
     let tr=`scale(${k},1) translate(${x},0)`
-    //this.body.style("transform-origin","50 0")
     this.chart.attr("transform",tr)
-
-    this.update_scales(transform)
-    /*
-    let newscale=transform.rescaleX(this.scales.base_X)
-    this.xaxis.scale(newscale)
-    this.axes.select(".xaxis").call(this.xaxis)
-    this.scales.X=newscale
-  */
+    this.update_scales()
   }
 
   endzoom(){

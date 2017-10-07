@@ -12,7 +12,7 @@ import {Fronius} from './fronius'
 import {FetchClient} from "../services/fetchclient";
 
 const DEFAULT_RESOLUTION = 400000
-const resolution = 3600000 //400000
+const resolution = 400000 //3600000
 
 export class FroniusLoader {
   private linearScale
