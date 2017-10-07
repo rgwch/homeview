@@ -18,6 +18,7 @@ import {format} from 'd3-format'
 import {timeMinute} from 'd3-time'
 import {entries, key, values} from 'd3-collection'
 
+const MILLIS_PER_DAY=86400000
 
 export class Fronius extends component {
   private owncfg
@@ -113,15 +114,12 @@ export class Fronius extends component {
     /* use wait aspect while processing new data */
     select(this.element).select(".fronius_adapter").classed("wait", true)
 
-    // console.log("before: "+this.scales.X.domain()+", "+this.scales.X.range())
     this.update_scales()
-    console.log("after: "+this.scales.X.domain()+", "+this.scales.X.range())
 
     let bounds:[number,number] = this.getBounds()
 
+    // fetch data
     let processed = await this.loader.resample(bounds)
-    // console.log(processed.PV.map(el=>{return[new Date(el[0]),el[1]]}))
-    console.log("first: "+new Date(processed.GRID[0][0])+", last: "+new Date(processed.GRID[processed.GRID.length-1][0]))
 
     /* Line Generator for time/power diagrams */
     const lineGrid = lineGenerator()
@@ -150,9 +148,10 @@ export class Fronius extends component {
 
     /* Summary numbers */
     let round1f = format(".1f")
-    let consumation = round1f(processed.consumation / 3600000)
-    let production = round1f(processed.production / 3600000)
-    let self_consumation = round1f(processed.self_consumation / 3600000)
+    const toKwh=3600000
+    let consumation = round1f(processed.consumation / toKwh)
+    let production = round1f(processed.production / toKwh)
+    let self_consumation = round1f(processed.self_consumation / toKwh)
     let max_power = Math.round(max(processed.PV.map(x => x[1])))
     this.max_power = max_power + " W"
     this.percent_power = "(" + Math.round(max_power * 100 / global.MAX_POWER) + "%)"
@@ -160,8 +159,8 @@ export class Fronius extends component {
     this.consumation = consumation + " kWh"
     this.self_consumation = self_consumation + " kWh "
     this.percent = "(" + Math.round(self_consumation * 100 / production) + "%)"
-    this.imported = round1f(processed.imported / 3600000) + " kWh"
-    this.exported = round1f(processed.exported / 3600000) + " kWh"
+    this.imported = round1f(processed.imported / toKwh) + " kWh"
+    this.exported = round1f(processed.exported / toKwh) + " kWh"
     this.today = this.dayspec()
 
     /* summary rectangle */
@@ -185,15 +184,22 @@ export class Fronius extends component {
    */
   async render() {
 
+    const chart={
+      h: this.cfg.height-this.cfg.paddingBottom,
+      w: this.cfg.width-this.cfg.paddingLeft-this.cfg.paddingRight,
+      top: this.cfg.paddingTop,
+      left: this.cfg.paddingLeft
+    }
+
     /* scale for time (X-Axis) */
     this.scales.base_X = scaleTime()
       .range([this.cfg.paddingLeft, this.cfg.width - this.cfg.paddingRight])
-      .domain([new Date(this.anchor),new Date(this.anchor+86400000)])
+      .domain([new Date(this.anchor),new Date(this.anchor+MILLIS_PER_DAY)])
 
     /* Scale for power (left axis) */
     this.scales.base_Y = scaleLinear()
       .domain([0, global.MAX_POWER])
-      .range([this.cfg.height - this.cfg.paddingBottom, this.cfg.paddingTop])
+      .range([chart.h, chart.top])
 
     /* Scale for cumulated energy (right axis) */
     this.scales.cumul = scaleLinear()
@@ -204,7 +210,7 @@ export class Fronius extends component {
     this.chart = this.body.append("g")
       //.attr("transform",`translate(${this.owncfg.paddingLeft},0)`)
 
-    this.sensitive=this.rectangle(this.chart,this.cfg.paddingLeft,0,this.cfg.width-this.cfg.paddingRight-this.cfg.paddingLeft,this.cfg.height-this.cfg.paddingBottom)
+    this.sensitive=this.rectangle(this.chart,chart.left,0,chart.w, chart.h)
       .attr("fill", "#e8e8e8")
 
     /* horizontal and vertical axes */
@@ -215,7 +221,7 @@ export class Fronius extends component {
       .on("end",()=>this.endzoom())
       .scaleExtent([0.2,5])
       //.translateExtent([[0,0],[this.cfg.width,this.cfg.height]])
-      .extent([[this.cfg.paddingLeft,0],[this.cfg.width-this.cfg.paddingLeft-this.cfg.paddingRight,this.cfg.height-this.cfg.paddingBottom]])
+      .extent([[chart.left,0],[chart.w,chart.h]])
     this.chart.call(this.zooom)
 
 
@@ -227,14 +233,14 @@ export class Fronius extends component {
 
     this.axes.append('g')
       .classed("xaxis", true)
-      .attr("transform", `translate(0,${this.cfg.height - this.cfg.paddingBottom})`)
+      .attr("transform", `translate(0,${chart.h})`)
       .call(this.xaxis)
 
     /* left y-axis */
     this.yaxis = axisLeft().scale(this.scales.base_Y)
     this.axes.append('g')
       .classed("yaxis",true)
-      .attr("transform", `translate(${this.cfg.paddingLeft},0)`)
+      .attr("transform", `translate(${chart.left},0)`)
       .call(this.yaxis)
 
     /* right y-axis */
@@ -243,7 +249,7 @@ export class Fronius extends component {
 
     this.axes.append("g")
       .classed("raxis", true)
-      .attr("transform", `translate(${this.cfg.width - this.cfg.paddingRight},0)`)
+      .attr("transform", `translate(${chart.left+chart.w},0)`)
       .call(raxis)
 
 
@@ -291,7 +297,7 @@ export class Fronius extends component {
       .attr("ry", button_radius)
       .on("click", event => {
         this.update()
-        this.do_transform(100,1.0)
+        this.do_transform(chart.w,1.0)
         this.update()
       })
 
@@ -309,12 +315,13 @@ export class Fronius extends component {
       .attr("rx", button_radius)
       .attr("ry", button_radius)
       .on("click", (event) => {
-        this.do_transform(-100,1.0)
+        this.do_transform((chart.w)*-1,1.0)
         this.update()
       })
 
     const summary = select(this.element).select(".summary")
       .attr("style", "width:100px")
+
     this.update()
   } // render
 
