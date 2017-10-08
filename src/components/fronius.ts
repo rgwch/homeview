@@ -302,7 +302,7 @@ export class Fronius extends component {
       .attr("ry", button_radius)
       .on("click", event => {
         this.update()
-        this.do_transform(chart.w/3,1.0)
+        this.do_transform(chart.w/3)
         this.update()
       })
 
@@ -320,7 +320,7 @@ export class Fronius extends component {
       .attr("rx", button_radius)
       .attr("ry", button_radius)
       .on("click", (event) => {
-        this.do_transform((chart.w/3)*-1,1.0)
+        this.do_transform((chart.w/3)*-1)
         this.update()
       })
 
@@ -332,8 +332,6 @@ export class Fronius extends component {
       .attr("d",crosshair)
       .attr("stroke-linecap","round")
       .classed("navsymbol",true)
-    //this.line(reset,button_size/2,4,button_size/2,button_size-4, "navsymbol")
-    //this.line(reset, 4, button_size/2, button_size-4,button_size/2, "navsymbol")
 
     this.rectangle(reset,0,0,button_size,button_size)
       .classed("navbutton",true)
@@ -417,10 +415,12 @@ export class Fronius extends component {
     this.scales.X=newscale
   }
 
-  do_transform(offset,zoom){
+  do_transform(offset,zoom=null){
     const transform=zoomTransform(this.chart.node())
     this.zooom.translateBy(this.chart,offset===0 ? transform.x*-1 : offset,transform.y)
-    this.zooom.scaleTo(this.chart,zoom)
+    if(zoom) {
+      this.zooom.scaleTo(this.chart, zoom)
+    }
     this.update_scales()
 
   }
