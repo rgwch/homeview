@@ -279,9 +279,14 @@ export class Fronius extends component {
     const button_offs = Math.round(this.cfg.width / 40)
     const button_pos = Math.round((this.cfg.height / 2) - (button_size / 2))
     const button_radius = Math.round(button_size / 5)
+    const button_center = Math.round(button_size/2)
     const arrow_pos = Math.round(button_size / 3)
     const left_arrow: String = `${button_size - arrow_pos},${arrow_pos / 2} ${arrow_pos},${Math.round(button_size / 2)} ${button_size - arrow_pos},${button_size - arrow_pos / 2}`
     const right_arrow: String = `${arrow_pos},${arrow_pos / 2} ${button_size - arrow_pos},${Math.round(button_size / 2)} ${arrow_pos},${button_size - arrow_pos / 2}`
+    const cpadding=8
+    const crosshair= `M ${button_center} ${cpadding} L ${button_center} ${button_center-cpadding} 
+      M ${button_center} ${button_center+cpadding} L ${button_center} ${button_size-cpadding}
+      M ${cpadding} ${button_center} L ${button_center-cpadding} ${button_center} M ${button_center+cpadding} ${button_center} L ${button_size-cpadding} ${button_center}`
 
     /* Button for previous day */
     const prevDay = this.axes.append('g')
@@ -297,7 +302,7 @@ export class Fronius extends component {
       .attr("ry", button_radius)
       .on("click", event => {
         this.update()
-        this.do_transform(chart.w,1.0)
+        this.do_transform(chart.w/3,1.0)
         this.update()
       })
 
@@ -315,7 +320,27 @@ export class Fronius extends component {
       .attr("rx", button_radius)
       .attr("ry", button_radius)
       .on("click", (event) => {
-        this.do_transform((chart.w)*-1,1.0)
+        this.do_transform((chart.w/3)*-1,1.0)
+        this.update()
+      })
+
+    /* Button for reset */
+    const reset = this.axes.append("g")
+      .attr("transform",`translate(${this.cfg.width-this.cfg.paddingRight - button_offs - button_size}, ${this.cfg.paddingTop})`)
+
+    reset.append("svg:path")
+      .attr("d",crosshair)
+      .attr("stroke-linecap","round")
+      .classed("navsymbol",true)
+    //this.line(reset,button_size/2,4,button_size/2,button_size-4, "navsymbol")
+    //this.line(reset, 4, button_size/2, button_size-4,button_size/2, "navsymbol")
+
+    this.rectangle(reset,0,0,button_size,button_size)
+      .classed("navbutton",true)
+      .attr("rx",button_radius)
+      .attr("ry",button_radius)
+      .on("click", event=>{
+        this.do_transform(0,1.0)
         this.update()
       })
 
@@ -334,6 +359,15 @@ export class Fronius extends component {
       .attr("height", h)
   }
 
+  /* Helper to append a line */
+  private line(parent,x1,y1,x2,y2, clazz){
+    return parent.append("svg:line")
+      .attr("x1",x1)
+      .attr("x2",x2)
+      .attr("y1",y1)
+      .attr("y2",y2)
+      .classed(clazz,true)
+  }
 
   /**
    * Helper to append a String
@@ -365,7 +399,7 @@ export class Fronius extends component {
     let transform=event.transform
     let tr=`translate(${x},0) scale(${k},1)`
     this.chart.attr("transform",tr)
-    this.sensitive.attr("transform",`translate(${x*-1},0)`)
+    this.sensitive.attr("transform",`translate(${x*-1},0) scale(${k},1)`)
 
     this.update_scales()
   }
@@ -385,7 +419,8 @@ export class Fronius extends component {
 
   do_transform(offset,zoom){
     const transform=zoomTransform(this.chart.node())
-    this.zooom.translateBy(this.chart,offset,transform.y)
+    this.zooom.translateBy(this.chart,offset===0 ? transform.x*-1 : offset,transform.y)
+    this.zooom.scaleTo(this.chart,zoom)
     this.update_scales()
 
   }
