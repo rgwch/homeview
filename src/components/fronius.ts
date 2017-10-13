@@ -166,10 +166,11 @@ export class Fronius extends component {
     /* summary rectangle */
 
     const summary_table = select(this.element).select(".summary_table").node().getBoundingClientRect()
-    const summary_width = Math.max(summary_table.width + 40, this.cfg.width - this.cfg.paddingLeft - this.cfg.paddingRight)
+    const summary_width = Math.min(this.cfg.width,(summary_table.width + 40))
     const summary_height = Math.round(this.cfg.height / 3)
     const summary_left = this.cfg.width > 200 ? 100 : this.cfg.paddingLeft
     const font_size = summary_height / 12
+
     select(this.element).select(".summary")
       .classed("frame", true)
       .attr("style", `position:absolute;top:20px;left:${summary_left}px;width:${summary_width}px;height:${summary_height}px;font-size:${font_size}px;text-align:left`)
@@ -342,8 +343,29 @@ export class Fronius extends component {
         this.update()
       })
 
+    /*
     const summary = select(this.element).select(".summary")
-      .attr("style", "width:100px")
+      .style("width:100px")
+*/
+
+    /* text for axes */
+    const ly=chart.top
+    const scale_font=10
+    const lxl=chart.left+scale_font+5
+
+    this.axes.append("svg:text")
+      .text("Leistung (W)")
+      .attr("font-size",scale_font+"px")
+      .attr("text-anchor","end")
+      .attr("transform",`rotate(-90,${lxl},${ly}) translate(${lxl},${ly})`)
+
+    const lxt=chart.w+chart.left-scale_font
+    this.axes.append("svg:text")
+      .text("Energie (kWh)")
+      .attr("font-size",scale_font+"px")
+      .attr("text-anchor","end")
+      .attr("transform",`rotate(-90,${lxt},${ly}) translate(${lxt},${ly})`)
+
 
     this.update()
   } // render
