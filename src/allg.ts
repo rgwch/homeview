@@ -9,7 +9,6 @@ import {FetchClient} from './services/fetchclient'
 import {select, selectAll} from 'd3-selection'
 import {entries, keys, values} from 'd3-collection'
 import {PLATFORM} from 'aurelia-pal'
-import {Util} from './services/util'
 import globals from './globals'
 import {Layout} from './layout'
 
@@ -91,19 +90,21 @@ export class Allg {
       let nextRow = 0
       let y = 0
       let x = 0
-      let elemInRow=0
+      let elemInRow = 0
+
       function clearLine() {
         y = nextRow + 5
         nextRow = 0
         lastElem = undefined
         x = 0
-        elemInRow=0
+        elemInRow = 0
       }
-      elems.forEach((elem,index)=>{
-        let dom=select(`#${elem.id}`)
-        if(dom.size!=1 || elemInRow>numCols){
+
+      elems.forEach((elem, index) => {
+        let dom = select(`#${elem.id}`)
+        if (dom.size != 1 || elemInRow > numCols) {
           clearLine()
-        }else{
+        } else {
 
         }
       })
@@ -166,7 +167,7 @@ export class Allg {
           dom.attr("style", `left:${x}px;top:${y}px;`)
           lastElem = dom.node().getBoundingClientRect()
         } else {
-          nextRow=y+lastElem.height
+          nextRow = y + lastElem.height
           clearLine()
         }
       })

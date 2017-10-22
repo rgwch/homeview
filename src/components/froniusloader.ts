@@ -7,8 +7,6 @@ import {Util} from '../services/util'
 import {max, mean, merge, range} from 'd3-array'
 import {scaleLinear} from 'd3-scale'
 import {entries, key, values} from 'd3-collection'
-import environment from '../environment'
-import {Fronius} from './fronius'
 import {FetchClient} from "../services/fetchclient";
 
 const DEFAULT_RESOLUTION = 400000
@@ -17,17 +15,18 @@ const resolution = 400000 //3600000
 export class FroniusLoader {
   private linearScale
 
-  constructor(private fetcher:FetchClient){
-    const today=new Date()
+  constructor(private fetcher: FetchClient) {
+    const today = new Date()
     today.setHours(0)
     today.setMinutes(0)
     today.setSeconds(0)
     today.setMilliseconds(0)
-    const begin=today.getTime()-2*86400000
-    const end=today.getTime()+2*86400000
-    this.linearScale=scaleLinear().domain([begin/resolution,end/resolution]).range([0,10000])
+    const begin = today.getTime() - 2 * 86400000
+    const end = today.getTime() + 2 * 86400000
+    this.linearScale = scaleLinear().domain([begin / resolution, end / resolution]).range([0, 10000])
 
   }
+
   /**
    * Create a new dataset from PV and Grid samples
    * @param bounds upper and lower timestamp for new samples
@@ -35,7 +34,7 @@ export class FroniusLoader {
    *     number, consumation: number, self_consumation: number, imported: number, exported: number}}
    */
 
-  async resample(bounds:[number,number]) {
+  async resample(bounds: [number, number]) {
     // resolution of the samples. 3'600'000 = 1/h;
     // factor: 750
 
@@ -63,20 +62,21 @@ export class FroniusLoader {
       })
       return output
     }
+
     let input = await  this.getSeries(bounds[0], bounds[1])
 
 
     let result = {
-      PV              : resample_internal(input[global.ACT_POWER] || []),
-      GRID            : resample_internal(input[global.GRID_FLOW] || []),
-      DIFF            : [],
-      cumulated       : [],
-      used            : [],
-      production      : 0,
-      consumation     : 0,
+      PV: resample_internal(input[global.ACT_POWER] || []),
+      GRID: resample_internal(input[global.GRID_FLOW] || []),
+      DIFF: [],
+      cumulated: [],
+      used: [],
+      production: 0,
+      consumation: 0,
       self_consumation: 0,
-      imported        : 0,
-      exported        : 0
+      imported: 0,
+      exported: 0
     }
     let diff = result.DIFF
     let slotlength = resolution / 1000
@@ -112,22 +112,22 @@ export class FroniusLoader {
    */
   async getSeries(from: number, to: number) {
 
-    if(global.mock){
-      let dummydata=(f,t)=>{
-        return range(Math.round(f/resolution),Math.round(t/resolution)).map(item=>{
-          return [item*resolution, this.linearScale(item)] // //Math.random()*global.MAX_POWER]
+    if (global.mock) {
+      let dummydata = (f, t) => {
+        return range(Math.round(f / resolution), Math.round(t / resolution)).map(item => {
+          return [item * resolution, this.linearScale(item)] // //Math.random()*global.MAX_POWER]
         })
       }
       return {
-        [global.ACT_POWER]: dummydata(from,to),
-        [global.GRID_FLOW]: dummydata(from,to)
+        [global.ACT_POWER]: dummydata(from, to),
+        [global.GRID_FLOW]: dummydata(from, to)
       }
-    }else {
+    } else {
       const query = `select value from "${global.ACT_POWER}" where time >= ${from}ms and time < ${to}ms;
       select value from "${global.GRID_FLOW}" where time >= ${from}ms and time < ${to}ms`
       const sql = Util.urlencode(query)
       const raw = await this.fetcher.fetchJson(`${global.influx}/query?db=iobroker&epoch=ms&precision=ms&q=${sql}`)
-      const ret={}
+      const ret = {}
       raw.results.forEach(result => {
         if (result.series) {
           result.series.forEach(serie => {

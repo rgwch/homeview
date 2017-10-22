@@ -8,18 +8,19 @@ import global from './globals'
 import {FetchClient} from "./services/fetchclient"
 
 @autoinject
-export class Layout{
+export class Layout {
 
-  constructor(private fetch:FetchClient){}
+  constructor(private fetch: FetchClient) {
+  }
 
-  lightify=(id)=>this.do_lightify(id)
+  lightify = (id) => this.do_lightify(id)
 
-  private three_buttons_def= {
+  private three_buttons_def = {
     type: "button",
     map: {
-      1:0,
-      0:1,
-      2:2
+      1: 0,
+      0: 1,
+      2: 2
     },
     buttons: [
       {
@@ -34,11 +35,11 @@ export class Layout{
       }
     ]
   }
-  private two_buttons_def ={
+  private two_buttons_def = {
     type: "button",
-    map:{
-      1:1,
-      0:0
+    map: {
+      1: 1,
+      0: 0
     },
     buttons: [
       {
@@ -50,24 +51,40 @@ export class Layout{
       }
     ]
   }
-  treppenlicht=Object.assign({message: "treppenlicht_state",id:"treppenlicht",
-    val: global._stair_light_state,switch: global._stair_light_manual}, this.three_buttons_def)
-  tuerlicht=Object.assign({message: "tuerlicht_state", id:"tuerlicht",
-    val: global._door_light_state, switch: global._door_light_manual}, this.three_buttons_def)
-  fernsehlicht=Object.assign({message: "fernsehlicht_state", id:"fernsehlicht",
-    val:global._television_light_state, switch: global._television_light_manual}, this.three_buttons_def)
-  autolader=Object.assign({message: "auto_state", id:"auto_lader",
-    val: global._car_loader_state, switch: global._car_loader_manual}, this.three_buttons_def)
-  mediacenter=Object.assign({message: "mediacenter_state", id:"mediacenter",
-    val: global._mediacenter_state, switch: global._mediacenter_state}, this.two_buttons_def)
-  wlanext= Object.assign({message: "wlanextender_state", id:"wlanext",
-    val: global._wlan_state, switch: global._wlan_state}, this.two_buttons_def,{map:{0:0,1:1}})
-  esszimmer=Object.assign({message: "esszimmer_state", id: "esszimmer",
-    val: global._diningroom_light, statefun: this.lightify}, this.two_buttons_def)
-  korridor=Object.assign({message: "korridor_state", id: "korridor",
-    val: global._corridor_light, statefun: this.lightify},this.two_buttons_def )
+  treppenlicht = Object.assign({
+    message: "treppenlicht_state", id: "treppenlicht",
+    val: global._stair_light_state, switch: global._stair_light_manual
+  }, this.three_buttons_def)
+  tuerlicht = Object.assign({
+    message: "tuerlicht_state", id: "tuerlicht",
+    val: global._door_light_state, switch: global._door_light_manual
+  }, this.three_buttons_def)
+  fernsehlicht = Object.assign({
+    message: "fernsehlicht_state", id: "fernsehlicht",
+    val: global._television_light_state, switch: global._television_light_manual
+  }, this.three_buttons_def)
+  autolader = Object.assign({
+    message: "auto_state", id: "auto_lader",
+    val: global._car_loader_state, switch: global._car_loader_manual
+  }, this.three_buttons_def)
+  mediacenter = Object.assign({
+    message: "mediacenter_state", id: "mediacenter",
+    val: global._mediacenter_state, switch: global._mediacenter_state
+  }, this.two_buttons_def)
+  wlanext = Object.assign({
+    message: "wlanextender_state", id: "wlanext",
+    val: global._wlan_state, switch: global._wlan_state
+  }, this.two_buttons_def, {map: {0: 0, 1: 1}})
+  esszimmer = Object.assign({
+    message: "esszimmer_state", id: "esszimmer",
+    val: global._diningroom_light, statefun: this.lightify
+  }, this.two_buttons_def)
+  korridor = Object.assign({
+    message: "korridor_state", id: "korridor",
+    val: global._corridor_light, statefun: this.lightify
+  }, this.two_buttons_def)
 
-  outside_gauge= {
+  outside_gauge = {
     type: "gauge",
     message: "outside_data_update",
     id: "outside_climate",
@@ -95,11 +112,11 @@ export class Layout{
     },
       {from: 70, to: 75, color: "#ffd74c"}, {from: 75, to: 80, color: "#DC3912"}]
   }
-  livingroom_gauge= Object.assign({}, this.outside_gauge,
+  livingroom_gauge = Object.assign({}, this.outside_gauge,
     {
       message: "livingroom_data_update", upperMin: 16, upperMax: 30,
       id: "livingroom_climate",
-      vals:{
+      vals: {
         upper: global._livingroom_temp,
         lower: global._livingroom_humidity
       },
@@ -112,10 +129,10 @@ export class Layout{
       },
         {from: 60, to: 70, color: "#ffd74c"}, {from: 70, to: 80, color: "#DC3912"}]
     })
-  bathroom_gauge=Object.assign({}, this.livingroom_gauge, {
+  bathroom_gauge = Object.assign({}, this.livingroom_gauge, {
     message: "bathroom_data_update",
     id: "bathroom_climate",
-    vals:{
+    vals: {
       upper: global._bathroom_temp,
       lower: global._bathroom_humidity
     },
@@ -123,54 +140,58 @@ export class Layout{
       {from: 25, to: 30, color: "#DC3912"}]
   })
 
-  vertical_sensors={
+  vertical_sensors = {
     type: "gauge",
     height: 204,
     width: 53,
     padding: 10,
     suffix: "",
   }
-  light_sensor=Object.assign({},this.vertical_sensors,{
+  light_sensor = Object.assign({}, this.vertical_sensors, {
     id: "lightsensor_outside",
     message: "brightness_update",
     val: global._brightness,
     min: 0,
     max: 250,
     units: "Licht",
-    bands: [{from:0,to:110,color:"#3917b2"},{from:110,to:130,color:"#5884e5"},{from:130,to:250,color: "#18c5ff"}]
+    bands: [{from: 0, to: 110, color: "#3917b2"}, {from: 110, to: 130, color: "#5884e5"}, {
+      from: 130,
+      to: 250,
+      color: "#18c5ff"
+    }]
   })
-  pv_energy=Object.assign({}, this.vertical_sensors,{
+  pv_energy = Object.assign({}, this.vertical_sensors, {
     id: "sun_energy",
     message: "pv_energy_update",
     val: global.ACT_POWER,
     min: 0,
     max: 10000,
     units: "PV",
-    bands: [{from:0, to:10000,color: "yellow"}]
+    bands: [{from: 0, to: 10000, color: "yellow"}]
   })
-  energy_flow=Object.assign({},this.vertical_sensors,{
-    id:"energy_flow",
+  energy_flow = Object.assign({}, this.vertical_sensors, {
+    id: "energy_flow",
     message: "fronius_flow",
     val: global.GRID_FLOW,
     width: 53,
     min: 5000,
-    max:-5000,
+    max: -5000,
     units: "Netz",
-    bands: [{from: -5000,to:0,color: "green"},{from:0, to: 5000, color: "red"}]
+    bands: [{from: -5000, to: 0, color: "green"}, {from: 0, to: 5000, color: "red"}]
   })
-  fronius_cfg={
-    width: 4*210,
+  fronius_cfg = {
+    width: 4 * 210,
     height: 420,
-    id:"fronius_widget",
-    message:"fronius_msg"
+    id: "fronius_widget",
+    message: "fronius_msg"
   }
 
 
-  async do_lightify(id){
-    let values=await this.fetch.getValues([id+".on",id+".reachable"])
-    if(values[1]==0){
+  async do_lightify(id) {
+    let values = await this.fetch.getValues([id + ".on", id + ".reachable"])
+    if (values[1] == 0) {
       return false
-    }else{
+    } else {
       return values[0]
     }
   }

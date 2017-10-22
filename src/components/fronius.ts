@@ -4,27 +4,39 @@
  * to an influx database named "iobroker"
  */
 import global from '../globals'
+import {Component, Helper} from './helper'
 import {FroniusLoader} from './froniusloader'
-import {component} from "./component";
 import {event, select, Selection} from 'd3-selection'
 import 'd3-transition'
 import {scaleLinear, scaleTime} from "d3-scale";
 import {zoom, zoomTransform} from 'd3-zoom'
-import {area as areaGenerator, line as lineGenerator} from 'd3-shape'
+import {arc, area as areaGenerator, line as lineGenerator} from 'd3-shape'
 import {axisBottom, axisLeft, axisRight} from 'd3-axis'
 import {max, mean, merge, range} from 'd3-array'
 import {timeFormat, timeFormatLocale} from 'd3-time-format'
 import {format} from 'd3-format'
 import {timeMinute} from 'd3-time'
 import {entries, key, values} from 'd3-collection'
+import {autoinject, bindable} from 'aurelia-framework'
+import {EventAggregator} from "aurelia-event-aggregator"
+import {FetchClient} from '../services/fetchclient'
 
-const MILLIS_PER_DAY=86400000
 
-export class Fronius extends component {
+const MILLIS_PER_DAY = 86400000
+
+@autoinject
+export class Fronius implements Component {
+  @bindable cfg
   private owncfg
+  body
+  ea
+  element
 
-  component_name() {
-    return "fronius_adapter"
+  component_name = "fronius_adapter"
+
+  constructor(private fetcher: FetchClient, ea: EventAggregator, element: Element, private hlp: Helper) {
+    this.ea = ea
+    this.element = element
   }
 
   private loader = new FroniusLoader(this.fetcher)
@@ -34,11 +46,11 @@ export class Fronius extends component {
   private xaxis
   private yaxis
   private sensitive
-  private scales={
-    base_X:null,
-    base_Y:null,
+  private scales = {
+    base_X: null,
+    base_Y: null,
     X: null,
-    Y:null,
+    Y: null,
     cumul: null
   }
   private anchor
@@ -60,9 +72,9 @@ export class Fronius extends component {
     this.anchor = dAnchor.getTime()
   }
 
-  private getBounds():[number,number]{
-    let transform=zoomTransform(this.chart.node())
-    return this.scales.X.domain().map(d=>d.getTime())
+  private getBounds(): [number, number] {
+    let transform = zoomTransform(this.chart.node())
+    return this.scales.X.domain().map(d => d.getTime())
   }
 
 
@@ -82,17 +94,22 @@ export class Fronius extends component {
 
   private zooom
 
+  attached() {
+    this.hlp.check(this)
+  }
+
+
   /***
    * Configure the Widget
    */
   configure() {
     this.cfg = Object.assign({}, {
-      message      : "fronius_update",
-      id           : "fronius_adapter",
-      paddingLeft  : 50,
+      message: "fronius_update",
+      id: "fronius_adapter",
+      paddingLeft: 50,
       paddingBottom: 20,
-      paddingRight : 30,
-      paddingTop   : 20
+      paddingRight: 30,
+      paddingTop: 20
     }, this.cfg)
     if (this.cfg.width > window.innerWidth - this.cfg.paddingRight) {
       this.cfg.width = window.innerWidth - this.cfg.paddingRight
@@ -100,13 +117,13 @@ export class Fronius extends component {
     if (this.cfg.height > window.innerHeight - this.cfg.paddingBottom - this.cfg.paddingTop) {
       this.cfg.height = window.innerHeight - this.cfg.paddingBottom - this.cfg.paddingTop
     }
-    const today=new Date()
+    const today = new Date()
     today.setHours(0)
     today.setMinutes(0)
     today.setSeconds(0)
     today.setMilliseconds(0)
     this.setAnchor(today.getTime())
-    this.owncfg=this.cfg
+    this.owncfg = this.cfg
   }
 
 
@@ -116,7 +133,7 @@ export class Fronius extends component {
 
     this.update_scales()
 
-    let bounds:[number,number] = this.getBounds()
+    let bounds: [number, number] = this.getBounds()
 
     // fetch data
     let processed = await this.loader.resample(bounds)
@@ -148,7 +165,7 @@ export class Fronius extends component {
 
     /* Summary numbers */
     let round1f = format(".1f")
-    const toKwh=3600000
+    const toKwh = 3600000
     let consumation = round1f(processed.consumation / toKwh)
     let production = round1f(processed.production / toKwh)
     let self_consumation = round1f(processed.self_consumation / toKwh)
@@ -166,7 +183,7 @@ export class Fronius extends component {
     /* summary rectangle */
 
     const summary_table = select(this.element).select(".summary_table").node().getBoundingClientRect()
-    const summary_width = Math.min(this.cfg.width,(summary_table.width + 40))
+    const summary_width = Math.min(this.cfg.width, (summary_table.width + 40))
     const summary_height = Math.round(this.cfg.height / 3)
     const summary_left = this.cfg.width > 200 ? 100 : this.cfg.paddingLeft
     const font_size = summary_height / 12
@@ -185,9 +202,9 @@ export class Fronius extends component {
    */
   async render() {
 
-    const chart={
-      h: this.cfg.height-this.cfg.paddingBottom,
-      w: this.cfg.width-this.cfg.paddingLeft-this.cfg.paddingRight,
+    const chart = {
+      h: this.cfg.height - this.cfg.paddingBottom,
+      w: this.cfg.width - this.cfg.paddingLeft - this.cfg.paddingRight,
       top: this.cfg.paddingTop,
       left: this.cfg.paddingLeft
     }
@@ -195,7 +212,7 @@ export class Fronius extends component {
     /* scale for time (X-Axis) */
     this.scales.base_X = scaleTime()
       .range([this.cfg.paddingLeft, this.cfg.width - this.cfg.paddingRight])
-      .domain([new Date(this.anchor),new Date(this.anchor+MILLIS_PER_DAY)])
+      .domain([new Date(this.anchor), new Date(this.anchor + MILLIS_PER_DAY)])
 
     /* Scale for power (left axis) */
     this.scales.base_Y = scaleLinear()
@@ -209,22 +226,21 @@ export class Fronius extends component {
 
     /* Chart element */
     this.chart = this.body.append("g")
-      //.attr("transform",`translate(${this.owncfg.paddingLeft},0)`)
+    //.attr("transform",`translate(${this.owncfg.paddingLeft},0)`)
 
-    this.sensitive=this.rectangle(this.chart,chart.left,0,chart.w, chart.h)
+    this.sensitive = this.hlp.rectangle(this.chart, chart.left, 0, chart.w, chart.h)
       .attr("fill", "#e8e8e8")
 
     /* horizontal and vertical axes */
-    this.axes=this.body.append("g")
+    this.axes = this.body.append("g")
 
     this.zooom = zoom()
-      .on("zoom", ()=>this.zoomed())
-      .on("end",()=>this.endzoom())
-      .scaleExtent([0.2,5])
+      .on("zoom", () => this.zoomed())
+      .on("end", () => this.endzoom())
+      .scaleExtent([0.2, 5])
       //.translateExtent([[0,0],[this.cfg.width,this.cfg.height]])
-      .extent([[chart.left,0],[chart.w,chart.h]])
+      .extent([[chart.left, 0], [chart.w, chart.h]])
     this.chart.call(this.zooom)
-
 
 
     /* X-Axis */
@@ -240,7 +256,7 @@ export class Fronius extends component {
     /* left y-axis */
     this.yaxis = axisLeft().scale(this.scales.base_Y)
     this.axes.append('g')
-      .classed("yaxis",true)
+      .classed("yaxis", true)
       .attr("transform", `translate(${chart.left},0)`)
       .call(this.yaxis)
 
@@ -250,9 +266,8 @@ export class Fronius extends component {
 
     this.axes.append("g")
       .classed("raxis", true)
-      .attr("transform", `translate(${chart.left+chart.w},0)`)
+      .attr("transform", `translate(${chart.left + chart.w},0)`)
       .call(raxis)
-
 
 
     /* power consumation diagram */
@@ -274,20 +289,20 @@ export class Fronius extends component {
       .classed("cumulated_consumption", true)
 
 
-
     /* Buttons */
     const button_size = Math.round(this.cfg.height / 8)
     const button_offs = Math.round(this.cfg.width / 40)
     const button_pos = Math.round((this.cfg.height / 2) - (button_size / 2))
     const button_radius = Math.round(button_size / 5)
-    const button_center = Math.round(button_size/2)
+    const button_center = Math.round(button_size / 2)
     const arrow_pos = Math.round(button_size / 3)
     const left_arrow: String = `${button_size - arrow_pos},${arrow_pos / 2} ${arrow_pos},${Math.round(button_size / 2)} ${button_size - arrow_pos},${button_size - arrow_pos / 2}`
     const right_arrow: String = `${arrow_pos},${arrow_pos / 2} ${button_size - arrow_pos},${Math.round(button_size / 2)} ${arrow_pos},${button_size - arrow_pos / 2}`
-    const cpadding=8
-    const crosshair= `M ${button_center} ${cpadding} L ${button_center} ${button_center-cpadding} 
-      M ${button_center} ${button_center+cpadding} L ${button_center} ${button_size-cpadding}
-      M ${cpadding} ${button_center} L ${button_center-cpadding} ${button_center} M ${button_center+cpadding} ${button_center} L ${button_size-cpadding} ${button_center}`
+    const cpadding = 8
+    const crosshair = `M ${button_center} ${cpadding} L ${button_center} ${button_center - cpadding} 
+      M ${button_center} ${button_center + cpadding} L ${button_center} ${button_size - cpadding}
+      M ${cpadding} ${button_center} L ${button_center - cpadding} ${button_center} M ${button_center + cpadding} ${button_center} 
+      L ${button_size - cpadding} ${button_center}`
 
     /* Button for previous day */
     const prevDay = this.axes.append('g')
@@ -297,13 +312,13 @@ export class Fronius extends component {
       .classed("navsymbol", true)
       .attr("points", left_arrow)    //"30,12 10,25 30,40")
 
-    this.rectangle(prevDay, 0, 0, button_size, button_size)
+    this.hlp.rectangle(prevDay, 0, 0, button_size, button_size)
       .classed("navbutton", true)
       .attr("rx", button_radius)
       .attr("ry", button_radius)
       .on("click", event => {
         this.update()
-        this.do_transform(chart.w/3)
+        this.do_transform(chart.w / 3)
         this.update()
       })
 
@@ -316,30 +331,30 @@ export class Fronius extends component {
       .classed("navsymbol", true)
       .attr("points", right_arrow)
 
-    this.rectangle(nextDay, 0, 0, button_size, button_size)
+    this.hlp.rectangle(nextDay, 0, 0, button_size, button_size)
       .classed("navbutton", true)
       .attr("rx", button_radius)
       .attr("ry", button_radius)
       .on("click", (event) => {
-        this.do_transform((chart.w/3)*-1)
+        this.do_transform((chart.w / 3) * -1)
         this.update()
       })
 
     /* Button for reset */
     const reset = this.axes.append("g")
-      .attr("transform",`translate(${this.cfg.width-this.cfg.paddingRight - button_offs - button_size}, ${this.cfg.paddingTop})`)
+      .attr("transform", `translate(${this.cfg.width - this.cfg.paddingRight - button_offs - button_size}, ${this.cfg.paddingTop})`)
 
     reset.append("svg:path")
-      .attr("d",crosshair)
-      .attr("stroke-linecap","round")
-      .classed("navsymbol",true)
+      .attr("d", crosshair)
+      .attr("stroke-linecap", "round")
+      .classed("navsymbol", true)
 
-    this.rectangle(reset,0,0,button_size,button_size)
-      .classed("navbutton",true)
-      .attr("rx",button_radius)
-      .attr("ry",button_radius)
-      .on("click", event=>{
-        this.do_transform(0,1.0)
+    this.hlp.rectangle(reset, 0, 0, button_size, button_size)
+      .classed("navbutton", true)
+      .attr("rx", button_radius)
+      .attr("ry", button_radius)
+      .on("click", event => {
+        this.do_transform(0, 1.0)
         this.update()
       })
 
@@ -349,44 +364,36 @@ export class Fronius extends component {
 */
 
     /* text for axes */
-    const ly=chart.top
-    const scale_font=10
-    const lxl=chart.left+scale_font+5
+    const ly = chart.top
+    const scale_font = 10
+    const lxl = chart.left + scale_font + 5
 
     this.axes.append("svg:text")
       .text("Leistung (W)")
-      .attr("font-size",scale_font+"px")
-      .attr("text-anchor","end")
-      .attr("transform",`rotate(-90,${lxl},${ly}) translate(${lxl},${ly})`)
+      .attr("font-size", scale_font + "px")
+      .attr("text-anchor", "end")
+      .attr("transform", `rotate(-90,${lxl},${ly}) translate(${lxl},${ly})`)
 
-    const lxt=chart.w+chart.left-scale_font
+    const lxt = chart.w + chart.left - scale_font
     this.axes.append("svg:text")
       .text("Energie (kWh)")
-      .attr("font-size",scale_font+"px")
-      .attr("text-anchor","end")
-      .attr("transform",`rotate(-90,${lxt},${ly}) translate(${lxt},${ly})`)
+      .attr("font-size", scale_font + "px")
+      .attr("text-anchor", "end")
+      .attr("transform", `rotate(-90,${lxt},${ly}) translate(${lxt},${ly})`)
 
 
     this.update()
   } // render
 
-  /* Helper to append a rectangle */
-  private rectangle(parent, x, y, w, h) {
-    return parent.append("svg:rect")
-      .attr("x", x)
-      .attr("y", y)
-      .attr("width", w)
-      .attr("height", h)
-  }
 
   /* Helper to append a line */
-  private line(parent,x1,y1,x2,y2, clazz){
+  private line(parent, x1, y1, x2, y2, clazz) {
     return parent.append("svg:line")
-      .attr("x1",x1)
-      .attr("x2",x2)
-      .attr("y1",y1)
-      .attr("y2",y2)
-      .classed(clazz,true)
+      .attr("x1", x1)
+      .attr("x2", x2)
+      .attr("y1", y1)
+      .attr("y2", y2)
+      .classed(clazz, true)
   }
 
   /**
@@ -416,39 +423,39 @@ export class Fronius extends component {
     let y = event.transform.y
     let k = event.transform.k
     // console.log(event.transform.toString())
-    let transform=event.transform
-    let tr=`translate(${x},0) scale(${k},1)`
-    this.chart.attr("transform",tr)
-    this.sensitive.attr("transform",`translate(${x*-1},0) scale(${k},1)`)
+    let transform = event.transform
+    let tr = `translate(${x},0) scale(${k},1)`
+    this.chart.attr("transform", tr)
+    this.sensitive.attr("transform", `translate(${x * -1},0) scale(${k},1)`)
 
     this.update_scales()
   }
 
-  endzoom(){
-    console.log("Endzoom "+event.transform)
+  endzoom() {
+    console.log("Endzoom " + event.transform)
     this.update()
   }
 
-  update_scales(tra=null){
-    let transform=tra || zoomTransform(this.chart.node())
-    let newscale=transform.rescaleX(this.scales.base_X)
+  update_scales(tra = null) {
+    let transform = tra || zoomTransform(this.chart.node())
+    let newscale = transform.rescaleX(this.scales.base_X)
     this.xaxis.scale(newscale)
     this.axes.select(".xaxis").call(this.xaxis)
-    this.scales.X=newscale
+    this.scales.X = newscale
   }
 
-  do_transform(offset,zoom=null){
-    const transform=zoomTransform(this.chart.node())
-    this.zooom.translateBy(this.chart,offset===0 ? transform.x*-1 : offset,transform.y)
-    if(zoom) {
+  do_transform(offset, zoom = null) {
+    const transform = zoomTransform(this.chart.node())
+    this.zooom.translateBy(this.chart, offset === 0 ? transform.x * -1 : offset, transform.y)
+    if (zoom) {
       this.zooom.scaleTo(this.chart, zoom)
     }
     this.update_scales()
 
   }
+
   gotMessage(msg) {
 
   }
-
 
 }

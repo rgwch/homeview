@@ -1,4 +1,3 @@
-
 export class Util {
 
   /* Returns a function, that, as long as it continues to be invoked, will not
@@ -25,9 +24,9 @@ export class Util {
    */
   static debounce(func, wait, scope) {
     var timeout;
-    return function() {
+    return function () {
       var context = scope || this, args = arguments;
-      var later = function() {
+      var later = function () {
         timeout = null;
         func.apply(context, args);
       };
@@ -47,14 +46,14 @@ export class Util {
     threshold || (threshold = 250);
     var last, deferTimer;
 
-    return function(arg={}) {
+    return function (arg = {}) {
       var context = scope || this;
       var now = +new Date, args = arguments;
 
       if (last && now < last + threshold) {
         // Hold on to it
         clearTimeout(deferTimer);
-        deferTimer = setTimeout(function() {
+        deferTimer = setTimeout(function () {
           last = now;
           fn.apply(context, args);
         }, threshold);
@@ -64,6 +63,7 @@ export class Util {
       }
     };
   }
+
   /**
    * taken and modified from
    * https://www.npmjs.com/package/x-www-form-urlencode

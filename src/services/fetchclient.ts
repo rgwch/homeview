@@ -15,7 +15,7 @@ const KNOWN_SOURCES = [
   {s: "humid", l: 20, u: 80},
   {s: "energy", l: 1000, u: 100000},
   {s: "power", l: 0, u: 10000},
-  {s: "012", l:0, u:2}
+  {s: "012", l: 0, u: 2}
 ]
 
 export class FetchClient {
@@ -33,7 +33,7 @@ export class FetchClient {
           return false
         }
       })
-      let r=Math.random()
+      let r = Math.random()
       return Math.round((r * (upper - lower) + lower) * 10) / 10
     }
     else {
@@ -42,22 +42,24 @@ export class FetchClient {
     }
   }
 
-  public async fetchJson(url){
+  public async fetchJson(url) {
     let result = await fetch(url)
     return (await result.json())
   }
 
-  public async getValue(id:String):Promise<any>{
+  public async getValue(id: String): Promise<any> {
     return this.fetchValue(`${globals.iobroker}/get/${id}`)
   }
 
-  public async getValues(ids:Array<String>):Promise<Array<any>>{
-    return Promise.all(ids.map(id=>{return this.getValue(id)})).then(result=>{
+  public async getValues(ids: Array<String>): Promise<Array<any>> {
+    return Promise.all(ids.map(id => {
+      return this.getValue(id)
+    })).then(result => {
       return result
     })
   }
 
-  fakeSeries(start, end, lower, upper){
-    return range(start,end,30000).map(elem=>[elem,Math.round(Math.random()*(upper-lower)+lower)])
+  fakeSeries(start, end, lower, upper) {
+    return range(start, end, 30000).map(elem => [elem, Math.round(Math.random() * (upper - lower) + lower)])
   }
 }

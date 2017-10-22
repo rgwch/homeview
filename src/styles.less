@@ -8,7 +8,7 @@ h3 {
 }
 
 svg {
-  .power_prod{
+  .power_prod {
     stroke: blue;
     stroke-width: 1.0;
     fill: none;
@@ -18,85 +18,89 @@ svg {
     stroke-width: 0.8;
     fill: none;
   }
-  .cumulated_energy{
+  .cumulated_energy {
     stroke: green;
     stroke-width: 0.8;
     fill: #c7e9b2;
     opacity: 0.25;
   }
-  .cumulated_consumption{
+  .cumulated_consumption {
     stroke: #aa0000;
     stroke-width: 0.4;
     fill: #f7cea7;
     opacity: 0.25;
   }
-  .navbutton{
+  .navbutton {
     fill: #a1a1a1;
     opacity: 0.6;
   }
-  .navsymbol{
+  .navsymbol {
     stroke: #1111aa;
     stroke-width: 8;
     fill: none;
     opacity: 0.4;
   }
+  .pointer {
+    stroke: #ff0000;
+    fill: #ff1100;
+    opacity: 0.8;
+  }
 }
 
-
-.wait{
+.wait {
   cursor: wait;
   opacity: 0.4;
 }
-.frame{
+
+.frame {
   border: 5px solid @bordercolor;
   border-radius: 5px;
   fill: #d6ff88;
-  background-color: lighten(@fillcolor,20%);
+  background-color: lighten(@fillcolor, 20%);
   opacity: 0.8;
   stroke: black;
   stroke-width: 1;
-  padding:5px;
+  padding: 5px;
 }
 
-.halftile{
+.halftile {
   border: 2px inset @bordercolor;
   border-radius: 5px;
   margin: 5px;
   padding: 5px;
   position: absolute;
-  text-align:center;
+  text-align: center;
   color: @captioncolor;
-  background-color: lighten(@fillcolor,10%);
-  font-size:18px;
+  background-color: lighten(@fillcolor, 10%);
+  font-size: 18px;
 }
 
-.tile{
+.tile {
   .halftile;
   width: 205px;
 }
 
-.inner{
+.inner {
   fill: @fillcolor;
   stroke: @strokecolor;
   stroke-width: 0.6;
 }
 
-.white{
+.white {
   fill: #e1e1e1;
   stroke: @strokecolor;
   stroke-width: 0.6
 }
 
-
-.flat_button{
+.flat_button {
   margin: 3px !important;
 }
 
-.light_on{
+.light_on {
   background: yellow;
 }
 
-.light_off{
+.light_off {
   background: #d3d3d3;
 }
 

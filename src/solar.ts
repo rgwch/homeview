@@ -30,9 +30,10 @@ export class Solar {
   private x
   private width
   private resizing = false
-  private timer=null
+  private timer = null
 
-  constructor(private fetcher:FetchClient){}
+  constructor(private fetcher: FetchClient) {
+  }
 
   private update_dimensions() {
     if (!this.resizing) {
@@ -53,11 +54,11 @@ export class Solar {
     }
   }
 
-  detached(){
-    if(this.timer!=null){
+  detached() {
+    if (this.timer != null) {
       clearTimeout(this.timer)
     }
-    this.timer=null
+    this.timer = null
   }
 
   attached() {
@@ -87,7 +88,7 @@ export class Solar {
       .attr("x", padding + 5)
       .attr("y", 25)
 
-    this.timer=setInterval(() => {
+    this.timer = setInterval(() => {
       this.update()
     }, 10000)
 
@@ -100,13 +101,13 @@ export class Solar {
 
   async update() {
 
-    const power= await this.fetcher.fetchValue(`${globals.iobroker}/get/${globals.ACT_POWER}`)
+    const power = await this.fetcher.fetchValue(`${globals.iobroker}/get/${globals.ACT_POWER}`)
     this.update_dimensions()
     let bar = d3sel.select("#power_bar")
     bar.attr("width", this.x(power) - this.x(0))
     let text = d3sel.select("#textval")
     text.text(`${power} Watt`)
-    const day=await this.fetcher.fetchValue(`${globals.iobroker}/get/${globals.DAY_ENERGY}`)
+    const day = await this.fetcher.fetchValue(`${globals.iobroker}/get/${globals.DAY_ENERGY}`)
     this.day_energy = format(day / 1000)
     const year = await this.fetcher.fetchValue(`${globals.iobroker}/get/${globals.YEAR_ENERGY}`)
     this.year_energy = format(year / 1000)

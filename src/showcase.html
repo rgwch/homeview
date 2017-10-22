@@ -1,13 +1,20 @@
 <template>
-  <require from="./components/doublegauge"></require>
-  <require from="./components/multiswitch"></require>
+  <require from="components/circulargauge"></require>
+  <require from="components/doublegauge"></require>
+  <require from="components/fronius"></require>
+  <require from="components/multiswitch"></require>
   <require from="components/lineargauge"></require>
   <require from="components/verticalgauge"></require>
   <require from="components/lcd7segm"></require>
-  <require from="./components/lcdclock"></require>
-  <require from="./components/fronius"></require>
+  <require from="components/lcdclock"></require>
+  <require from="components/threewayswitch"></require>
+
   <div class="container">
     <div class="row">
+      <div class="col-sm-3">
+        <h3>Circular Gauge</h3>
+        <circulargauge cfg.bind="circular" class="tile"></circulargauge>
+      </div>
       <div class="col-sm-3">
         <h2>Doublegauge</h2>
         <doublegauge cfg.bind="doubleg"></doublegauge>
@@ -20,6 +27,8 @@
         <h2>Linear Gauge</h2>
         <lineargauge cfg.bind="linear"></lineargauge>
       </div>
+    </div>
+    <div class="row">
       <div class="col-sm-3">
         <h2>Vertical Gauge</h2>
         <verticalgauge cfg.bind="vertical"></verticalgauge>
@@ -32,10 +41,18 @@
         <h3>LCD Clock</h3>
         <lcdclock cfg.bind="clock" class="tile"></lcdclock>
       </div>
-      <div class="col-xs-12">
+      <div class="col-sm-3">
+        <h3>Threeway switch</h3>
+        <threewayswitch cfg.bind="tws"></threewayswitch>
+      </div>
+
+    </div>
+    <div class="row">
+      <div class="col-sm-12">
         <h3>Fronius</h3>
         <fronius class="halftile" cfg.bind="fronius"></fronius>
       </div>
+
     </div>
   </div>
 </template>

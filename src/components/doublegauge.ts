@@ -2,14 +2,13 @@
  * Homeview -  a simple frontend for a smarthome system
  * (c) 2017 by G. Weirich
  */
-
+import {Component, Helper} from './helper'
 import {autoinject, bindable, noView} from 'aurelia-framework';
 import {EventAggregator} from "aurelia-event-aggregator"
 import {scaleLinear} from "d3-scale";
-import {select,Selection} from 'd3-selection'
-import {arc} from 'd3-shape'
+import {select, Selection} from 'd3-selection'
 import 'd3-transition'
-import {component} from "./component";
+import {arc} from 'd3-shape'
 
 
 const MIN_VALUE = 15
@@ -17,8 +16,9 @@ const MAX_VALUE = 165
 
 @autoinject
 @noView
-export class Doublegauge extends component{
+export class Doublegauge implements Component {
   @bindable cfg
+  body: Selection
   private upperScale
   private lowerScale
   private upperArrow
@@ -26,14 +26,15 @@ export class Doublegauge extends component{
   private upperValue
   private lowerValue
   private arcsize = 15
-  component_name(){
-    return "Doublegauge"
+  component_name = "Doublegauge"
+
+  constructor(public element: Element, public ea: EventAggregator, private hlp: Helper) {
   }
 
-
-  gotMessage(msg){
-    this.redraw(msg.upper,msg.lower)
+  gotMessage(msg) {
+    this.redraw(msg.upper, msg.lower)
   }
+
   /**
    * Configure the component with reasonable defaults. So, the application
    * needs only to change presets which are different from the default.
@@ -87,37 +88,28 @@ export class Doublegauge extends component{
    * Initial display of the component
    */
   render() {
-    // create unique id and attach SVG container
-    /*
-    this.element.id = "dg_" + this.cfg.message
-    this.body = select("#" + this.element.id).append("svg:svg")
-      .attr("class", "doublegauge")
-      .attr("width", this.cfg.size)
-      .attr("height", this.cfg.size);
-*/
     // basic setup
-    this.rectangle(0, 0, this.cfg.size, this.cfg.size,
-      "black", "#a79ea3")
-    this.rectangle(5, 5, this.cfg.size - 10, this.cfg.size - 10,
-      "blue", "#d3d3d3")
+    this.hlp.rectangle(this.body, 0, 0, this.cfg.size, this.cfg.size, "frame")
+    this.hlp.rectangle(this.body, 5, 5, this.cfg.size - 10, this.cfg.size - 10,
+      "inner")
     let center = this.cfg.size / 2
     let size = (this.cfg.size / 2) * 0.9
 
     // create colored bands for the scales
     this.cfg.upperBands.forEach(band => {
-      this.arch(center, center, size - this.arcsize, size,
-        this.deg2rad(this.upperScale(band.from)),
-        this.deg2rad(this.upperScale(band.to)), band.color, 270)
+      this.hlp.arch(this.body, center, center, size - this.arcsize, size,
+        this.hlp.deg2rad(this.upperScale(band.from)),
+        this.hlp.deg2rad(this.upperScale(band.to)), band.color, 270)
     })
     this.cfg.lowerBands.forEach(band => {
-      this.arch(center, center, size - this.arcsize, size,
-        this.deg2rad(this.lowerScale(band.from)),
-        this.deg2rad(this.lowerScale(band.to)), band.color, 90)
+      this.hlp.arch(this.body, center, center, size - this.arcsize, size,
+        this.hlp.deg2rad(this.lowerScale(band.from)),
+        this.hlp.deg2rad(this.lowerScale(band.to)), band.color, 90)
     })
 
     // create the pointers, initial reading is 90° for both
     this.upperArrow = this.arrow(this.body, center, center,
-      center, center-size, "red")
+      center, center - size, "red")
     this.lowerArrow = this.arrow(this.body, center, center,
       center, center + size, "#0048ff")
 
@@ -193,33 +185,6 @@ export class Doublegauge extends component{
       .style("fill", "black")
   }
 
-  // helper to draw a rectangle
-  rectangle(x, y, w, h, stroke, fill) {
-    this.body.append("svg:rect")
-      .attr("x", x)
-      .attr("y", y)
-      .attr("width", w)
-      .attr("height", h)
-      .attr("stroke", stroke)
-      .attr("fill", fill)
-      .attr("stroke-width", "1")
-  }
-
-  // helper to draw and position an arch
-  arch(x, y, inner, outer, start, end, color, rotation) {
-    let gen = arc()
-      .startAngle(start)
-      .endAngle(end)
-      .innerRadius(inner)
-      .outerRadius(outer)
-    this.body.append("svg:path")
-      .style("fill", color)
-      .attr("d", gen)
-      .attr("transform", () => {
-        return `translate(${x},${y}) rotate(${rotation})`
-      })
-  }
-
   // helper to draw a pointer
   arrow(parent, cx, cy, x, y, color) {
     return parent.append("svg:line")
@@ -231,15 +196,11 @@ export class Doublegauge extends component{
       .attr("stroke-width", 2)
   }
 
-  // helper to convert degrees into radiants
-  deg2rad(deg) {
-    return deg * Math.PI / 180
-  }
 
   // helper to convert a value to coordinates
   valueToPoint(value, factor, scale) {
     let arc = scale(value)
-    let rad = this.deg2rad(arc)
+    let rad = this.hlp.deg2rad(arc)
     let r = ((this.cfg.size / 2) * 0.9 - this.arcsize) * factor
     let x = r * Math.cos(rad)
     let y = r * Math.sin(rad)
@@ -254,20 +215,26 @@ export class Doublegauge extends component{
   redraw(top, bottom) {
     let center = this.cfg.size / 2
     let size = (this.cfg.size / 2) * 0.9
-    let factor=size/(size-this.arcsize)-0.05
-    let tpos=this.valueToPoint(top,factor,this.upperScale)
-    let bpos=this.valueToPoint(bottom,1.2,this.lowerScale)
+    let factor = size / (size - this.arcsize) - 0.05
+    let tpos = this.valueToPoint(top, factor, this.upperScale)
+    let bpos = this.valueToPoint(bottom, 1.2, this.lowerScale)
     this.upperArrow
       .transition()
       .duration(400)
-      .attr("x2",center-tpos.x)
-      .attr("y2",center-tpos.y)
+      .attr("x2", center - tpos.x)
+      .attr("y2", center - tpos.y)
     this.lowerArrow
       .transition()
       .duration(400)
-      .attr("x2",center+bpos.x)
-      .attr("y2",center+bpos.y)
+      .attr("x2", center + bpos.x)
+      .attr("y2", center + bpos.y)
     this.upperValue.text(top + this.cfg.upperSuffix)
     this.lowerValue.text(bottom + this.cfg.lowerSuffix)
   }
+
+  attached() {
+    this.hlp.check(this)
+  }
+
+
 }
