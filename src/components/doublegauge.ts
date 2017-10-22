@@ -3,7 +3,7 @@
  * (c) 2017 by G. Weirich
  */
 
-import {autoinject, bindable} from 'aurelia-framework';
+import {autoinject, bindable, noView} from 'aurelia-framework';
 import {EventAggregator} from "aurelia-event-aggregator"
 import {scaleLinear} from "d3-scale";
 import {select,Selection} from 'd3-selection'
@@ -16,6 +16,7 @@ const MIN_VALUE = 15
 const MAX_VALUE = 165
 
 @autoinject
+@noView
 export class Doublegauge extends component{
   @bindable cfg
   private upperScale

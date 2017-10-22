@@ -3,7 +3,7 @@
  * (c) 2017 by G. Weirich
  */
 
-import {autoinject, bindable} from 'aurelia-framework';
+import {autoinject, bindable, noView} from 'aurelia-framework';
 import {EventAggregator} from "aurelia-event-aggregator"
 import {scaleLinear} from "d3-scale";
 import {select, Selection} from 'd3-selection'
@@ -11,7 +11,8 @@ import 'd3-transition'
 
 const FRAMEWIDTH=5
 
-@autoinject()
+@autoinject
+@noView
 export class Lineargauge{
   @bindable cfg
   private scale

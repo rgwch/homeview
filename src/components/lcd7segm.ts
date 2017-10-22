@@ -3,13 +3,14 @@
  * (c) 2017 by G. Weirich
  */
 
-import {autoinject, bindable} from 'aurelia-framework';
+import {autoinject, bindable, noView} from 'aurelia-framework';
 import {EventAggregator} from "aurelia-event-aggregator"
 import {scaleLinear} from "d3-scale";
 import {select, Selection} from 'd3-selection'
 import 'd3-transition'
 
 @autoinject
+@noView
 export class Lcd7segm {
   @bindable cfg
   private body

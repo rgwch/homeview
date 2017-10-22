@@ -5,7 +5,9 @@
 
 import * as d3sel from 'd3-selection'
 import {component} from './component'
+import {noView} from 'aurelia-framework'
 
+@noView
 export class Threewayswitch extends component{
   component_name(): String {
     return "ThreeWaySwitch";
