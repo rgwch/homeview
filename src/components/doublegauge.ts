@@ -89,9 +89,7 @@ export class Doublegauge implements Component {
    */
   render() {
     // basic setup
-    this.hlp.rectangle(this.body, 0, 0, this.cfg.size, this.cfg.size, "frame")
-    this.hlp.rectangle(this.body, 5, 5, this.cfg.size - 10, this.cfg.size - 10,
-      "inner")
+    this.hlp.frame(this.body,this)
     let center = this.cfg.size / 2
     let size = (this.cfg.size / 2) * 0.9
 

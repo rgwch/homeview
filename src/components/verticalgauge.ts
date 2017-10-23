@@ -10,7 +10,6 @@ import {select, Selection} from 'd3-selection'
 import 'd3-transition'
 import {Component, Helper} from "./helper";
 
-const FRAMEWIDTH = 5
 const INDICATOR_FONT = 10
 
 @autoinject
@@ -49,11 +48,12 @@ export class Verticalgauge implements Component {
     }, this.cfg)
     const topspace = (this.cfg.height / INDICATOR_FONT)
     const bottomspace = this.cfg.units ? topspace : 0
-    this.scale = scaleLinear().domain([this.cfg.max, this.cfg.min]).range([FRAMEWIDTH + this.cfg.padding + topspace, this.cfg.height - FRAMEWIDTH - this.cfg.padding - bottomspace])
+    this.scale = scaleLinear().domain([this.cfg.max, this.cfg.min]).range([Helper.BORDER + this.cfg.padding + topspace, this.cfg.height - Helper.BORDER - this.cfg.padding - bottomspace])
     this.scale.clamp(true)
   }
 
   render() {
+    const FRAMEWIDTH=Helper.BORDER
     this.element.id = "vg_" + this.cfg.id
     this.body = select("#" + this.element.id).append("svg:svg")
       .attr("class", "verticalgauge")
@@ -61,8 +61,7 @@ export class Verticalgauge implements Component {
       .attr("height", this.cfg.height)
 
     // draw frame
-    this.rectangle(0, 0, this.cfg.width, this.cfg.height, "frame")
-    this.rectangle(FRAMEWIDTH, FRAMEWIDTH, this.cfg.width - 2 * FRAMEWIDTH, this.cfg.height - 2 * FRAMEWIDTH, "inner")
+    this.hlp.frame(this.body,this)
     this.body.append("svg:rect")
 
     const centerline = FRAMEWIDTH + 4
@@ -100,7 +99,7 @@ export class Verticalgauge implements Component {
     // value text
     let valueFontSize = (this.cfg.height / INDICATOR_FONT) * 0.6
     let center = FRAMEWIDTH + (this.cfg.width - FRAMEWIDTH) / 2
-    this.rectangle(FRAMEWIDTH, FRAMEWIDTH, this.cfg.width - 2 * FRAMEWIDTH, FRAMEWIDTH + INDICATOR_FONT + 2, "white")
+    this.hlp.rectangle(this.body,FRAMEWIDTH, FRAMEWIDTH, this.cfg.width - 2 * FRAMEWIDTH, FRAMEWIDTH + INDICATOR_FONT + 2, "white")
     this.value = this.body.append("svg:text")
       .attr("x", center)
       .attr("y", FRAMEWIDTH + 1 + valueFontSize)
@@ -112,7 +111,7 @@ export class Verticalgauge implements Component {
 
     // Unit text
     if (this.cfg.units) {
-      this.rectangle(FRAMEWIDTH, this.cfg.height - 2 * FRAMEWIDTH - INDICATOR_FONT - 4, this.cfg.width - 2 * FRAMEWIDTH, INDICATOR_FONT + 4 + FRAMEWIDTH, "white")
+      this.hlp.rectangle(this.body,FRAMEWIDTH, this.cfg.height - 2 * FRAMEWIDTH - INDICATOR_FONT - 4, this.cfg.width - 2 * FRAMEWIDTH, INDICATOR_FONT + 4 + FRAMEWIDTH, "white")
       this.body.append("svg:text")
         .attr("x", center - 2)
         .attr("y", this.cfg.height - INDICATOR_FONT)
@@ -124,15 +123,6 @@ export class Verticalgauge implements Component {
 
   }
 
-  // helper to add a rectangle
-  rectangle(x, y, w, h, clazz) {
-    this.body.append("svg:rect")
-      .attr("x", x)
-      .attr("y", y)
-      .attr("width", w)
-      .attr("height", h)
-      .classed(clazz, true)
-  }
 
   // helper to add a line
   line(x1, y1, x2, y2, color, width) {

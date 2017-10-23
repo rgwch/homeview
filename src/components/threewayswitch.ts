@@ -35,8 +35,8 @@ export class Threewayswitch implements Component {
   }
 
   render() {
-    this.rectangle(0, 0, this.cfg.width, this.cfg.height, "black", "#a79ea3")
-    this.rectangle(5, 5, this.cfg.width - 10, this.cfg.height - 10, "blue", "#d3d3d3")
+    this.hlp.rectangle(this.body,0, 0, this.cfg.width, this.cfg.height, "frame")
+    this.hlp.rectangle(this.body,5, 5, this.cfg.width - 10, this.cfg.height - 10, "inner")
     let x1 = 10
     let y1 = 10
     let x4 = this.cfg.width - 10

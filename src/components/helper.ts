@@ -1,6 +1,8 @@
 import {select, Selection} from 'd3-selection'
 import {arc} from 'd3-shape'
 
+
+
 export interface Component {
   configure()
 
@@ -16,6 +18,7 @@ export interface Component {
 }
 
 export class Helper {
+  static BORDER=5
   check(component: Component) {
     if (undefined == component.cfg) {
       console.log(`error! No configuration for ${component.component_name}`)
@@ -62,6 +65,13 @@ export class Helper {
   // helper to convert degrees into radiants
   deg2rad(deg) {
     return deg * Math.PI / 180
+  }
+
+  frame(parent,component:Component){
+    let w=component.cfg.width || component.cfg.size
+    let h=component.cfg.height || component.cfg.size
+    this.rectangle(parent,0,0,w,h,"frame")
+    this.rectangle(parent, Helper.BORDER,Helper.BORDER,w-2*Helper.BORDER,h-2*Helper.BORDER,"inner")
   }
 
 

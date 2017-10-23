@@ -15,6 +15,7 @@ export class Circulargauge implements Component{
   private scale;
   private arcsize;
   private pointer;
+  private rotation=360-(MAX_ANGLE-MIN_ANGLE)/2
   body
 
   constructor(public element: Element, public ea: EventAggregator, private hlp: Helper) {
@@ -29,49 +30,54 @@ export class Circulargauge implements Component{
     }, this.cfg)
     this.scale = scaleLinear().domain([this.cfg.min, this.cfg.max]).range([MIN_ANGLE, MAX_ANGLE])
     this.scale.clamp(true)
-    this.arcsize = this.cfg.size / 6
+    this.arcsize = this.cfg.size / 7
   }
 
   render() {
     // basic setup
     let dim = this.cfg.size
+    this.hlp.frame(this.body,this)
+    /*
     this.hlp.rectangle(this.body, 0, 0, dim, dim, "frame")
     this.hlp.rectangle(this.body, 5, 5, dim - 10, dim - 10,
       "inner")
+      */
     let center = dim / 2
     let size = (dim / 2) * 0.9
     let pointer_width = 10
     let pointer_base = 0.3
-    let pointer_stroke = `M ${center} ${center} 
-    L ${center + size * pointer_base} ${center + pointer_width / 2}
-    L ${center + size} ${center}
-    L ${center + size * pointer_base} ${center - pointer_width / 2}
+    let pointer_stroke= `M ${center-pointer_width/2} ${center} 
+    L ${center} ${center-size+this.arcsize}
+    L ${center+pointer_width/2} ${center}
+    L ${center} ${center+size*pointer_base}
     Z`
 
     this.cfg.bands.forEach(band => {
       this.hlp.arch(this.body, center, center, size - this.arcsize, size,
         this.hlp.deg2rad(this.scale(band.from)),
-        this.hlp.deg2rad(this.scale(band.to)), band.color, 360 - (MAX_ANGLE - MIN_ANGLE) / 2)
+        this.hlp.deg2rad(this.scale(band.to)), band.color, this.rotation)
     })
 
     this.pointer = this.body.append("g")
     this.pointer.append("svg:path")
       .attr("d", pointer_stroke)
       .classed("pointer", true)
+    this.pointer.append("svg:circle")
+      .attr("cx",center)
+      .attr("cy",center)
+      .attr("r",4)
 
     this.redraw(0)
   }
 
   redraw(newValue) {
+
     let center = this.cfg.size / 2
     let size = (this.cfg.size / 2) * 0.9
-    let factor = size / (size - this.arcsize) - 0.05
+    let vertical=(360-MAX_ANGLE)
+    let zero=vertical-MAX_ANGLE
     let arc = this.scale(newValue)
-    let rad = this.hlp.deg2rad(arc)
-    let r = ((this.cfg.size / 2) * 0.9 - this.arcsize) * factor
-    let x = r * Math.cos(rad)
-    let y = r * Math.sin(rad)
-    
+    this.pointer.attr("transform",`rotate(${this.rotation+arc},${center},${center})`)
   }
 
   gotMessage(any) {

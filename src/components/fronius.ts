@@ -201,7 +201,7 @@ export class Fronius implements Component {
    * @returns {Promise<void>}
    */
   async render() {
-
+    this.hlp.frame(this.body,this)
     const chart = {
       h: this.cfg.height - this.cfg.paddingBottom,
       w: this.cfg.width - this.cfg.paddingLeft - this.cfg.paddingRight,

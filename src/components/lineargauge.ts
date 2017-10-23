@@ -8,31 +8,27 @@ import {EventAggregator} from "aurelia-event-aggregator"
 import {scaleLinear} from "d3-scale";
 import {select, Selection} from 'd3-selection'
 import 'd3-transition'
+import {Helper,Component} from './helper'
 
-const FRAMEWIDTH = 5
 
 @autoinject
 @noView
-export class Lineargauge {
+export class Lineargauge implements Component {
   @bindable cfg
+  readonly component_name="Lineargauge"
   private scale
-  private body
+  body
   private indicator
   private value
 
-  constructor(private ea: EventAggregator, private element: Element) {
+  constructor(public ea: EventAggregator, public element: Element, private hlp:Helper) {
   }
 
+  gotMessage(value){
+    this.redraw(value)
+  }
   attached() {
-    if (undefined == this.cfg) {
-      console.log("error! No configuration for multiswitch")
-      throw(new Error("missing configuration"))
-    }
-    this.configure()
-    this.render()
-    this.ea.subscribe(this.cfg.message, value => {
-      this.redraw(value)
-    })
+    this.hlp.check(this)
   }
 
   configure() {
@@ -51,16 +47,9 @@ export class Lineargauge {
   }
 
   render() {
-    this.element.id = "lg_" + this.cfg.message
-    this.body = select("#" + this.element.id).append("svg:svg")
-      .attr("class", "lineargauge")
-      .attr("width", this.cfg.width)
-      .attr("height", this.cfg.height)
-
+    const FRAMEWIDTH=Helper.BORDER
     // draw frame
-    this.rectangle(0, 0, this.cfg.width, this.cfg.height, "frame")
-    this.rectangle(FRAMEWIDTH, FRAMEWIDTH, this.cfg.width - 2 * FRAMEWIDTH, this.cfg.height - 2 * FRAMEWIDTH, "inner")
-    this.body.append("svg:rect")
+    this.hlp.frame(this.body,this)
     const baseline = this.cfg.height - (2 * FRAMEWIDTH) - 2
     // draw colored bands
     this.cfg.bands.forEach(band => {
@@ -100,15 +89,6 @@ export class Lineargauge {
       .style("fill", "grey")
   }
 
-  // helper to add a rectangle
-  rectangle(x, y, w, h, clazz) {
-    this.body.append("svg:rect")
-      .attr("x", x)
-      .attr("y", y)
-      .attr("width", w)
-      .attr("height", h)
-      .classed(clazz, true)
-  }
 
   // helper to add a line
   line(x1, y1, x2, y2, color, width) {
