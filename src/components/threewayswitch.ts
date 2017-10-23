@@ -30,7 +30,7 @@ export class Threewayswitch implements Component {
     this.cfg = Object.assign(this.cfg, {
       width: 180,
       height: 50,
-      event: "tws_clicked"
+      message: "tws_clicked"
     })
   }
 

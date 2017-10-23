@@ -1,4 +1,4 @@
-import {Helper} from './helper'
+import {Helper,Component} from './helper'
 import {autoinject, bindable, noView} from 'aurelia-framework';
 import {EventAggregator} from "aurelia-event-aggregator"
 import {scaleLinear} from "d3-scale";
@@ -9,15 +9,15 @@ const MAX_ANGLE = 300
 
 @autoinject
 @noView
-export class Circulargauge {
+export class Circulargauge implements Component{
   @bindable cfg
   component_name: String = "Circulargauge"
   private scale;
   private arcsize;
   private pointer;
-  private body
+  body
 
-  constructor(private element: Element, private ea: EventAggregator, private hlp: Helper) {
+  constructor(public element: Element, public ea: EventAggregator, private hlp: Helper) {
   }
 
   configure() {
@@ -59,6 +59,7 @@ export class Circulargauge {
       .attr("d", pointer_stroke)
       .classed("pointer", true)
 
+    this.redraw(0)
   }
 
   redraw(newValue) {
@@ -70,7 +71,7 @@ export class Circulargauge {
     let r = ((this.cfg.size / 2) * 0.9 - this.arcsize) * factor
     let x = r * Math.cos(rad)
     let y = r * Math.sin(rad)
-
+    
   }
 
   gotMessage(any) {
