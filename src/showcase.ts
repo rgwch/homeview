@@ -144,5 +144,6 @@ export class Showcase {
       this.counter = 0
     }
     this.ea.publish(this.clock.message)
+    this.ea.publish(this.circular.message,await this.fetcher.fetchValue("fake://cent"))
   }
 }
