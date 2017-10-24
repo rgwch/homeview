@@ -14,6 +14,9 @@ Simple frontend for an ioBroker based home control and automation system.
       cd homeview
       [sudo] npm install -g aurelia-cli
       npm install
+      
+ - copy src/globals_sample.ts to src/globals.ts
+ 
       au run --watch
     
 - point your browser (recommended: chrome) to `localhost:9000/#/showcase`    
