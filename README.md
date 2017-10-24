@@ -17,7 +17,7 @@ Simple frontend for an ioBroker based home control and automation system.
       
  - copy src/globals_sample.ts to src/globals.ts
  
-      au run --watch
+       au run --watch
     
 - point your browser (recommended: chrome) to `localhost:9000/#/showcase`    
 
