@@ -103,7 +103,7 @@ export class Circulargauge implements Component{
   }
 
   attached() {
-    this.hlp.check(this)
+    this.hlp.initialize(this)
   }
 
 }

@@ -19,7 +19,7 @@ export interface Component {
 
 export class Helper {
   static BORDER=5
-  check(component: Component) {
+  initialize(component: Component) {
     if (undefined == component.cfg) {
       console.log(`error! No configuration for ${component.component_name}`)
       throw(new Error("configuration missing for " + component.component_name))
@@ -62,16 +62,26 @@ export class Helper {
   }
 
   // helper to append a text element
-  stringElem(parent:Selection, x, y, size, align) {
+  stringElem(parent:Selection, x, y, size, align,dy=undefined) {
     return parent.append("svg:text")
       .attr("x", x)
       .attr("y", y)
       .attr("text-anchor", align)
-      .attr("dy", size / 2)
+      .attr("dy", dy || size / 2)
       .style("font-size", size + "px")
       .style("fill", "black")
   }
 
+  // helper to add a line
+  line(parent, x1, y1, x2, y2, color, width) {
+    return parent.append("svg:line")
+      .attr("x1", x1)
+      .attr("x2", x2)
+      .attr("y1", y1)
+      .attr("y2", y2)
+      .attr("stroke", color)
+      .attr("stroke-width", width)
+  }
 
   // helper to convert degrees into radiants
   deg2rad(deg) {

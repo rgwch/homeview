@@ -23,7 +23,7 @@ export class Threewayswitch implements Component {
   }
 
   attached() {
-    this.hlp.check(this)
+    this.hlp.initialize(this)
   }
 
   configure() {

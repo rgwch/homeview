@@ -95,7 +95,7 @@ export class Fronius implements Component {
   private zooom
 
   attached() {
-    this.hlp.check(this)
+    this.hlp.initialize(this)
   }
 
 
