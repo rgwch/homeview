@@ -61,6 +61,17 @@ export class Helper {
       })
   }
 
+  // helper to append a text element
+  stringElem(parent:Selection, x, y, size, align) {
+    return parent.append("svg:text")
+      .attr("x", x)
+      .attr("y", y)
+      .attr("text-anchor", align)
+      .attr("dy", size / 2)
+      .style("font-size", size + "px")
+      .style("fill", "black")
+  }
+
 
   // helper to convert degrees into radiants
   deg2rad(deg) {

@@ -121,27 +121,27 @@ export class Doublegauge implements Component {
 
     /* fields for actual measurements in the center of the upper and lower scale */
     let valuesFontSize = Math.round(size / 4)
-    this.upperValue = this.stringElem(center, center - size / 2 + 2,
+    this.upperValue = this.hlp.stringElem(this.body,center, center - size / 2 + 2,
       valuesFontSize, "middle")
-    this.lowerValue = this.stringElem(center, center + size / 2 - 2,
+    this.lowerValue = this.hlp.stringElem(this.body,center, center + size / 2 - 2,
       valuesFontSize, "middle")
 
     let markersFontSize = Math.round(size / 6)
 
     /* write min and max values to the upper scale */
     let lp = this.valueToPoint(this.cfg.upperMin, 0.9, this.upperScale)
-    this.stringElem(center - lp.x, center - lp.y, markersFontSize, "start")
+    this.hlp.stringElem(this.body,center - lp.x, center - lp.y, markersFontSize, "start")
       .text(this.cfg.upperMin)
     lp = this.valueToPoint(this.cfg.upperMax, 0.9, this.upperScale)
-    this.stringElem(center - lp.x, center - lp.y, markersFontSize, "end")
+    this.hlp.stringElem(this.body,center - lp.x, center - lp.y, markersFontSize, "end")
       .text(this.cfg.upperMax)
 
     /* write min and max values to the lower scale */
     lp = this.valueToPoint(this.cfg.lowerMin, 0.9, this.lowerScale)
-    this.stringElem(center + lp.x, center + lp.y, markersFontSize, "start")
+    this.hlp.stringElem(this.body,center + lp.x, center + lp.y, markersFontSize, "start")
       .text(this.cfg.lowerMin)
     lp = this.valueToPoint(this.cfg.lowerMax, 0.9, this.lowerScale)
-    this.stringElem(center + lp.x, center + lp.y, markersFontSize, "end")
+    this.hlp.stringElem(this.body,center + lp.x, center + lp.y, markersFontSize, "end")
       .text(this.cfg.lowerMax)
 
 
@@ -172,16 +172,6 @@ export class Doublegauge implements Component {
 
   }
 
-  // helper to append a text element
-  stringElem(x, y, size, align) {
-    return this.body.append("svg:text")
-      .attr("x", x)
-      .attr("y", y)
-      .attr("text-anchor", align)
-      .attr("dy", size / 2)
-      .style("font-size", size + "px")
-      .style("fill", "black")
-  }
 
   // helper to draw a pointer
   arrow(parent, cx, cy, x, y, color) {

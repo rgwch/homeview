@@ -15,7 +15,7 @@ export class Circulargauge implements Component{
   private scale;
   private arcsize;
   private pointer;
-  private frame
+  private valueText;
   private rotation=360-(MAX_ANGLE-MIN_ANGLE)/2
   body
 
@@ -62,6 +62,7 @@ export class Circulargauge implements Component{
     })
 
     let frame=this.body.append("g")
+      .attr("transform",`translate(${center},${center}) rotate(${this.rotation-90})`)
     this.pointer = frame.append("g")
     this.pointer.append("svg:path")
       .attr("d", pointer_stroke)
@@ -71,10 +72,11 @@ export class Circulargauge implements Component{
       .attr("cy",0)
       .attr("r",4)
 
-    let bbox=this.pointer.node().getBBox()
-    this.hlp.rectangle(this.pointer,bbox.x,bbox.y,bbox.width,bbox.height,"frame").attr("opacity",0.2)
-    this.hlp.rectangle(this.pointer,0,0,10,10).style("color","black")
-    this.pointer .attr("transform",`translate(${center},${center})`)
+    /* fields for actual measurements in the center of the upper and lower scale */
+    let valuesFontSize = Math.round(size / 4)
+    this.valueText = this.hlp.stringElem(this.body,center, center + size / 2 + 2,
+      valuesFontSize, "middle")
+
 
     this.redraw(0)
   }
@@ -86,14 +88,14 @@ export class Circulargauge implements Component{
     let vertical=(360-MAX_ANGLE)
     let zero=vertical-MAX_ANGLE
     let arc = this.scale(newValue)
-    // let rcenter =this.centerToOrigin(this.pointer.node())
-    // this.pointer.attr("transform",`translate(${rcenter.x},${rcenter.y})`)
-    this.pointer .attr("transform",`translate(${center},${center})`)
 
     this.pointer
-      //.transition()
-     // .duration(8000)
-      .attr("transform",`rotate(${this.rotation+arc})`)
+      .transition()
+      .duration(700)
+      .attr("transform",`rotate(${arc})`)
+
+    this.valueText.text(Math.round(newValue))
+
   }
 
   gotMessage(value) {
@@ -103,12 +105,5 @@ export class Circulargauge implements Component{
   attached() {
     this.hlp.check(this)
   }
-  centerToOrigin = (el) =>{
-    let boundingBox = el.getBBox();
-    return {
-      x: -1 * Math.floor(boundingBox.width / 2),
-      y: -1 * Math.floor(boundingBox.height / 2)
-    };
-  };
 
 }
