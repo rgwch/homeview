@@ -5,22 +5,24 @@
 
 import 'whatwg-fetch'
 import globals from '../globals'
-import {range} from 'd3-array'
+import { range } from 'd3-array'
+import {scaleLinear} from 'd3-scale'
+import {Util} from '../services/util'
 
 /**
  * In mock mode: create reasonable random values based on URL patterns
  */
 const KNOWN_SOURCES = [
-  {s: "temperatur", l: -1, u: 36},
-  {s: "humid", l: 20, u: 80},
-  {s: "energy", l: 1000, u: 100000},
-  {s: "power", l: 0, u: 10000},
-  {s: "012", l: 0, u: 2},
-  {s: "cent", l: 0, u: 100}
+  { s: "temperatur", l: -1, u: 36 },
+  { s: "humid", l: 20, u: 80 },
+  { s: "energy", l: 1000, u: 100000 },
+  { s: "power", l: 0, u: 10000 },
+  { s: "012", l: 0, u: 2 },
+  { s: "cent", l: 0, u: 100 }
 ]
 
 export class FetchClient {
-
+  
   public async fetchValue(url) {
     if (globals.mock || url.startsWith("fake")) {
       let upper = 100
@@ -59,8 +61,40 @@ export class FetchClient {
       return result
     })
   }
+  /**
+   * Read new data from an influx database (as defined in global.influx)
+   * @param from -  start timestamp (inlcuded) as unix epoch in ms
+   * @param to  - end timestamp (excluded) as unix epoch in ms
+   * @returns {Promise<{}>}
+   */
+  async getSeries(datapoint: string, from: number, to: number) {
+    const resolution = 400000 //3600000
+    const linearScale = scaleLinear().domain([from / resolution, to / resolution]).range([0, 10000])
+    
+    if (globals.mock) {
+      let dummydata = (f, t) => {
+        return range(Math.round(f / resolution), Math.round(t / resolution)).map(item => {
+          return [item * resolution, linearScale(item)] 
+        })
+      }
+      return {
+        [datapoint]: dummydata(from, to),
+      }
+    } else {
+      const query = `select value from "${datapoint}" where time >= ${from}ms and time < ${to}ms`
+      const sql = Util.urlencode(query)
+      const raw = await this.fetchJson(`${globals.influx}/query?db=iobroker&epoch=ms&precision=ms&q=${sql}`)
+      const ret = {}
+      raw.results.forEach(result => {
+        if (result.series) {
+          result.series.forEach(serie => {
+            ret[serie.name] = serie.values
+          })
+        }
+      })
 
-  fakeSeries(start, end, lower, upper) {
-    return range(start, end, 30000).map(elem => [elem, Math.round(Math.random() * (upper - lower) + lower)])
+      return ret
+    }
   }
+
 }
