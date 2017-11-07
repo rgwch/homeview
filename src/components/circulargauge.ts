@@ -3,6 +3,7 @@ import { autoinject, bindable, noView } from 'aurelia-framework';
 import { EventAggregator } from "aurelia-event-aggregator"
 import { scaleLinear } from "d3-scale";
 import { select, Selection } from 'd3-selection'
+import {timechart} from './timechart'
 import 'd3-transition'
 
 const MIN_ANGLE = 0
