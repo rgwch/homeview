@@ -62,26 +62,33 @@ export class FetchClient {
     })
   }
   /**
-   * Read new data from an influx database (as defined in global.influx)
+   * Read new data from an influx database (as defined in global.influx). If globals.mock is true: renders
+   * a straight line from 0 to 1000
+   * @param datapoint: name of the influx tables to read
    * @param from -  start timestamp (inlcuded) as unix epoch in ms
    * @param to  - end timestamp (excluded) as unix epoch in ms
    * @returns {Promise<{}>}
    */
-  async getSeries(datapoint: string, from: number, to: number) {
-    const resolution = 400000 //3600000
+  async fetchSeries(datapoints: string[], from: number, to: number) {
+    const resolution = 40000 //3600000
     const linearScale = scaleLinear().domain([from / resolution, to / resolution]).range([0, 10000])
     
     if (globals.mock) {
-      let dummydata = (f, t) => {
+      const dummydata = (f, t) => {
         return range(Math.round(f / resolution), Math.round(t / resolution)).map(item => {
           return [item * resolution, linearScale(item)] 
         })
       }
-      return {
-        [datapoint]: dummydata(from, to),
-      }
+      let ret={}
+      datapoints.forEach(dp=>{
+        ret[dp]=dummydata(from,to)
+      })
+      return ret
     } else {
-      const query = `select value from "${datapoint}" where time >= ${from}ms and time < ${to}ms`
+      let query=""
+      datapoints.forEach(pt=>{
+        query +=`select value from "${pt}" where time >= ${from}ms and time < ${to}ms;`
+      })
       const sql = Util.urlencode(query)
       const raw = await this.fetchJson(`${globals.influx}/query?db=iobroker&epoch=ms&precision=ms&q=${sql}`)
       const ret = {}
