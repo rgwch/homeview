@@ -1,4 +1,0 @@
-
-exports.timechart=function(parent){
-
-}

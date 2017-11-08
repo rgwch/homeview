@@ -2,8 +2,7 @@ import { Helper, Component } from './helper'
 import { autoinject, bindable, noView } from 'aurelia-framework';
 import { EventAggregator } from "aurelia-event-aggregator"
 import { scaleLinear } from "d3-scale";
-import { select, Selection } from 'd3-selection'
-import {timechart} from './timechart'
+import {Timechart} from './timechart'
 import 'd3-transition'
 
 const MIN_ANGLE = 0
@@ -21,6 +20,7 @@ export class Circulargauge implements Component {
   private rotation = 360 - (MAX_ANGLE - MIN_ANGLE) / 2
   private expanded
   body
+  private tc:Timechart
 
   constructor(public element: Element, public ea: EventAggregator, private hlp: Helper) {
   }
@@ -35,6 +35,9 @@ export class Circulargauge implements Component {
     this.scale = scaleLinear().domain([this.cfg.min, this.cfg.max]).range([MIN_ANGLE, MAX_ANGLE])
     this.scale.clamp(true)
     this.arcsize = this.cfg.size / 7
+    if(this.cfg.timeSeries){
+      this.tc=new Timechart(this.body)
+    }
   }
 
   render() {
@@ -92,7 +95,7 @@ export class Circulargauge implements Component {
         this.cfg.size - switchpos - Helper.BORDER, switchpos, switchpos, "navbutton")
         .on("click", event => {
           if (this.expanded) {
-            this.expanded.remove()
+            this.tc.attr("display","none")
             this.expanded = undefined
           } else {
             this.expanded = select(this.element).append("svg:svg")
