@@ -1,11 +1,14 @@
 import { select, Selection } from 'd3-selection'
+import {Helper} from './helper'
 
 export class Timechart{
   private body:Selection
   constructor(private element){
-    this.body=select(this.element).append("svg:svg")
-      .attr("width","100%")
-      .attr("height","100%")
+    let w=element.attr("width")
+    this.body=element.append("g")
+      .attr("transform","translate(-40,0)")
+      .append("svg:rect")
+        .classed("inner",true)
   }
   attr(name,value){
     return this.body.attr(name,value)

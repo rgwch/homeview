@@ -35,9 +35,7 @@ export class Circulargauge implements Component {
     this.scale = scaleLinear().domain([this.cfg.min, this.cfg.max]).range([MIN_ANGLE, MAX_ANGLE])
     this.scale.clamp(true)
     this.arcsize = this.cfg.size / 7
-    if(this.cfg.timeSeries){
-      this.tc=new Timechart(this.body)
-    }
+  
   }
 
   render() {
@@ -90,6 +88,9 @@ export class Circulargauge implements Component {
 
     /* Button for expansion of time series */
     if (this.cfg.timeSeries) {
+        this.tc=new Timechart(this.body)
+          .attr("width","300px")
+          .attr("height","100%")
       const switchpos = this.cfg.size / 10
       this.hlp.rectangle(this.body, this.cfg.size - switchpos - Helper.BORDER,
         this.cfg.size - switchpos - Helper.BORDER, switchpos, switchpos, "navbutton")
@@ -98,12 +99,9 @@ export class Circulargauge implements Component {
             this.tc.attr("display","none")
             this.expanded = undefined
           } else {
-            this.expanded = select(this.element).append("svg:svg")
-              .attr("width", this.cfg.size * 2)
-              .attr("height", this.cfg.size)
-              .attr("id", this.component_name + this.cfg.message + "ext")
-            this.hlp.rectangle(this.expanded, 1, 1, this.cfg.size * 2 - 2, this.cfg.size - 2, "inner")
-
+            this.tc.attr("display","block")
+            this.expanded=true
+            this.body.attr("width",this.cfg.size*2)
           }
         })
     }
