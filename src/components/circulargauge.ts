@@ -89,7 +89,7 @@ export class Circulargauge implements Component {
     /* Button for expansion of time series */
     if (this.cfg.timeSeries) {
       this.tc=new Timechart(this.body,0,30)
-      .attr("width","300px")
+      this.tc.attr("width","300px")
       .attr("height","100%")
       .attr("display","none")
       const switchpos = this.cfg.size / 10

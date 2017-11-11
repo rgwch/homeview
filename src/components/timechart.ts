@@ -65,8 +65,8 @@ export class Timechart {
     this.chart.select(".diagonale")
     .attr("x1", "0px")
     .attr("y1", "0px")
-    .attr("x2", "100px")
-    .attr("y2", "100px")
+    .attr("x2", this.body.attr("width"))
+    .attr("y2", this.body.attr("height"))
     .attr("stroke-width", 2)
     .attr("stroke", "green")
 
