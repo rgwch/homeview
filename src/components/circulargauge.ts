@@ -88,12 +88,13 @@ export class Circulargauge implements Component {
 
     /* Button for expansion of time series */
     if (this.cfg.timeSeries) {
-        this.tc=new Timechart(this.body)
-          .attr("width","300px")
-          .attr("height","100%")
+      this.tc=new Timechart(this.body,0,30)
+      .attr("width","300px")
+      .attr("height","100%")
+      .attr("display","none")
       const switchpos = this.cfg.size / 10
-      this.hlp.rectangle(this.body, this.cfg.size - switchpos - Helper.BORDER,
-        this.cfg.size - switchpos - Helper.BORDER, switchpos, switchpos, "navbutton")
+      this.hlp.rectangle(this.body, Helper.BORDER,
+          Helper.BORDER, switchpos, switchpos, "navbutton")
         .on("click", event => {
           if (this.expanded) {
             this.tc.attr("display","none")
@@ -102,6 +103,8 @@ export class Circulargauge implements Component {
             this.tc.attr("display","block")
             this.expanded=true
             this.body.attr("width",this.cfg.size*2)
+            this.tc.draw([])
+            
           }
         })
     }
