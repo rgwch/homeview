@@ -4,6 +4,8 @@ import { EventAggregator } from "aurelia-event-aggregator"
 import { scaleLinear } from "d3-scale";
 import {Timechart} from './timechart'
 import 'd3-transition'
+import { FetchClient } from '../services/fetchclient';
+import globals from '../globals'
 
 const MIN_ANGLE = 0
 const MAX_ANGLE = 300
@@ -22,7 +24,7 @@ export class Circulargauge implements Component {
   body
   private tc:Timechart
 
-  constructor(public element: Element, public ea: EventAggregator, private hlp: Helper) {
+  constructor(public element: Element, public ea: EventAggregator, private hlp: Helper, private fetcher:FetchClient) {
   }
 
   configure() {
@@ -88,7 +90,7 @@ export class Circulargauge implements Component {
 
     /* Button for expansion of time series */
     if (this.cfg.timeSeries) {
-      this.tc=new Timechart(this.body,0,30)
+      this.tc=new Timechart(this.body,{min: 12,max: 28},{min:20,max:80})
       this.tc.attr("width","300px")
       .attr("height","100%")
       .attr("display","none")
@@ -102,8 +104,12 @@ export class Circulargauge implements Component {
           } else {
             this.tc.attr("display","block")
             this.expanded=true
-            this.body.attr("width",this.cfg.size*2)
-            this.tc.draw([])
+            this.tc.attr("width",this.cfg.size+"px")
+            let until=new Date().getTime()
+            let from=until-86400000
+            this.fetcher.fetchSeries([globals._livingroom_temp,globals._livingroom_humidity],from,until).then(result =>{
+              this.tc.draw({left:result[globals._livingroom_temp],right:result[globals._livingroom_humidity]})              
+            })
             
           }
         })
