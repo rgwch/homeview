@@ -90,7 +90,7 @@ export class Circulargauge implements Component {
 
     /* Button for expansion of time series */
     if (this.cfg.timeSeries) {
-      this.tc=new Timechart(this.body,{min: 12,max: 28},{min:20,max:80})
+      this.tc=new Timechart(this.body,{min: 18,max: 28},{min:38,max:50})
       this.tc.attr("width","300px")
       .attr("height","100%")
       .attr("display","none")

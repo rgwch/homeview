@@ -2,6 +2,10 @@ import { select, Selection } from 'd3-selection'
 import { scaleLinear, scaleTime } from "d3-scale";
 import { axisBottom, axisLeft, axisRight } from 'd3-axis'
 import { arc, area as areaGenerator, line as lineGenerator } from 'd3-shape'
+import {format as intFormat} from 'd3-format'
+import {timeFormat, timeFormatLocale} from 'd3-time-format'
+import {timeMinute, timeHour} from 'd3-time'
+
 
 
 import { Helper } from './helper'
@@ -10,14 +14,16 @@ export class Timechart {
   private body: Selection
   private chart
   private xAxis
-  private axes
+  private format = timeFormat("%H:%M")
+  
+  // private axes
   private scales = {
     x: null,
     yl: null,
     yr: null
   }
-  private left_offset = 20
-  private bottom_offset = 20
+  private left_offset = 18
+  private bottom_offset = 18
   constructor(private element, private left, private right) {
     let w = element.attr("width")
     let h = element.attr("height")
@@ -32,46 +38,52 @@ export class Timechart {
       .attr("height", "100%")
 
     this.chart = this.body.append("g")
-    this.axes = this.body.append("g")
 
+    this.scales.x = scaleTime()
+      .domain([start, end])
 
-    this.chart.append("svg:line")
-      .classed("diagonale", true)
-
+      /**
+       * left y scale and Axis
+       */
+    this.scales.yl = scaleLinear()
+      .range([h - Helper.BORDER - this.bottom_offset, Helper.BORDER+8])
+      .domain([left.min, left.max])
     this.chart.append("path")
       .classed("diagram_left", true)
 
-
-    this.scales.x = scaleTime()
-      .range([Helper.BORDER + this.left_offset, w - Helper.BORDER])
-      .domain([start, end])
-    this.scales.yl = scaleLinear()
-      .range([h - Helper.BORDER - this.bottom_offset, Helper.BORDER])
-      .domain([left.min, left.max])
-
     const yAxisLeft = axisLeft().scale(this.scales.yl)
-    this.axes.append("g")
+      .tickFormat(intFormat("d"))
+    this.chart.append("g")
       .classed("yaxis", true)
       .attr("transform", `translate(${this.left_offset + Helper.BORDER},0)`)
       .call(yAxisLeft)
 
-
+      /**
+       * right y scale and axis
+       */
     if (right.max) {
       this.scales.yr = scaleLinear()
-        .range([h - Helper.BORDER - this.bottom_offset, Helper.BORDER])
+        .range([h - Helper.BORDER - this.bottom_offset, Helper.BORDER+8])
         .domain([right.min, right.max])
       this.chart.append("path")
         .classed("diagram_right", true)
       const yAxisRight = axisRight().scale(this.scales.yr)
-      this.axes.append("g")
+      this.chart.append("g")
         .classed("yaxis", true)
-        .attr("transform", `translate(${w - Helper.BORDER-this.left_offset},0)`)
+        .attr("transform", `translate(${w - Helper.BORDER - this.left_offset},0)`)
         .call(yAxisRight)
     }
 
 
+    /**
+     * x scale and axis
+     */
     this.xAxis = axisBottom().scale(this.scales.x)
-    this.axes.append("g")
+    .tickArguments([timeHour.every(6)])
+    //.ticks(5)
+    .tickFormat(this.format)
+
+    this.chart.append("g")
       .classed("xaxis", true)
       .attr("transform", `translate(0,${h - this.bottom_offset - Helper.BORDER})`)
       .call(this.xAxis)
@@ -81,29 +93,21 @@ export class Timechart {
   }
 
   draw(values) {
-    let w = parseInt(this.body.attr("width"))
-    this.scales.x.range([Helper.BORDER + this.left_offset, w - Helper.BORDER])
-    this.axes.select(".xaxis").call(this.xAxis)
-    /*
-    this.chart.select(".diagonale")
-    .attr("x1", "0px")
-    .attr("y1", "0px")
-    .attr("x2", w+"px")
-    .attr("y2", this.body.attr("height"))
-    .attr("stroke-width", 2)
-    .attr("stroke", "green")
-  */
-    const lineGrid = lineGenerator()
-      .x(d => this.scales.x(d[0]))
-      .y(d => this.scales.yl(d[1]))
-    this.chart.select(".diagram_left").datum(values.left).attr("d", lineGrid)
-
+    let w = parseInt(this.body.attr("width")) - Helper.BORDER-(this.right.max ? this.left_offset:0)
+    this.scales.x.range([Helper.BORDER + this.left_offset, w])   
     if (this.right.max) {
-      const line2 = lineGenerator()
+      const lineRight = lineGenerator()
         .x(d => this.scales.x(d[0]))
         .y(d => this.scales.yr(d[1]))
-      this.chart.select(".diagram_right").datum(values.right).attr("d", line2)
+      this.chart.select(".diagram_right").datum(values.right).attr("d", lineRight)
     }
+    const lineLeft = lineGenerator()
+      .x(d => this.scales.x(d[0]))
+      .y(d => this.scales.yl(d[1]))
+    this.chart.select(".diagram_left").datum(values.left).attr("d", lineLeft)
+
+    this.chart.select(".xaxis").call(this.xAxis)
+
   }
 
   attr(name, value) {
