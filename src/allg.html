@@ -16,10 +16,11 @@
       Haustür
       <multiswitch cfg.bind="l.tuerlicht"></multiswitch>
     </div>
-    <div class="tile" id="${l.esszimmer.id}" >
+    
+    <!-- div class="tile" id="${l.esszimmer.id}" >
       Esszimmer
       <multiswitch cfg.bind="l.esszimmer"></multiswitch>
-    </div>
+    </div -->
     <div class="tile" id="${l.korridor.id}" >
       Korridor
       <multiswitch cfg.bind="l.korridor"></multiswitch>
@@ -49,6 +50,11 @@
       Badezimmer
       <doublegauge cfg.bind="l.bathroom_gauge"></doublegauge>
     </div>
+    <div class="tile" id="${l.shower_gauge.id}">
+      Dusche
+      <doublegauge cfg.bind="l.shower_gauge"></doublegauge>
+    </div>
+  
     <div id="${l.light_sensor.id}" class="halftile">
       <verticalgauge cfg.bind="l.light_sensor"></verticalgauge>
     </div>

@@ -75,10 +75,12 @@ export class Layout {
     message: "wlanextender_state", id: "wlanext",
     val: global._wlan_state, switch: global._wlan_state
   }, this.two_buttons_def, {map: {0: 0, 1: 1}})
+  /*
   esszimmer = Object.assign({
     message: "esszimmer_state", id: "esszimmer",
     val: global._diningroom_light, statefun: this.lightify
   }, this.two_buttons_def)
+  */
   korridor = Object.assign({
     message: "korridor_state", id: "korridor",
     val: global._corridor_light, statefun: this.lightify
@@ -135,6 +137,17 @@ export class Layout {
     vals: {
       upper: global._bathroom_temp,
       lower: global._bathroom_humidity
+    },
+    upperBands: [{from: 16, to: 21, color: "#bff7ff"}, {from: 21, to: 25, color: "#109618"},
+      {from: 25, to: 30, color: "#DC3912"}]
+  })
+
+  shower_gauge = Object.assign({}, this.livingroom_gauge, {
+    message: "shower_data_update",
+    id: "shower_climate",
+    vals: {
+      upper: global._shower_temp,
+      lower: global._shower_humidity
     },
     upperBands: [{from: 16, to: 21, color: "#bff7ff"}, {from: 21, to: 25, color: "#109618"},
       {from: 25, to: 30, color: "#DC3912"}]

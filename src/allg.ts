@@ -72,10 +72,10 @@ export class Allg {
     let l = this.l
     clearTimeout(this.resize_throttle)
     this.resize_throttle = setTimeout(() => {
-      const elems = [l.treppenlicht, l.tuerlicht, l.esszimmer, l.korridor, l.fernsehlicht, this.l.autolader,
-        this.l.wlanext, this.l.mediacenter, "skip", this.l.light_sensor, this.l.pv_energy, this.l.energy_flow,
-        this.l.outside_gauge, this.l.livingroom_gauge, this.l.bathroom_gauge, "skip", this.l.fronius_cfg]
-
+      
+      const elems = [l.treppenlicht, l.tuerlicht, /*l.esszimmer,*/ l.korridor, l.fernsehlicht, this.l.autolader,
+        this.l.wlanext, this.l.mediacenter, "skip", this.l.light_sensor, this.l.pv_energy, this.l.energy_flow,this.l.outside_gauge, this.l.livingroom_gauge, this.l.bathroom_gauge, this.l.shower_gauge, "skip", this.l.fronius_cfg]
+    
       const innerWidth = window.innerWidth
       let elemWidth = 180
       let numCols = 4
@@ -127,11 +127,11 @@ export class Allg {
     this.resize_throttle = setTimeout(() => {
       const innerWidth = window.innerWidth // Math.min(window.innerWidth,1000)
       // define all elements to display (from layout.ts). Must also reside in the html
-      const elems = [l.treppenlicht.id, l.tuerlicht.id, l.esszimmer.id,
+      const elems = [l.treppenlicht.id, l.tuerlicht.id, /*l.esszimmer.id, */
         l.korridor.id, l.fernsehlicht.id,
         this.l.autolader.id, this.l.wlanext.id, this.l.mediacenter.id, "skip", this.l.light_sensor.id, this.l.pv_energy.id,
-        this.l.energy_flow.id, this.l.outside_gauge.id,
-        this.l.livingroom_gauge.id, this.l.bathroom_gauge.id, "skip", this.l.fronius_cfg.id]
+        this.l.energy_flow.id, "skip", this.l.outside_gauge.id,
+        this.l.livingroom_gauge.id, this.l.bathroom_gauge.id, this.l.shower_gauge.id,"skip", this.l.fronius_cfg.id]
       let lastElem
       let nextRow = 0
       let y = 0
