@@ -152,6 +152,16 @@ export class Layout {
     upperBands: [{from: 16, to: 21, color: "#bff7ff"}, {from: 21, to: 25, color: "#109618"},
       {from: 25, to: 30, color: "#DC3912"}]
   })
+  upstairs_gauge = Object.assign({}, this.livingroom_gauge, {
+    message: "upstairs_data_update",
+    id: "upstairs_climate",
+    vals: {
+      upper: global._upstairs_temp,
+      lower: global._upstairs_humidity
+    },
+    upperBands: [{from: 16, to: 21, color: "#bff7ff"}, {from: 21, to: 25, color: "#109618"},
+      {from: 25, to: 30, color: "#DC3912"}]
+  })
 
   vertical_sensors = {
     type: "gauge",
