@@ -1,0 +1,4 @@
+#! /bin/bash
+
+au build --env prod
+scp -r scripts index.html myname@homeview.local:serve/public/homeview
